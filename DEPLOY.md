@@ -1,0 +1,34 @@
+# Онлайн: GitHub + Vercel + Aiven Postgres
+
+Приложение уже можно выложить на Vercel. Общая база (все видят одни задачи) появится после Aiven.
+
+## 1. GitHub
+Репозиторий создаётся командой (или вручную: github.com/new).
+
+## 2. Aiven — бесплатный Postgres
+1. Открой https://console.aiven.io/signup
+2. Google / GitHub, план **Free / Hobby** если есть, иначе самый дешёвый PostgreSQL.
+3. Create service → **PostgreSQL** → облако ближе к тебе.
+4. Service → **Connection information** → скопируй **Service URI**
+   `postgresql://avnadmin:...@....aivencloud.com:PORT/defaultdb?sslmode=require`
+
+## 3. Таблицы и сид
+Локально в папке `web`:
+
+```bash
+cd web
+echo 'DATABASE_URL="вставь-uri-aiven"' > .env
+npx prisma db push
+# затем в браузере или curl:
+curl -X POST https://ТВОЙ-ДОМЕН/api/state -H 'content-type: application/json' -d '{"reset":true}'
+```
+
+## 4. Vercel
+1. vercel.com → Import GitHub repo
+2. **Root Directory:** `web`
+3. Environment Variable: `DATABASE_URL` = тот же URI Aiven
+4. Deploy
+
+Логины как на экране входа: **1111 / 1111** Owner, **2222 / 2222** Armen, …
+
+Пока `DATABASE_URL` нет — сайт живёт, данные остаются в браузере (localStorage).

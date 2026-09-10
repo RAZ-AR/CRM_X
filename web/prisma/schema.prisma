@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id
+  email       String   @unique
+  password    String
+  name        String
+  role        String
+  zone        String?
+  title       String
+  avatar      String
+  permissions Json
+  boardZones  Json
+}
+
+model Zone {
+  slug      String @id
+  name      String
+  emoji     String
+  color     String
+  deadline  String
+  readiness Json
+}
+
+model Task {
+  id             String  @id
+  title          String
+  description    String  @default("")
+  zone           String
+  zones          Json
+  assigneeId     String
+  authorId       String
+  participantIds Json
+  startDate      String
+  due            String
+  priority       String
+  status         String
+  weight         Int     @default(1)
+  criticalPath   Boolean @default(false)
+  result         String  @default("")
+  createdAt      String
+  attachments    Json
+  code           String  @default("")
+  wave           String  @default("")
+  workstream     String  @default("")
+  dependsOn      Json
+}
+
+model Comment {
+  id        String @id
+  taskId    String
+  userId    String
+  text      String
+  createdAt String
+}
+
+model Subtask {
+  id     String  @id
+  taskId String
+  title  String
+  done   Boolean @default(false)
+}
+
+model WikiPage {
+  id         String @id
+  title      String
+  body       String
+  zone       String
+  visibility String
+}
+
+model Contact {
+  id      String @id
+  name    String
+  company String @default("")
+  title   String @default("")
+  phone   String @default("")
+  email   String @default("")
+  zone    String
+  kind    String
+}
+
+model Notice {
+  id        String  @id
+  userId    String
+  text      String
+  taskId    String?
+  createdAt String
+  read      Boolean @default(false)
+}

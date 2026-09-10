@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #ececee;
+  --ink: #111111;
+  --mint: #2bb673;
+  --coral: #e86a4a;
+  --lavender: #6b7cff;
+  --soft: #f4f4f6;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.card {
+  background: white;
+  border-radius: 24px;
+}
+
+.pill {
+  border-radius: 999px;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  background: white;
+  color: inherit;
+  font: inherit;
+}
+
+textarea {
+  border-radius: 1rem;
+}
