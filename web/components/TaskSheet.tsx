@@ -21,6 +21,7 @@ export function TaskSheet({
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState("");
   const [sub, setSub] = useState("");
+  const [pendingStatus, setPendingStatus] = useState<null | import("@/lib/types").TaskStatus>(null);
   if (!current) return null;
   const task = tasks.find((t) => t.id === taskId);
   if (!task || !canSeeTask(current, task)) {
@@ -89,17 +90,37 @@ export function TaskSheet({
         <div>
           <div className="text-xs text-[#9a9aa0] mb-2">Статус</div>
           <div className="flex flex-wrap gap-1.5">
-            {columns.map((c) => (
+            {columns.map((c) => {
+              const on = (pendingStatus ?? task.status) === c;
+              return (
               <button
                 key={c}
                 type="button"
-                onClick={() => updateTask(task.id, { status: c })}
-                className={`pill px-3 py-1.5 text-xs ${task.status === c ? "bg-black text-white" : "bg-[#f4f4f6]"}`}
+                onClick={() => setPendingStatus(c === task.status ? null : c)}
+                className={`pill px-3 py-1.5 text-xs ${on ? "bg-black text-white" : "bg-[#f4f4f6]"}`}
               >
                 {statusMeta[c].emoji} {statusMeta[c].label}
               </button>
-            ))}
+            );})}
           </div>
+          {pendingStatus && pendingStatus !== task.status && (
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                className="pill bg-black text-white px-4 py-2 text-sm flex-1"
+                onClick={() => {
+                  updateTask(task.id, { status: pendingStatus });
+                  setPendingStatus(null);
+                  onClose?.();
+                }}
+              >
+                Сохранить · {statusMeta[pendingStatus].label}
+              </button>
+              <button type="button" className="pill bg-[#f4f4f6] px-4 py-2 text-sm" onClick={() => setPendingStatus(null)}>
+                Отмена
+              </button>
+            </div>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <Meta k="Исполнитель" v={assignee?.name ?? "—"} />
