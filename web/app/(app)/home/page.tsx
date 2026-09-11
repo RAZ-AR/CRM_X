@@ -57,7 +57,7 @@ export default function HomePage() {
 
   return (
     <div className="grid xl:grid-cols-12 gap-4">
-      <section className="xl:col-span-7 bg-[#f4f4f6] rounded-[24px] p-5">
+      <section className="xl:col-span-7 bg-[#f4f4f6] rounded-[24px] p-4 md:p-5">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-semibold">Сегодня</h3>
           <Link href="/kanban" className="text-sm text-[#9a9aa0]">Доска ›</Link>
@@ -97,7 +97,7 @@ export default function HomePage() {
         )}
       </section>
 
-      <section className="xl:col-span-5 bg-white rounded-[24px] p-5 border border-black/5">
+      <section className="xl:col-span-5 bg-white rounded-[24px] p-4 md:p-5 border border-black/5">
         <div className="flex justify-between mb-3">
           <h3 className="font-semibold">Календарь</h3>
           <span className="text-sm text-[#9a9aa0]">{now.toLocaleDateString("ru-RU", { month: "long" })}</span>

@@ -40,7 +40,7 @@ export function TaskSheet({
   const files = task.attachments ?? [];
 
   return (
-    <div className="bg-white rounded-[28px] overflow-hidden max-h-[90vh] flex flex-col shadow-2xl">
+    <div className="bg-white rounded-t-[24px] md:rounded-[28px] overflow-hidden max-h-[92dvh] flex flex-col shadow-2xl">
       <div className="h-3" style={{ background: accent }} />
       <div className="px-7 pt-5 pb-3 flex items-start gap-3">
         <div className="flex-1 min-w-0">
@@ -216,8 +216,8 @@ export function TaskModal() {
   const { previewId, setPreviewId } = useStore();
   if (!previewId) return null;
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 grid place-items-center p-4" onClick={() => setPreviewId(null)}>
-      <div className="w-full max-w-xl" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 bg-black/40 grid place-items-end md:place-items-center p-0 md:p-4" onClick={() => setPreviewId(null)}>
+      <div className="w-full max-w-xl max-h-[92dvh] md:max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         <TaskSheet taskId={previewId} onClose={() => setPreviewId(null)} />
       </div>
     </div>

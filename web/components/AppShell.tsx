@@ -6,16 +6,17 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
   BookOpen,
-  Calendar,
   CheckSquare,
   Contact,
   Home,
   Kanban,
   LayoutGrid,
   LogOut,
+  Menu,
   Search,
   Settings,
   Users,
+  X,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { cpoNav, employeeNav, isCpo } from "@/lib/access";
@@ -37,11 +38,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
   const [bell, setBell] = useState(false);
+  const [menu, setMenu] = useState(false);
   const [q, setQ] = useState("");
 
   useEffect(() => {
     if (!current) router.replace("/login");
   }, [current, router]);
+  useEffect(() => {
+    setMenu(false);
+    setBell(false);
+  }, [path]);
   if (!current) return null;
 
   const nav = isCpo(current) ? cpoNav() : employeeNav(current);
@@ -49,9 +55,30 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const unread = mine.filter((n) => !n.read).length;
   const team = users.filter((u) => u.id !== current.id).slice(0, 5);
 
+  const navList = (
+    <nav className="flex flex-col gap-1 flex-1">
+      {nav.map((n) => {
+        const on = path === n.href || (n.href.startsWith("/kanban") && path === "/kanban");
+        return (
+          <Link
+            key={n.href}
+            href={n.href}
+            className={clsx(
+              "flex items-center gap-3 px-4 py-2.5 rounded-full text-sm",
+              on ? "bg-black text-white" : "text-[#6b6b70] hover:bg-[#f4f4f6]",
+            )}
+          >
+            {icons[n.icon]}
+            {n.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+
   return (
-    <div className="min-h-screen p-3 md:p-5">
-      <div className="bg-white rounded-[28px] min-h-[calc(100vh-2.5rem)] md:grid md:grid-cols-[240px_1fr] overflow-hidden">
+    <div className="min-h-dvh md:p-5 bg-[#ececee]">
+      <div className="bg-white md:rounded-[28px] min-h-dvh md:min-h-[calc(100dvh-2.5rem)] md:grid md:grid-cols-[240px_1fr] overflow-hidden">
         <aside className="hidden md:flex flex-col p-6 border-r border-black/5">
           <Link href="/home" className="flex items-center gap-2 mb-8">
             <span className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#2bb673] to-[#6b7cff] grid place-items-center text-white text-xs font-bold">
@@ -66,37 +93,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </h2>
           )}
           <div className="text-[11px] tracking-widest text-[#9a9aa0] mb-2">MENU</div>
-          <nav className="flex flex-col gap-1 flex-1">
-            {nav.map((n) => {
-              const on = path === n.href;
-              return (
-                <Link
-                  key={n.href}
-                  href={n.href}
-                  className={clsx(
-                    "flex items-center gap-3 px-4 py-2.5 rounded-full text-sm",
-                    on ? "bg-black text-white" : "text-[#6b6b70] hover:bg-[#f4f4f6]",
-                  )}
-                >
-                  {icons[n.icon]}
-                  {n.label}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="flex -space-x-2 mb-4">
+          {navList}
+          <div className="flex -space-x-2 mb-4 mt-4">
             {team.map((u) => (
-              <span
-                key={u.id}
-                title={u.name}
-                className="h-9 w-9 rounded-full bg-[#f4f4f6] border-2 border-white grid place-items-center text-xs font-semibold"
-              >
+              <span key={u.id} className="h-9 w-9 rounded-full bg-[#f4f4f6] border-2 border-white grid place-items-center text-xs font-semibold">
                 {u.avatar}
               </span>
             ))}
-            <span className="h-9 w-9 rounded-full bg-white border border-dashed border-[#ccc] grid place-items-center text-[10px] text-[#9a9aa0]">
-              {users.length}+
-            </span>
           </div>
           {isCpo(current) && (
             <Link href="/settings" className="flex items-center gap-2 text-sm text-[#6b6b70] py-1">
@@ -114,42 +117,66 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </button>
         </aside>
 
-        <div className="min-w-0 flex flex-col">
-          <header className="relative flex items-center gap-3 px-6 py-4">
-            <div className="flex-1 flex items-center gap-2 bg-[#f4f4f6] rounded-full px-4 h-11">
-              <Search size={16} className="text-[#9a9aa0]" />
+        {menu && (
+          <div className="md:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setMenu(false)}>
+            <div className="absolute left-0 top-0 bottom-0 w-[80%] max-w-xs bg-white p-5 flex flex-col" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-between items-center mb-6">
+                <Link href="/home" className="flex items-center gap-2 font-semibold" onClick={() => setMenu(false)}>
+                  <span className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#2bb673] to-[#6b7cff] grid place-items-center text-white text-xs">X</span>
+                  CRM X
+                </Link>
+                <button onClick={() => setMenu(false)} className="h-9 w-9 grid place-items-center rounded-full bg-[#f4f4f6]">
+                  <X size={18} />
+                </button>
+              </div>
+              {navList}
+              <button
+                className="mt-4 text-left text-sm text-[#6b6b70]"
+                onClick={() => {
+                  logout();
+                  router.push("/login");
+                }}
+              >
+                Выйти
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="min-w-0 flex flex-col pb-16 md:pb-0">
+          <header className="relative flex items-center gap-2 px-3 py-3 md:px-6 md:py-4">
+            <button className="md:hidden h-10 w-10 rounded-full bg-[#f4f4f6] grid place-items-center shrink-0" onClick={() => setMenu(true)}>
+              <Menu size={18} />
+            </button>
+            <Link href="/home" className="md:hidden font-semibold text-sm shrink-0">CRM X</Link>
+            <div className="flex-1 flex items-center gap-2 bg-[#f4f4f6] rounded-full px-3 h-10 md:h-11 min-w-0">
+              <Search size={16} className="text-[#9a9aa0] shrink-0" />
               <input
-                className="flex-1 bg-transparent border-0 rounded-none px-0 py-0"
+                className="flex-1 bg-transparent border-0 rounded-none px-0 py-0 min-w-0 text-sm"
                 placeholder="Поиск…"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") router.push("/tasks");
+                  if (e.key === "Enter") router.push("/kanban");
                 }}
               />
             </div>
             <button
-              className="h-11 w-11 rounded-full bg-[#f4f4f6] grid place-items-center relative"
+              className="h-10 w-10 md:h-11 md:w-11 rounded-full bg-[#f4f4f6] grid place-items-center relative shrink-0"
               onClick={() => setBell((v) => !v)}
             >
               <Bell size={18} />
               {unread > 0 && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#e86a4a] text-white text-[10px]">
+                <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-[#e86a4a] text-white text-[10px]">
                   {unread}
                 </span>
               )}
             </button>
-            <div className="flex items-center gap-2 pl-1">
-              <span className="h-10 w-10 rounded-full bg-[#d4f5e4] grid place-items-center font-semibold">
-                {current.avatar}
-              </span>
-              <div className="hidden sm:block text-sm">
-                <div className="font-semibold leading-tight">{current.name}</div>
-                <div className="text-[#9a9aa0] text-xs">{current.title}</div>
-              </div>
-            </div>
+            <span className="hidden sm:grid h-10 w-10 rounded-full bg-[#d4f5e4] place-items-center font-semibold shrink-0">
+              {current.avatar}
+            </span>
             {bell && (
-              <div className="absolute right-8 top-20 w-80 max-h-96 overflow-auto bg-white rounded-2xl shadow-lg z-20 p-2 border border-black/5">
+              <div className="absolute right-3 top-14 w-[min(20rem,calc(100vw-1.5rem))] max-h-80 overflow-auto bg-white rounded-2xl shadow-lg z-30 p-2 border border-black/5">
                 <div className="flex justify-between px-2 py-1 text-xs text-[#9a9aa0]">
                   <span>Уведомления</span>
                   <button onClick={markAllRead}>прочитать все</button>
@@ -173,10 +200,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </div>
             )}
           </header>
-          <main className="flex-1 px-6 pb-6">{children}</main>
-        <TaskModal />
+          <main className="flex-1 px-3 pb-4 md:px-6 md:pb-6 min-w-0">{children}</main>
+          <TaskModal />
         </div>
       </div>
+
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-black/5 grid grid-cols-4 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] z-30">
+        <Link href="/home" className={clsx("flex flex-col items-center gap-0.5 text-[11px]", path === "/home" ? "text-black font-semibold" : "text-[#9a9aa0]")}>
+          <Home size={20} /> Главная
+        </Link>
+        <Link href="/kanban" className={clsx("flex flex-col items-center gap-0.5 text-[11px]", path === "/kanban" ? "text-black font-semibold" : "text-[#9a9aa0]")}>
+          <Kanban size={20} /> Доска
+        </Link>
+        <button type="button" className="flex flex-col items-center gap-0.5 text-[11px] text-[#9a9aa0]" onClick={() => setBell(true)}>
+          <Bell size={20} /> События
+        </button>
+        <button type="button" className="flex flex-col items-center gap-0.5 text-[11px] text-[#9a9aa0]" onClick={() => setMenu(true)}>
+          <Menu size={20} /> Меню
+        </button>
+      </nav>
     </div>
   );
 }

@@ -59,10 +59,10 @@ export default function KanbanPage() {
           onClose={() => setOpen(false)}
         />
       )}
-      <div className="overflow-x-auto pb-4">
-        <div className="flex gap-3 min-w-[1100px]">
+      <div className="overflow-x-auto pb-4 -mx-3 px-3 snap-x snap-mandatory">
+        <div className="flex gap-3 min-w-0 md:min-w-[1100px]">
           {columns.map((col) => (
-            <div key={col} className="card p-3 w-52 flex-1">
+            <div key={col} className="card p-3 w-[85vw] max-w-[320px] md:w-52 md:max-w-none md:flex-1 shrink-0 snap-center">
               <div className="text-sm font-medium mb-2 px-1">
                 {statusMeta[col].emoji} {statusMeta[col].label}
                 {col === "todo" ? " · бэклог" : ""}
