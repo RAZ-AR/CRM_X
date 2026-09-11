@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { canEditTask, canSeeTask, columns, statusMeta, taskZones } from "@/lib/access";
+import { canEditTask, canSeeTask, columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
 import { filesToAttachments } from "@/lib/files";
 import type { Priority } from "@/lib/types";
-import { X } from "lucide-react";
+import { Flame, X } from "lucide-react";
 
 export function TaskSheet({
   taskId,
@@ -64,7 +64,10 @@ export function TaskSheet({
               onBlur={(e) => e.target.value && updateTask(task.id, { title: e.target.value })}
             />
           ) : (
-            <h1 className="text-2xl font-bold leading-tight">{task.title}</h1>
+            <h1 className="text-2xl font-bold leading-tight flex items-start gap-2">
+              {isOverdue(task) && <Flame className="text-[#e86a4a] shrink-0 mt-1" />}
+              <span>{task.title}</span>
+            </h1>
           )}
         </div>
         {canEdit && (

@@ -1,8 +1,9 @@
 "use client";
 
-import { columns, statusMeta, taskZones } from "@/lib/access";
+import { columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
 import { useStore } from "@/lib/store";
 import type { Task, User, Zone } from "@/lib/types";
+import { Flame } from "lucide-react";
 
 export function TaskCard({
   task,
@@ -26,7 +27,10 @@ export function TaskCard({
       onDragStart={(e) => e.dataTransfer.setData("id", task.id)}
     >
       <button type="button" className="block w-full text-left" onClick={() => setPreviewId(task.id)}>
-        <div className="font-medium leading-snug">{task.title}</div>
+        <div className="font-medium leading-snug flex items-start gap-1">
+          {isOverdue(task) && <Flame size={16} className="text-[#e86a4a] shrink-0 mt-0.5" />}
+          <span>{task.title}</span>
+        </div>
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           {task.code && <span className="text-[10px] text-[#9a9aa0]">{task.code}</span>}
           {task.wave && <span className="pill bg-black text-white px-1.5 py-0.5 text-[10px]">{task.wave}</span>}

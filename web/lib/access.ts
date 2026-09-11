@@ -81,9 +81,27 @@ export function weightedProgress(tasks: Task[]) {
   return Math.round((done / total) * 100);
 }
 
-export function isOverdue(task: Task) {
+export function isOverdue(task: Task, onDate?: string) {
   if (task.status === "done") return false;
-  return task.due < new Date().toISOString().slice(0, 10);
+  const d = onDate || new Date().toISOString().slice(0, 10);
+  return task.due < d;
+}
+
+/** Старт уже наступил (или раньше), задача не закрыта. */
+export function isActual(task: Task, onDate?: string) {
+  if (task.status === "done") return false;
+  const d = onDate || new Date().toISOString().slice(0, 10);
+  const start = task.startDate || task.due;
+  return start <= d;
+}
+
+export function sortActual<T extends Task>(tasks: T[], onDate?: string) {
+  return [...tasks].sort((a, b) => {
+    const ao = isOverdue(a, onDate) ? 0 : 1;
+    const bo = isOverdue(b, onDate) ? 0 : 1;
+    if (ao !== bo) return ao - bo;
+    return a.due.localeCompare(b.due);
+  });
 }
 
 export function formatToday(d = new Date()) {

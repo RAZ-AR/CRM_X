@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { canSeeTask, isOverdue, taskZones } from "@/lib/access";
+import { canSeeTask, isActual, isOverdue, sortActual, taskZones } from "@/lib/access";
 import { zoneReadiness } from "@/lib/readiness";
 import { FitnessRings } from "@/components/FitnessRings";
 import { TaskCard } from "@/components/TaskCard";
@@ -21,7 +21,7 @@ export default function HomePage() {
 
   const visible = tasks.filter((t) => canSeeTask(current, t));
   const zoneList = zones;
-  const dayTasks = visible.filter((t) => t.due === picked && t.status !== "done");
+  const dayTasks = sortActual(visible.filter((t) => isActual(t, picked)), picked);
 
   const month = now.getMonth();
   const year = now.getFullYear();
@@ -31,13 +31,10 @@ export default function HomePage() {
   const prefix = `${year}-${String(month + 1).padStart(2, "0")}`;
   const dueDays = new Set(visible.filter((t) => t.due.startsWith(prefix)).map((t) => Number(t.due.slice(8, 10))));
   const overdueDays = new Set(
-    visible.filter(isOverdue).filter((t) => t.due.startsWith(prefix)).map((t) => Number(t.due.slice(8, 10))),
+    visible.filter((t) => isOverdue(t)).filter((t) => t.due.startsWith(prefix)).map((t) => Number(t.due.slice(8, 10))),
   );
 
-  const roadmapTasks = visible
-    .filter((t) => t.status !== "done")
-    .slice()
-    .sort((a, b) => (a.startDate || a.due).localeCompare(b.startDate || b.due));
+  const roadmapTasks = sortActual(visible.filter((t) => t.status !== "done"));
 
   const minD = "2026-09-10";
   const maxD = "2027-01-15";

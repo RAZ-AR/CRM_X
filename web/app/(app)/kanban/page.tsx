@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { canSeeTask, columns, statusMeta } from "@/lib/access";
+import { canSeeTask, columns, sortActual, statusMeta } from "@/lib/access";
 import { AddTaskModal } from "@/components/AddTaskModal";
 import { TaskCard } from "@/components/TaskCard";
 import type { ZoneSlug } from "@/lib/types";
@@ -23,7 +23,7 @@ export default function KanbanPage() {
   }, []);
 
   if (!current) return null;
-  let list = tasks.filter((t) => canSeeTask(current, t));
+  let list = sortActual(tasks.filter((t) => canSeeTask(current, t)));
   if (zone !== "all") list = list.filter((t) => t.zone === zone);
   if (due) list = list.filter((t) => t.due === due);
   const zobj = zones.find((z) => z.slug === zone);
