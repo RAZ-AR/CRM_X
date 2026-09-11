@@ -95,6 +95,32 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(KEY, JSON.stringify(state));
   }, [state, ready]);
 
+  useEffect(() => {
+    if (!ready || !current) return;
+    const today = new Date().toISOString().slice(0, 10);
+    setState((s) => {
+      const extra: Notice[] = [];
+      for (const task of s.tasks) {
+        if (task.status === "done" || task.due >= today) continue;
+        const exists = (s.notices ?? []).some(
+          (n) => n.userId === current.id && n.taskId === task.id && n.kind === "deadline",
+        );
+        if (exists) continue;
+        extra.push({
+          id: `n-${crypto.randomUUID().slice(0, 8)}`,
+          userId: current.id,
+          text: `Просрочено: ${task.title}`,
+          taskId: task.id,
+          createdAt: new Date().toISOString(),
+          read: false,
+          kind: "deadline",
+        });
+      }
+      if (!extra.length) return s;
+      return { ...s, notices: [...extra, ...(s.notices ?? [])] };
+    });
+  }, [ready, current?.id]);
+
   const login = useCallback(
     (email: string, password: string) => {
       const u = state.users.find(
@@ -113,18 +139,38 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem(USER_KEY);
   }, []);
 
-  const pushNotice = (userId: string, text: string, taskId?: string) => {
-    if (!userId) return;
-    const n: Notice = {
-      id: `n-${crypto.randomUUID().slice(0, 8)}`,
-      userId,
-      text,
-      taskId,
-      createdAt: new Date().toISOString(),
-      read: false,
-      kind: "task_new",
-    };
-    setState((s) => ({ ...s, notices: [n, ...(s.notices ?? [])] }));
+  const pushNotices = (
+    s: AppState,
+    task: Task,
+    actorId: string | undefined,
+    actorName: string,
+    kind: Notice["kind"],
+    textOther: string,
+    textSelf?: string,
+  ) => {
+    const zs = task.zones?.length ? task.zones : task.zone ? [task.zone] : [];
+    const ids = new Set<string>();
+    ids.add(task.authorId);
+    ids.add(task.assigneeId);
+    for (const u of s.users) {
+      if (u.role === "cpo") ids.add(u.id);
+      const boards = u.boardZones ?? [];
+      if (zs.some((z) => boards.includes(z))) ids.add(u.id);
+    }
+    const extra: Notice[] = [];
+    for (const uid of ids) {
+      if (!uid) continue;
+      extra.push({
+        id: `n-${crypto.randomUUID().slice(0, 8)}`,
+        userId: uid,
+        text: uid === actorId ? (textSelf || textOther) : textOther,
+        taskId: task.id,
+        createdAt: new Date().toISOString(),
+        read: false,
+        kind,
+      });
+    }
+    return extra;
   };
 
   const addTask = useCallback((t: Omit<Task, "id" | "createdAt">) => {
@@ -140,14 +186,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       id: `t-${crypto.randomUUID().slice(0, 8)}`,
       createdAt: new Date().toISOString().slice(0, 10),
     };
-    setState((s) => ({ ...s, tasks: [task, ...s.tasks] }));
-    if (t.assigneeId && t.assigneeId !== current?.id) {
-      pushNotice(t.assigneeId, `Вас назначили: ${t.title}`, task.id);
-    }
-    const cpo = state.users.find((u) => u.role === "cpo");
-    if (cpo && cpo.id !== current?.id) {
-      pushNotice(cpo.id, `Новая задача: ${t.title}`, task.id);
-    }
+    setState((s) => {
+      const extra = pushNotices(
+        { ...s, tasks: [task, ...s.tasks] },
+        task,
+        current?.id,
+        current?.name || "",
+        "task_new",
+        `${current?.name || "Кто-то"} создал задачу: ${task.title}`,
+        `Вы создали задачу: ${task.title}`,
+      );
+      return { ...s, tasks: [task, ...s.tasks], notices: [...extra, ...(s.notices ?? [])] };
+    });
     return task.id;
   }, [current, state.users]);
 
@@ -159,24 +209,33 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
     setState((s) => {
       const t = s.tasks.find((x) => x.id === id);
-      if (!t) return s;
-      const extra: Notice[] = [];
-      const mk = (userId: string, text: string, kind: Notice["kind"] = "status"): Notice => ({
-        id: `n-${crypto.randomUUID().slice(0, 8)}`,
-        userId,
-        text,
-        taskId: id,
-        createdAt: new Date().toISOString(),
-        read: false,
-        kind,
-      });
-      if (patch.status && current) {
-        for (const uid of new Set([t.authorId, t.assigneeId])) {
-          if (uid !== current.id) extra.push(mk(uid, `${current.name} сменил статус: ${t.title}`));
-        }
+      if (!t || !current) return s;
+      let extra: Notice[] = [];
+      if (patch.status) {
+        extra = extra.concat(
+          pushNotices(
+            s,
+            t,
+            current.id,
+            current.name,
+            "status",
+            `${current.name} сменил статус «${t.title}»`,
+            `Вы сменили статус «${t.title}»`,
+          ),
+        );
       }
-      if (patch.assigneeId && patch.assigneeId !== current?.id) {
-        extra.push(mk(patch.assigneeId, `Вас назначили: ${t.title}`, "task_new"));
+      if (patch.assigneeId) {
+        extra = extra.concat(
+          pushNotices(
+            s,
+            t,
+            current.id,
+            current.name,
+            "task_new",
+            `${current.name} назначил исполнителя: ${t.title}`,
+            `Вы назначили исполнителя: ${t.title}`,
+          ),
+        );
       }
       if (!extra.length) return s;
       return { ...s, notices: [...extra, ...(s.notices ?? [])] };
@@ -196,21 +255,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       };
       setState((s) => {
         const task = s.tasks.find((x) => x.id === taskId);
-        const extra: Notice[] = [];
+        let extra: Notice[] = [];
         if (task) {
-          for (const uid of new Set([task.authorId, task.assigneeId])) {
-            if (uid !== current.id) {
-              extra.push({
-                id: `n-${crypto.randomUUID().slice(0, 8)}`,
-                userId: uid,
-                text: `${current.name} прокомментировал «${task.title}»`,
-                taskId,
-                createdAt: new Date().toISOString(),
-                read: false,
-                kind: "comment",
-              });
-            }
-          }
+          extra = extra.concat(
+            pushNotices(
+              s,
+              task,
+              current.id,
+              current.name,
+              "comment",
+              `${current.name} прокомментировал «${task.title}»`,
+              `Вы прокомментировали «${task.title}»`,
+            ),
+          );
         }
         return { ...s, comments: [...s.comments, c], notices: [...extra, ...(s.notices ?? [])] };
       });
