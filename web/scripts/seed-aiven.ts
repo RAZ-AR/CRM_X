@@ -16,7 +16,10 @@ async function main() {
   for (const u of seed.users) await prisma.user.create({ data: u as never });
   for (const t of seed.tasks) await prisma.task.create({ data: t as never });
   for (const w of seed.wiki) await prisma.wikiPage.create({ data: w as never });
-  for (const c of seed.contacts) await prisma.contact.create({ data: c as never });
+  for (const c of seed.contacts) {
+    const { telegram, whatsapp, ...rest } = c as never as Record<string, unknown>;
+    await prisma.contact.create({ data: rest as never });
+  }
   for (const n of seed.notices) await prisma.notice.create({ data: n as never });
   console.log("seeded", seed.tasks.length, "tasks", seed.users.length, "users");
 }
