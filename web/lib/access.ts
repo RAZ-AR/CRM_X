@@ -128,19 +128,10 @@ export const statusMeta: Record<
   Task["status"],
   { label: string; emoji: string; color: string }
 > = {
-  todo: { label: "Не начато", emoji: "⚪", color: "#E5E7EB" },
+  todo: { label: "Не начато · бэклог", emoji: "", color: "#E5E7EB" },
   in_progress: { label: "В работе", emoji: "🔵", color: "#BFDBFE" },
-  waiting: { label: "Ожидает", emoji: "🟡", color: "#FDE68A" },
-  blocked: { label: "Заблокировано", emoji: "🔴", color: "#FECACA" },
   review: { label: "На проверке", emoji: "🟣", color: "#DDD6FE" },
   done: { label: "Готово", emoji: "🟢", color: "#BBF7D0" },
 };
 
-export const columns: Task["status"][] = [
-  "todo",
-  "in_progress",
-  "waiting",
-  "blocked",
-  "review",
-  "done",
-];
+export const columns: Task["status"][] = ["todo", "in_progress", "review", "done"];

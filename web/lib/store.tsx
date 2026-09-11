@@ -54,7 +54,7 @@ type Store = AppState & {
 };
 
 const Ctx = createContext<Store | null>(null);
-const KEY = "crmx-norion-v6";
+const KEY = "crmx-norion-v7";
 const USER_KEY = "crmx-user";
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -77,10 +77,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           ...u,
           managerId: u.managerId === undefined ? (u.id === "u-cpo" ? null : "u-armen") : u.managerId,
         }));
+        const mapStatus = (st: string) =>
+          st === "waiting" || st === "blocked" ? "in_progress" : st;
         setState({
           ...seed,
           ...parsed,
           users,
+          tasks: (parsed.tasks ?? seed.tasks).map((task: Task) => ({
+            ...task,
+            status: mapStatus(task.status) as Task["status"],
+          })),
           notices: parsed.notices ?? seed.notices,
           contacts,
           broadcast: parsed.broadcast ?? seed.broadcast ?? null,

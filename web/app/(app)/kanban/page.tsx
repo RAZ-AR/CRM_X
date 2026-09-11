@@ -75,7 +75,6 @@ export default function KanbanPage() {
             <div key={col} className="card p-3 w-[85vw] max-w-[320px] md:w-52 md:max-w-none md:flex-1 shrink-0 snap-center">
               <div className="text-sm font-medium mb-2 px-1">
                 {statusMeta[col].emoji} {statusMeta[col].label}
-                {col === "todo" ? " · бэклог" : ""}
               </div>
               <div
                 className="space-y-2 min-h-[200px]"

@@ -1,12 +1,6 @@
 export type Role = "cpo" | "employee";
 
-export type TaskStatus =
-  | "todo"
-  | "in_progress"
-  | "waiting"
-  | "blocked"
-  | "review"
-  | "done";
+export type TaskStatus = "todo" | "in_progress" | "review" | "done";
 
 export type Priority = "low" | "medium" | "high" | "critical";
 
