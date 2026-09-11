@@ -25,7 +25,7 @@ export function TaskSheet({
   const [pendingStatus, setPendingStatus] = useState<null | import("@/lib/types").TaskStatus>(null);
   if (!current) return null;
   const task = tasks.find((t) => t.id === taskId);
-  if (!task || !canSeeTask(current, task)) {
+  if (!task || !canSeeTask(current, task, users)) {
     return (
       <div className="p-8">Нет доступа</div>
     );

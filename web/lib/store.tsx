@@ -40,6 +40,7 @@ type Store = AppState & {
     email: string;
     title: string;
     zone: ZoneSlug;
+    managerId?: string | null;
   }) => void;
   markRead: (id: string) => void;
   markAllRead: () => void;
@@ -49,10 +50,11 @@ type Store = AppState & {
   addZone: (z: { name: string; emoji: string; color: string; deadline: string }) => void;
   setBroadcast: (text: string, emoji: string) => void;
   toggleReaction: (commentId: string, emoji: string) => void;
+  setManager: (userId: string, managerId: string | null) => void;
 };
 
 const Ctx = createContext<Store | null>(null);
-const KEY = "crmx-norion-v5";
+const KEY = "crmx-norion-v6";
 const USER_KEY = "crmx-user";
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -71,9 +73,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           telegram: c.telegram || "",
           whatsapp: c.whatsapp || "",
         }));
+        const users = (parsed.users ?? seed.users).map((u: User) => ({
+          ...u,
+          managerId: u.managerId === undefined ? (u.id === "u-cpo" ? null : "u-armen") : u.managerId,
+        }));
         setState({
           ...seed,
           ...parsed,
+          users,
           notices: parsed.notices ?? seed.notices,
           contacts,
           broadcast: parsed.broadcast ?? seed.broadcast ?? null,
@@ -401,6 +408,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  const setManager = useCallback((userId: string, managerId: string | null) => {
+    setState((s) => ({
+      ...s,
+      users: s.users.map((u) => (u.id === userId ? { ...u, managerId } : u)),
+    }));
+  }, []);
+
   const markAllRead = useCallback(() => {
     setState((s) => ({
       ...s,
@@ -411,7 +425,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [current]);
 
   const addUser = useCallback(
-    (u: { name: string; email: string; title: string; zone: ZoneSlug }) => {
+    (u: { name: string; email: string; title: string; zone: ZoneSlug; managerId?: string | null }) => {
       const user: User = {
         id: `u-${crypto.randomUUID().slice(0, 8)}`,
         name: u.name,
@@ -423,6 +437,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         avatar: u.name.slice(0, 1).toUpperCase(),
         permissions: [],
         boardZones: [u.zone],
+        managerId: u.managerId ?? current?.id ?? null,
       };
       setState((s) => ({ ...s, users: [...s.users, user] }));
     },
@@ -454,6 +469,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       addZone,
       setBroadcast,
       toggleReaction,
+      setManager,
     }),
     [
       state,
@@ -479,6 +495,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       addZone,
       setBroadcast,
       toggleReaction,
+      setManager,
     ],
   );
 

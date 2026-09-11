@@ -47,6 +47,7 @@ export type User = {
   avatar: string;
   permissions: Permission[];
   boardZones: ZoneSlug[];
+  managerId: string | null;
 };
 
 export type Zone = {

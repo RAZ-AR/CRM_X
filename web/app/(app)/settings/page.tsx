@@ -14,7 +14,7 @@ const PERMS: { id: Permission; label: string }[] = [
 ];
 
 export default function SettingsPage() {
-  const { current, users, zones, grant, addUser, setBoardZones } = useStore();
+  const { current, users, zones, grant, addUser, setBoardZones, setManager } = useStore();
   if (!current) return null;
   if (!canManagePeople(current)) return <div className="card p-6">Только Owner и Armen.</div>;
 
@@ -26,6 +26,7 @@ export default function SettingsPage() {
       email: String(fd.get("email")),
       title: String(fd.get("title")),
       zone: fd.get("zone") as ZoneSlug,
+      managerId: String(fd.get("managerId") || current!.id),
     });
     e.currentTarget.reset();
   }
@@ -46,12 +47,28 @@ export default function SettingsPage() {
             <option key={z.slug} value={z.slug}>{z.emoji} {z.name}</option>
           ))}
         </select>
+        <select name="managerId" defaultValue={current.id} className="sm:col-span-2">
+          {users.map((m) => (
+            <option key={m.id} value={m.id}>Руководитель: {m.name}</option>
+          ))}
+        </select>
         <p className="text-xs text-gray-400 sm:col-span-2">Пароль = логин. Доски можно включить ниже.</p>
         <button className="pill bg-black text-white px-4 py-2 sm:col-span-2">Создать</button>
       </form>
       {users.filter((u) => u.role === "employee").map((u) => (
         <div key={u.id} className="card p-5">
           <div className="font-medium">{u.name} · {u.title} · логин {u.email}</div>
+          <label className="text-xs text-[#757575] mt-2 block">Руководитель (видит задачи этого сотрудника)</label>
+          <select
+            className="mt-1 mb-2"
+            value={u.managerId || ""}
+            onChange={(e) => setManager(u.id, e.target.value || null)}
+          >
+            <option value="">— нет —</option>
+            {users.filter((m) => m.id !== u.id).map((m) => (
+              <option key={m.id} value={m.id}>{m.name}</option>
+            ))}
+          </select>
           <div className="text-xs text-[#757575] mt-1">Доски</div>
           <div className="mt-2 flex flex-wrap gap-2">
             {zones.map((z) => {

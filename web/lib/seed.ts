@@ -87,7 +87,8 @@ export const seed: AppState = {
         "kitchen",
         "cafe",
         "comx"
-      ]
+      ],
+      "managerId": null
     },
     {
       "id": "u-armen",
@@ -112,7 +113,8 @@ export const seed: AppState = {
         "kitchen",
         "cafe",
         "comx"
-      ]
+      ],
+      "managerId": "u-cpo"
     },
     {
       "id": "u-market",
@@ -132,7 +134,8 @@ export const seed: AppState = {
         "wafl",
         "comx",
         "cafe"
-      ]
+      ],
+      "managerId": "u-armen"
     },
     {
       "id": "u-tech",
@@ -146,7 +149,8 @@ export const seed: AppState = {
       "permissions": [],
       "boardZones": [
         "wafl"
-      ]
+      ],
+      "managerId": "u-armen"
     },
     {
       "id": "u-pastry",
@@ -160,7 +164,8 @@ export const seed: AppState = {
       "permissions": [],
       "boardZones": [
         "wafl"
-      ]
+      ],
+      "managerId": "u-armen"
     },
     {
       "id": "u-sous",
@@ -174,7 +179,8 @@ export const seed: AppState = {
       "permissions": [],
       "boardZones": [
         "kitchen"
-      ]
+      ],
+      "managerId": "u-armen"
     },
     {
       "id": "u-cook",
@@ -188,7 +194,8 @@ export const seed: AppState = {
       "permissions": [],
       "boardZones": [
         "kitchen"
-      ]
+      ],
+      "managerId": "u-armen"
     },
     {
       "id": "u-bar",
@@ -202,7 +209,8 @@ export const seed: AppState = {
       "permissions": [],
       "boardZones": [
         "cafe"
-      ]
+      ],
+      "managerId": "u-armen"
     },
     {
       "id": "u-wait",
@@ -216,7 +224,8 @@ export const seed: AppState = {
       "permissions": [],
       "boardZones": [
         "cafe"
-      ]
+      ],
+      "managerId": "u-armen"
     }
   ],
   "tasks": [

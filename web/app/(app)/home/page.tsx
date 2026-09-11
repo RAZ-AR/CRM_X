@@ -23,7 +23,7 @@ export default function HomePage() {
   const [msgEmoji, setMsgEmoji] = useState("💪");
   if (!current) return null;
 
-  const visible = tasks.filter((t) => canSeeTask(current, t));
+  const visible = tasks.filter((t) => canSeeTask(current, t, users));
   const zoneList = zones;
   const dayTasks = sortActual(visible.filter((t) => isActual(t, picked)), picked);
 

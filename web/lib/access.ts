@@ -17,12 +17,26 @@ export function taskZones(task: Task): ZoneSlug[] {
   return z;
 }
 
-export function canSeeTask(user: User, task: Task) {
-  if (isCpo(user) || canManagePeople(user)) return true;
-  if (task.assigneeId === user.id || task.authorId === user.id) return true;
-  if (task.participantIds.includes(user.id)) return true;
-  const boards = user.boardZones?.length ? user.boardZones : user.zone ? [user.zone] : [];
-  return taskZones(task).some((z) => boards.includes(z));
+export function subordinateIds(userId: string, users: User[]): string[] {
+  const out: string[] = [];
+  const walk = (id: string) => {
+    for (const u of users) {
+      if (u.managerId === id) {
+        out.push(u.id);
+        walk(u.id);
+      }
+    }
+  };
+  walk(userId);
+  return out;
+}
+
+/** Свои назначенные + задачи подчинённых. CPO видит всё. */
+export function canSeeTask(user: User, task: Task, users: User[] = []) {
+  if (isCpo(user)) return true;
+  if (task.assigneeId === user.id) return true;
+  if (users.length && subordinateIds(user.id, users).includes(task.assigneeId)) return true;
+  return false;
 }
 
 export function canEditTask(user: User, task: Task) {

@@ -23,7 +23,7 @@ export default function KanbanPage() {
   }, []);
 
   if (!current) return null;
-  let list = sortActual(tasks.filter((t) => canSeeTask(current, t)));
+  let list = sortActual(tasks.filter((t) => canSeeTask(current, t, users)));
   if (zone !== "all") list = list.filter((t) => t.zone === zone);
   if (due) list = list.filter((t) => t.due === due);
   const zobj = zones.find((z) => z.slug === zone);

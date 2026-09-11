@@ -7,7 +7,7 @@ import { canSeeTask, isOverdue, statusMeta } from "@/lib/access";
 export default function TasksPage() {
   const { current, tasks, users, zones } = useStore();
   if (!current) return null;
-  const list = tasks.filter((t) => canSeeTask(current, t));
+  const list = tasks.filter((t) => canSeeTask(current, t, users));
   return (
     <div className="card p-5">
       <h1 className="text-xl font-semibold mb-4">

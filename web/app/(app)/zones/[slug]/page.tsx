@@ -15,7 +15,7 @@ export default function ZonePage() {
   const allowed = isCpo(current) || (current.zone === zone.slug && hasPerm(current, "zone_page"));
   if (!allowed) return <div className="card p-6">Нет доступа к зоне.</div>;
   const visible = tasks.filter(
-    (t) => t.zone === zone.slug && (canSeeTask(current, t) || hasPerm(current, "zone_team_tasks")),
+    (t) => t.zone === zone.slug && canSeeTask(current, t, users),
   );
   const team = users.filter((u) => u.zone === zone.slug);
 
