@@ -83,6 +83,21 @@ export function TaskSheet({
       </div>
 
       <div className="px-7 pb-6 overflow-y-auto space-y-5">
+        <div>
+          <div className="text-xs text-[#9a9aa0] mb-2">Статус</div>
+          <div className="flex flex-wrap gap-1.5">
+            {columns.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => updateTask(task.id, { status: c })}
+                className={`pill px-3 py-1.5 text-xs ${task.status === c ? "bg-black text-white" : "bg-[#f4f4f6]"}`}
+              >
+                {statusMeta[c].emoji} {statusMeta[c].label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <Meta k="Исполнитель" v={assignee?.name ?? "—"} />
           <Meta k="Создал" v={author?.name ?? "—"} />

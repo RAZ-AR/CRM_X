@@ -118,20 +118,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </aside>
 
         {menu && (
-          <div className="md:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setMenu(false)}>
-            <div className="absolute left-0 top-0 bottom-0 w-[80%] max-w-xs bg-white p-5 flex flex-col" onClick={(e) => e.stopPropagation()}>
-              <div className="flex justify-between items-center mb-6">
-                <Link href="/home" className="flex items-center gap-2 font-semibold" onClick={() => setMenu(false)}>
-                  <span className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#2bb673] to-[#6b7cff] grid place-items-center text-white text-xs">X</span>
-                  CRM X
-                </Link>
-                <button onClick={() => setMenu(false)} className="h-9 w-9 grid place-items-center rounded-full bg-[#f4f4f6]">
-                  <X size={18} />
-                </button>
-              </div>
+          <div className="md:hidden fixed inset-0 z-40 bg-black/40 flex flex-col justify-end" onClick={() => setMenu(false)}>
+            <div
+              className="bg-white rounded-t-[24px] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] max-h-[75dvh] overflow-y-auto animate-[slideUp_.2s_ease-out]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[#ddd]" />
+              <div className="font-semibold mb-3">Навигация</div>
               {navList}
               <button
-                className="mt-4 text-left text-sm text-[#6b6b70]"
+                className="mt-4 w-full text-left text-sm text-[#6b6b70] py-2"
                 onClick={() => {
                   logout();
                   router.push("/login");

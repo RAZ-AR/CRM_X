@@ -51,3 +51,8 @@ textarea {
 textarea {
   border-radius: 1rem;
 }
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
