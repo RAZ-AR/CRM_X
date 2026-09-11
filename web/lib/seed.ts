@@ -1223,6 +1223,8 @@ export const seed: AppState = {
       "phone": "",
       "email": "1111",
       "zone": "all",
+      "telegram": "",
+      "whatsapp": "",
       "kind": "staff"
     },
     {
@@ -1233,6 +1235,8 @@ export const seed: AppState = {
       "phone": "",
       "email": "2222",
       "zone": "wafl",
+      "telegram": "",
+      "whatsapp": "",
       "kind": "staff"
     },
     {
@@ -1243,6 +1247,8 @@ export const seed: AppState = {
       "phone": "",
       "email": "",
       "zone": "wafl",
+      "telegram": "",
+      "whatsapp": "",
       "kind": "partner"
     }
   ]

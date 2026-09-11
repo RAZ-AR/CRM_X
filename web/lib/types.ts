@@ -21,9 +21,7 @@ export type Permission =
   | "contacts"
   | "manage_users";
 
-export type ZoneSlug = "wafl" | "kitchen" | "cafe" | "comx";
-
-export const ALL_ZONES: ZoneSlug[] = ["wafl", "kitchen", "cafe", "comx"];
+export type ZoneSlug = string;
 
 export const READINESS_BLOCKS = [
   "SPACE",
@@ -121,6 +119,8 @@ export type Contact = {
   title: string;
   phone: string;
   email: string;
+  telegram: string;
+  whatsapp: string;
   zone: ZoneSlug | "all";
   kind: "staff" | "vendor" | "partner";
 };

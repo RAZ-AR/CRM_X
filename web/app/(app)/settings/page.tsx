@@ -3,7 +3,7 @@
 import { FormEvent } from "react";
 import { useStore } from "@/lib/store";
 import { canManagePeople } from "@/lib/access";
-import { ALL_ZONES, type Permission, type ZoneSlug } from "@/lib/types";
+import { type Permission, type ZoneSlug } from "@/lib/types";
 
 const PERMS: { id: Permission; label: string }[] = [
   { id: "manage_users", label: "Управлять командой" },
@@ -54,18 +54,18 @@ export default function SettingsPage() {
           <div className="font-medium">{u.name} · {u.title} · логин {u.email}</div>
           <div className="text-xs text-[#757575] mt-1">Доски</div>
           <div className="mt-2 flex flex-wrap gap-2">
-            {ALL_ZONES.map((z) => {
-              const on = (u.boardZones ?? []).includes(z);
+            {zones.map((z) => {
+              const on = (u.boardZones ?? []).includes(z.slug);
               return (
                 <button
-                  key={z}
+                  key={z.slug}
                   className={`pill px-3 py-1.5 text-sm ${on ? "bg-black text-white" : "bg-gray-100"}`}
                   onClick={() => {
-                    const next = on ? (u.boardZones ?? []).filter((x) => x !== z) : [...(u.boardZones ?? []), z];
+                    const next = on ? (u.boardZones ?? []).filter((x) => x !== z.slug) : [...(u.boardZones ?? []), z.slug];
                     setBoardZones(u.id, next);
                   }}
                 >
-                  {z.toUpperCase()}
+                  {z.name}
                 </button>
               );
             })}

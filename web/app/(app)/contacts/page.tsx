@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useStore } from "@/lib/store";
 import { canSeeContact, hasPerm, isCpo } from "@/lib/access";
+import { displayPhone, telHref, tgHref, waHref } from "@/lib/links";
 import type { Contact, ZoneSlug } from "@/lib/types";
 
 export default function ContactsPage() {
@@ -17,8 +18,7 @@ export default function ContactsPage() {
 
   function onAdd(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    addContact(fromForm(fd));
+    addContact(fromForm(new FormData(e.currentTarget)));
     e.currentTarget.reset();
   }
 
@@ -46,8 +46,28 @@ export default function ContactsPage() {
               <div className="text-xs text-gray-400 uppercase">{c.kind}</div>
               <div className="font-semibold text-lg mt-1">{c.name}</div>
               <div className="text-sm text-gray-500">{c.title}{c.company ? ` · ${c.company}` : ""}</div>
-              <div className="text-sm mt-3">{c.phone}</div>
-              <div className="text-sm text-gray-500">{c.email}</div>
+              <div className="mt-3 space-y-1 text-sm">
+                {c.phone && (
+                  <a className="block text-[#2bb673] underline" href={telHref(c.phone)}>
+                    📞 {displayPhone(c.phone)}
+                  </a>
+                )}
+                {c.email && (
+                  <a className="block text-[#2383e2] underline" href={`mailto:${c.email}`}>
+                    ✉ {c.email}
+                  </a>
+                )}
+                {c.telegram && (
+                  <a className="block text-[#229ED9] underline" href={tgHref(c.telegram)} target="_blank" rel="noreferrer">
+                    Telegram @{c.telegram.replace(/^@/, "")}
+                  </a>
+                )}
+                {c.whatsapp && (
+                  <a className="block text-[#25D366] underline" href={waHref(c.whatsapp)} target="_blank" rel="noreferrer">
+                    WhatsApp {displayPhone(c.whatsapp)}
+                  </a>
+                )}
+              </div>
               {canEdit && (
                 <div className="mt-3 flex gap-3 text-sm">
                   <button className="underline" onClick={() => setEditId(c.id)}>Править</button>
@@ -72,12 +92,18 @@ export default function ContactsPage() {
 }
 
 function fromForm(fd: FormData): Omit<Contact, "id"> {
+  let phone = String(fd.get("phone") || "").trim();
+  let wa = String(fd.get("whatsapp") || "").trim();
+  if (phone && !phone.trim().startsWith("+") && /^\d/.test(phone)) phone = "+" + phone.replace(/\s/g, "");
+  if (wa && !wa.includes("+") && /^\d/.test(wa.replace(/\s/g, ""))) wa = "+" + wa.replace(/\s/g, "");
   return {
     name: String(fd.get("name")),
     company: String(fd.get("company") || ""),
     title: String(fd.get("title") || ""),
-    phone: String(fd.get("phone") || ""),
+    phone,
     email: String(fd.get("email") || ""),
+    telegram: String(fd.get("telegram") || "").replace(/^@/, ""),
+    whatsapp: wa,
     zone: (fd.get("zone") as ZoneSlug | "all") || "all",
     kind: (fd.get("kind") as Contact["kind"]) || "vendor",
   };
@@ -89,10 +115,12 @@ function Fields({ c, zones }: { c?: Contact; zones: { slug: string; name: string
       <input name="name" required placeholder="Имя" defaultValue={c?.name} />
       <input name="company" placeholder="Компания" defaultValue={c?.company} />
       <input name="title" placeholder="Должность" defaultValue={c?.title} />
-      <input name="phone" placeholder="Телефон" defaultValue={c?.phone} />
+      <input name="phone" placeholder="Телефон +374..." defaultValue={c?.phone} />
       <input name="email" placeholder="Email" defaultValue={c?.email} />
+      <input name="telegram" placeholder="Telegram ник (без @)" defaultValue={c?.telegram} />
+      <input name="whatsapp" placeholder="WhatsApp номер целиком" defaultValue={c?.whatsapp} />
       <select name="zone" defaultValue={c?.zone ?? "all"}>
-        <option value="all">Все зоны</option>
+        <option value="all">Все проекты</option>
         {zones.map((z) => (
           <option key={z.slug} value={z.slug}>{z.name}</option>
         ))}

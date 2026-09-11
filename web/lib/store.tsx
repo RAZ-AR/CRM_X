@@ -46,10 +46,11 @@ type Store = AppState & {
   setBoardZones: (userId: string, boardZones: import("./types").ZoneSlug[]) => void;
   previewId: string | null;
   setPreviewId: (id: string | null) => void;
+  addZone: (z: { name: string; emoji: string; color: string; deadline: string }) => void;
 };
 
 const Ctx = createContext<Store | null>(null);
-const KEY = "crmx-norion-v2";
+const KEY = "crmx-norion-v3";
 const USER_KEY = "crmx-user";
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -63,7 +64,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const raw = localStorage.getItem(KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        setState({ ...seed, ...parsed, notices: parsed.notices ?? seed.notices });
+        const contacts = (parsed.contacts ?? seed.contacts).map((c: Contact) => ({
+          ...c,
+          telegram: c.telegram || "",
+          whatsapp: c.whatsapp || "",
+        }));
+        setState({ ...seed, ...parsed, notices: parsed.notices ?? seed.notices, contacts });
       }
       const uid = localStorage.getItem(USER_KEY);
       if (uid) {
@@ -234,6 +240,30 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  const addZone = useCallback((z: { name: string; emoji: string; color: string; deadline: string }) => {
+    const slug = z.name
+      .toLowerCase()
+      .replace(/[^a-z0-9а-яё]+/gi, "-")
+      .replace(/^-|-$/g, "") || `p-${crypto.randomUUID().slice(0, 6)}`;
+    setState((s) => ({
+      ...s,
+      zones: [
+        ...s.zones,
+        {
+          slug,
+          name: z.name,
+          emoji: z.emoji || "📁",
+          color: z.color || "#E5E7EB",
+          deadline: z.deadline,
+          readiness: {
+            SPACE: 10, EQUIPMENT: 10, TEAM: 10, PRODUCT: 10,
+            IT: 10, MARKETING: 10, OPERATIONS: 10, READY: 5,
+          },
+        },
+      ],
+    }));
+  }, []);
+
   const addContact = useCallback((c: Omit<Contact, "id">) => {
     setState((s) => ({
       ...s,
@@ -319,6 +349,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setBoardZones,
       previewId,
       setPreviewId,
+      addZone,
     }),
     [
       state,
@@ -341,6 +372,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setBoardZones,
       previewId,
       setPreviewId,
+      addZone,
     ],
   );
 

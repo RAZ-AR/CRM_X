@@ -1,5 +1,4 @@
 import type { Contact, Permission, Task, User, WikiPage, ZoneSlug } from "./types";
-import { ALL_ZONES } from "./types";
 
 export function isCpo(user: User) {
   return user.role === "cpo";
@@ -53,10 +52,8 @@ export function employeeNav(user: User) {
     { href: "/kanban", label: "Доска", icon: "kanban" },
   ];
   const boards = user.boardZones?.length ? user.boardZones : user.zone ? [user.zone] : [];
-  for (const z of ALL_ZONES) {
-    if (boards.includes(z)) {
-      items.push({ href: `/kanban?zone=${z}`, label: z.toUpperCase(), icon: "zone" });
-    }
+  for (const z of boards) {
+    items.push({ href: `/kanban?zone=${z}`, label: z.toUpperCase(), icon: "zone" });
   }
   if (hasPerm(user, "wiki")) items.push({ href: "/wiki", label: "Wiki", icon: "wiki" });
   if (hasPerm(user, "contacts")) items.push({ href: "/contacts", label: "Контакты", icon: "contacts" });
@@ -68,7 +65,7 @@ export function cpoNav() {
   return [
     { href: "/home", label: "Главная", icon: "home" },
     { href: "/kanban", label: "Доска", icon: "kanban" },
-    { href: "/zones", label: "Зоны", icon: "zone" },
+    { href: "/zones", label: "Проекты", icon: "zone" },
     { href: "/settings", label: "Команда", icon: "team" },
     { href: "/wiki", label: "Wiki", icon: "wiki" },
     { href: "/contacts", label: "Контакты", icon: "contacts" },
