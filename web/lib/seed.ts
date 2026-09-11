@@ -2717,7 +2717,7 @@ export const seed: AppState = {
   "wiki": [
     {
       "id": "w1",
-      "title": "Norion",
+      "title": "CRM X",
       "body": "Кинотеатр Москва, Ереван. A 10 окт окно Corner. B 31 окт Dark Kitchen. C 10 янв зал. Ремонт: Corner → кухня → зал.",
       "zone": "all",
       "visibility": "staff"
@@ -2745,7 +2745,7 @@ export const seed: AppState = {
     {
       "id": "k1",
       "name": "Owner",
-      "company": "Norion",
+      "company": "CRM X",
       "title": "CPO",
       "phone": "",
       "email": "1111",
@@ -2757,7 +2757,7 @@ export const seed: AppState = {
     {
       "id": "k2",
       "name": "Armen",
-      "company": "Norion",
+      "company": "CRM X",
       "title": "Product Owner",
       "phone": "",
       "email": "2222",

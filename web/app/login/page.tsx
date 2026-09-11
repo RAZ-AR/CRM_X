@@ -26,7 +26,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen grid place-items-center p-6">
       <div className="bg-white rounded-[30px] w-full max-w-md p-8">
-        <h1 className="text-2xl font-semibold mb-1">Norion CRM</h1>
+        <h1 className="text-2xl font-semibold mb-1">CRM X</h1>
         <p className="text-sm text-[#757575] mb-5">логин = пароль</p>
         <form
           className="flex flex-col gap-3"

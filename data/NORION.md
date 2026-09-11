@@ -1,5 +1,5 @@
-# Norion → CRM export
-Выгрузка 10 сентября 2026. Источник: Notion Norion, проект Multifunctional Space — Yerevan.
+# CRM X → CRM export
+Выгрузка 10 сентября 2026. Источник: Notion CRM X, проект Multifunctional Space — Yerevan.
 
 ## Как кормить CRM
 - `tasks.csv` — 35 задач. Это и есть бэклог. Все статусы сейчас `backlog` / «Не начато».

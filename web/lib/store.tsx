@@ -54,7 +54,7 @@ type Store = AppState & {
 };
 
 const Ctx = createContext<Store | null>(null);
-const KEY = "crmx-norion-v7";
+const KEY = "crmx-v8";
 const USER_KEY = "crmx-user";
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -65,7 +65,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(KEY);
+      const raw = localStorage.getItem(KEY) || localStorage.getItem("crmx-norion-v7");
       if (raw) {
         const parsed = JSON.parse(raw);
         const contacts = (parsed.contacts ?? seed.contacts).map((c: Contact) => ({
