@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { canSeeTask, isActual, isOverdue, sortActual, taskZones } from "@/lib/access";
-import { zoneReadiness } from "@/lib/readiness";
+import { zoneTaskProgress } from "@/lib/readiness";
 import { FitnessRings } from "@/components/FitnessRings";
 import { TaskCard } from "@/components/TaskCard";
 
@@ -106,7 +106,7 @@ export default function HomePage() {
       <section className="grid grid-cols-2 gap-3">
         {zoneList.map((z) => {
           const n = visible.filter((t) => taskZones(t).includes(z.slug)).length;
-          const p = zoneReadiness(z);
+          const p = zoneTaskProgress(z.slug, visible);
           return (
             <Link
               key={z.slug}
@@ -126,7 +126,7 @@ export default function HomePage() {
 
       <section className="bg-white rounded-2xl p-4 border border-black/5">
         <h3 className="font-semibold mb-2 text-sm">Прогресс проектов</h3>
-        <FitnessRings zones={zoneList} />
+        <FitnessRings zones={zoneList} tasks={visible} />
       </section>
 
       <section>

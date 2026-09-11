@@ -1,4 +1,4 @@
-import type { Zone } from "./types";
+import type { Task, Zone } from "./types";
 import { READINESS_BLOCKS } from "./types";
 
 export function zoneReadiness(zone: Zone) {
@@ -23,3 +23,16 @@ export const BLOCK_COLORS: Record<string, string> = {
   OPERATIONS: "#67E8F9",
   READY: "#A7F3D0",
 };
+
+export function zoneTaskProgress(slug: string, tasks: Task[]) {
+  const list = tasks.filter((t) => {
+    const zs = t.zones?.length ? t.zones : t.zone ? [t.zone] : [];
+    return zs.includes(slug);
+  });
+  const total = list.reduce((s, t) => s + (t.weight || 1), 0);
+  if (!total) return 0;
+  const done = list
+    .filter((t) => t.status === "done")
+    .reduce((s, t) => s + (t.weight || 1), 0);
+  return Math.round((done / total) * 100);
+}

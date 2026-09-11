@@ -4,10 +4,10 @@ import Link from "next/link";
 import { FormEvent } from "react";
 import { useStore } from "@/lib/store";
 import { canManagePeople } from "@/lib/access";
-import { zoneReadiness } from "@/lib/readiness";
+import { zoneTaskProgress } from "@/lib/readiness";
 
 export default function ZonesPage() {
-  const { current, zones, addZone } = useStore();
+  const { current, zones, tasks, addZone } = useStore();
   if (!current) return null;
   if (!canManagePeople(current)) {
     return <div className="card p-6">Проекты видят Owner и Armen.</div>;
@@ -33,7 +33,7 @@ export default function ZonesPage() {
           <Link key={z.slug} href={`/kanban?zone=${z.slug}`} className="card p-6" style={{ background: z.color }}>
             <div className="text-2xl">{z.emoji}</div>
             <div className="text-xl font-semibold mt-2">{z.name}</div>
-            <div className="text-3xl font-semibold mt-4">{zoneReadiness(z)}%</div>
+            <div className="text-3xl font-semibold mt-4">{zoneTaskProgress(z.slug, tasks)}%</div>
           </Link>
         ))}
       </div>
