@@ -5,7 +5,7 @@ import { columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
 import { useStore } from "@/lib/store";
 import type { Task, TaskStatus, User, Zone } from "@/lib/types";
 import { formatDate } from "@/lib/dates";
-import { Check, Flame, X } from "lucide-react";
+import { Check, Flame, Paperclip, X } from "lucide-react";
 
 export function TaskCard({
   task,
@@ -52,7 +52,14 @@ export function TaskCard({
             {a?.name}
           </span>
         </div>
-        <div className="text-[11px] text-gray-400 mt-1">{formatDate(task.startDate)} → {formatDate(task.due)}</div>
+        <div className="text-[11px] text-gray-400 mt-1 flex items-center gap-2">
+          <span>{formatDate(task.startDate)} → {formatDate(task.due)}</span>
+          {(task.attachments?.length ?? 0) > 0 && (
+            <span className="inline-flex items-center gap-0.5 text-[#111]">
+              <Paperclip size={12} /> {task.attachments.length}
+            </span>
+          )}
+        </div>
       </button>
       {pending && pending !== task.status ? (
         <div className="mt-2 flex items-center gap-2">

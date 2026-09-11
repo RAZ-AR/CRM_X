@@ -23,7 +23,6 @@ export function TaskSheet({
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState("");
   const [sub, setSub] = useState("");
-  const [pendingStatus, setPendingStatus] = useState<null | import("@/lib/types").TaskStatus>(null);
   if (!current) return null;
   const task = tasks.find((t) => t.id === taskId);
   if (!task || !canSeeTask(current, task, users)) {
@@ -89,48 +88,15 @@ export function TaskSheet({
       </div>
 
       <div className="px-7 pb-6 overflow-y-auto space-y-5">
-        <div>
-          <div className="text-xs text-[#9a9aa0] mb-2">Статус</div>
-          <div className="flex flex-wrap gap-1.5">
-            {columns.map((c) => {
-              const on = (pendingStatus ?? task.status) === c;
-              return (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setPendingStatus(c === task.status ? null : c)}
-                className={`pill px-3 py-1.5 text-xs ${on ? "bg-black text-white" : "bg-[#f4f4f6]"}`}
-              >
-                {statusMeta[c].emoji} {statusMeta[c].label}
-              </button>
-            );})}
-          </div>
-          {pendingStatus && pendingStatus !== task.status && (
-            <div className="mt-3 flex gap-2">
-              <button
-                type="button"
-                className="pill bg-black text-white px-4 py-2 text-sm flex-1"
-                onClick={() => {
-                  updateTask(task.id, { status: pendingStatus });
-                  setPendingStatus(null);
-                  onClose?.();
-                }}
-              >
-                Сохранить · {statusMeta[pendingStatus].label}
-              </button>
-              <button type="button" className="pill bg-[#f4f4f6] px-4 py-2 text-sm" onClick={() => setPendingStatus(null)}>
-                Отмена
-              </button>
-            </div>
-          )}
-        </div>
         <div className="grid grid-cols-2 gap-3 text-sm">
+          <Meta k="Статус" v={`${statusMeta[task.status].emoji} ${statusMeta[task.status].label}`} />
           <Meta k="Исполнитель" v={assignee?.name ?? "—"} />
           <Meta k="Создал" v={author?.name ?? "—"} />
           <Meta k="Начало" v={formatDate(task.startDate)} />
           <Meta k="Конец" v={formatDate(task.due)} />
           <Meta k="Срочность" v={task.priority} />
           <Meta k="Поток" v={task.workstream || "—"} />
+          <Meta k="Вложения" v={files.length ? String(files.length) : "нет"} />
         </div>
 
         {editing && canEdit && (
@@ -198,26 +164,30 @@ export function TaskSheet({
           </form>
         </div>
 
-        {files.length > 0 && (
+        <div>
+          <div className="text-xs text-[#9a9aa0] mb-2">Вложения {files.length ? `· ${files.length}` : ""}</div>
+          {files.length === 0 && <p className="text-sm text-[#9a9aa0]">Файлов нет</p>}
           <div className="flex flex-wrap gap-2">
             {files.map((f) =>
               f.type.startsWith("image/") ? (
-                <a key={f.id} href={f.dataUrl} target="_blank" rel="noreferrer">
-                  <img src={f.dataUrl} alt="" className="h-16 w-16 object-cover rounded-xl" />
+                <a key={f.id} href={f.dataUrl} target="_blank" rel="noreferrer" className="block">
+                  <img src={f.dataUrl} alt={f.name} className="h-16 w-16 object-cover rounded-xl" />
+                  <div className="text-[10px] text-[#757575] truncate max-w-16">{f.name}</div>
                 </a>
               ) : (
-                <a key={f.id} href={f.dataUrl} download={f.name} className="text-xs underline">{f.name}</a>
+                <a key={f.id} href={f.dataUrl} download={f.name} className="text-xs underline bg-[#f4f4f6] rounded-xl px-3 py-2">{f.name}</a>
               ),
             )}
           </div>
-        )}
-        {editing && canEdit && (
-          <input type="file" accept="image/*,.pdf" className="text-sm" onChange={async (e) => {
-            if (!e.target.files?.length) return;
-            const more = await filesToAttachments(e.target.files);
-            updateTask(task.id, { attachments: [...files, ...more] });
-          }} />
-        )}
+          {editing && canEdit && (
+            <input type="file" accept="image/*,.pdf" className="text-sm mt-2" onChange={async (e) => {
+              if (!e.target.files?.length) return;
+              const more = await filesToAttachments(e.target.files);
+              updateTask(task.id, { attachments: [...files, ...more] });
+              e.target.value = "";
+            }} />
+          )}
+        </div>
 
         <div className="border-t border-black/5 pt-4">
           <div className="text-xs text-[#9a9aa0] mb-2">Комментарии</div>
