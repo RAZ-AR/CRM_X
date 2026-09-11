@@ -64,6 +64,7 @@ export type Comment = {
   userId: string;
   text: string;
   createdAt: string;
+  reactions: { emoji: string; userId: string }[];
 };
 
 export type Subtask = {
@@ -125,6 +126,8 @@ export type Contact = {
   kind: "staff" | "vendor" | "partner";
 };
 
+export type NoticeKind = "task_new" | "deadline" | "status" | "comment" | "broadcast";
+
 export type Notice = {
   id: string;
   userId: string;
@@ -132,6 +135,15 @@ export type Notice = {
   taskId?: string;
   createdAt: string;
   read: boolean;
+  readAt?: string;
+  kind?: NoticeKind;
+};
+
+export type Broadcast = {
+  text: string;
+  emoji: string;
+  authorId: string;
+  updatedAt: string;
 };
 
 export type AppState = {
@@ -143,4 +155,5 @@ export type AppState = {
   wiki: WikiPage[];
   contacts: Contact[];
   notices: Notice[];
+  broadcast: Broadcast | null;
 };

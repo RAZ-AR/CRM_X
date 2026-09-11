@@ -47,10 +47,12 @@ type Store = AppState & {
   previewId: string | null;
   setPreviewId: (id: string | null) => void;
   addZone: (z: { name: string; emoji: string; color: string; deadline: string }) => void;
+  setBroadcast: (text: string, emoji: string) => void;
+  toggleReaction: (commentId: string, emoji: string) => void;
 };
 
 const Ctx = createContext<Store | null>(null);
-const KEY = "crmx-norion-v4";
+const KEY = "crmx-norion-v5";
 const USER_KEY = "crmx-user";
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -69,7 +71,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           telegram: c.telegram || "",
           whatsapp: c.whatsapp || "",
         }));
-        setState({ ...seed, ...parsed, notices: parsed.notices ?? seed.notices, contacts });
+        setState({
+          ...seed,
+          ...parsed,
+          notices: parsed.notices ?? seed.notices,
+          contacts,
+          broadcast: parsed.broadcast ?? seed.broadcast ?? null,
+        });
       }
       const uid = localStorage.getItem(USER_KEY);
       if (uid) {
@@ -114,6 +122,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       taskId,
       createdAt: new Date().toISOString(),
       read: false,
+      kind: "task_new",
     };
     setState((s) => ({ ...s, notices: [n, ...(s.notices ?? [])] }));
   };
@@ -152,13 +161,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const t = s.tasks.find((x) => x.id === id);
       if (!t) return s;
       const extra: Notice[] = [];
-      const mk = (userId: string, text: string): Notice => ({
+      const mk = (userId: string, text: string, kind: Notice["kind"] = "status"): Notice => ({
         id: `n-${crypto.randomUUID().slice(0, 8)}`,
         userId,
         text,
         taskId: id,
         createdAt: new Date().toISOString(),
         read: false,
+        kind,
       });
       if (patch.status && current) {
         for (const uid of new Set([t.authorId, t.assigneeId])) {
@@ -166,7 +176,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         }
       }
       if (patch.assigneeId && patch.assigneeId !== current?.id) {
-        extra.push(mk(patch.assigneeId, `Вас назначили: ${t.title}`));
+        extra.push(mk(patch.assigneeId, `Вас назначили: ${t.title}`, "task_new"));
       }
       if (!extra.length) return s;
       return { ...s, notices: [...extra, ...(s.notices ?? [])] };
@@ -182,6 +192,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         userId: current.id,
         text,
         createdAt: new Date().toISOString(),
+        reactions: [],
       };
       setState((s) => {
         const task = s.tasks.find((x) => x.id === taskId);
@@ -196,6 +207,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 taskId,
                 createdAt: new Date().toISOString(),
                 read: false,
+                kind: "comment",
               });
             }
           }
@@ -239,6 +251,37 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       wiki: [{ ...p, id: `w-${crypto.randomUUID().slice(0, 8)}` }, ...s.wiki],
     }));
   }, []);
+
+  const setBroadcast = useCallback((text: string, emoji: string) => {
+    if (!current) return;
+    setState((s) => ({
+      ...s,
+      broadcast: {
+        text: text.slice(0, 300),
+        emoji: emoji || "💬",
+        authorId: current.id,
+        updatedAt: new Date().toISOString(),
+      },
+    }));
+  }, [current]);
+
+  const toggleReaction = useCallback((commentId: string, emoji: string) => {
+    if (!current) return;
+    setState((s) => ({
+      ...s,
+      comments: s.comments.map((c) => {
+        if (c.id !== commentId) return c;
+        const reactions = c.reactions ?? [];
+        const mine = reactions.find((r) => r.userId === current.id && r.emoji === emoji);
+        return {
+          ...c,
+          reactions: mine
+            ? reactions.filter((r) => !(r.userId === current.id && r.emoji === emoji))
+            : [...reactions, { emoji, userId: current.id }],
+        };
+      }),
+    }));
+  }, [current]);
 
   const addZone = useCallback((z: { name: string; emoji: string; color: string; deadline: string }) => {
     const slug = z.name
@@ -288,7 +331,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const markRead = useCallback((id: string) => {
     setState((s) => ({
       ...s,
-      notices: (s.notices ?? []).map((n) => (n.id === id ? { ...n, read: true } : n)),
+      notices: (s.notices ?? []).map((n) =>
+        n.id === id ? { ...n, read: true, readAt: n.readAt || new Date().toISOString() } : n,
+      ),
     }));
   }, []);
 
@@ -303,7 +348,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setState((s) => ({
       ...s,
       notices: (s.notices ?? []).map((n) =>
-        n.userId === current?.id ? { ...n, read: true } : n,
+        n.userId === current?.id ? { ...n, read: true, readAt: n.readAt || new Date().toISOString() } : n,
       ),
     }));
   }, [current]);
@@ -350,6 +395,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       previewId,
       setPreviewId,
       addZone,
+      setBroadcast,
+      toggleReaction,
     }),
     [
       state,
@@ -373,6 +420,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       previewId,
       setPreviewId,
       addZone,
+      setBroadcast,
+      toggleReaction,
     ],
   );
 

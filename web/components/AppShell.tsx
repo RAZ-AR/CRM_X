@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { cpoNav, employeeNav, isCpo } from "@/lib/access";
+import { noticeVisible } from "@/lib/emoji";
 import clsx from "clsx";
 import { TaskModal } from "@/components/TaskSheet";
 
@@ -34,7 +35,7 @@ const icons: Record<string, React.ReactNode> = {
 };
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { current, logout, notices, markRead, markAllRead, users } = useStore();
+  const { current, logout, notices, markRead, markAllRead, users, setPreviewId } = useStore();
   const path = usePathname();
   const router = useRouter();
   const [bell, setBell] = useState(false);
@@ -51,7 +52,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (!current) return null;
 
   const nav = isCpo(current) ? cpoNav() : employeeNav(current);
-  const mine = (notices ?? []).filter((n) => n.userId === current.id);
+  const mine = (notices ?? []).filter((n) => n.userId === current.id && noticeVisible(n));
   const unread = mine.filter((n) => !n.read).length;
   const team = users.filter((u) => u.id !== current.id).slice(0, 5);
 
@@ -180,10 +181,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 {mine.slice(0, 10).map((n) => (
                   <Link
                     key={n.id}
-                    href={n.taskId ? `/tasks/${n.taskId}` : "/notifications"}
-                    onClick={() => {
+                    href={n.taskId ? "#" : "/notifications"}
+                    onClick={(e) => {
+                      e.preventDefault();
                       markRead(n.id);
                       setBell(false);
+                      if (n.taskId) setPreviewId(n.taskId);
                     }}
                     className={`block rounded-xl px-3 py-2 text-sm mb-1 ${n.read ? "text-[#6b6b70]" : "bg-[#f4f4f6]"}`}
                   >

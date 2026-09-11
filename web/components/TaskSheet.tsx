@@ -6,6 +6,7 @@ import { canEditTask, canSeeTask, columns, isOverdue, statusMeta, taskZones } fr
 import { filesToAttachments } from "@/lib/files";
 import type { Priority } from "@/lib/types";
 import { Flame, X } from "lucide-react";
+import { EMOJIS } from "@/lib/emoji";
 
 export function TaskSheet({
   taskId,
@@ -16,7 +17,7 @@ export function TaskSheet({
 }) {
   const {
     current, tasks, users, zones, comments, subtasks,
-    updateTask, addComment, addSubtask, toggleSubtask,
+    updateTask, addComment, addSubtask, toggleSubtask, toggleReaction,
   } = useStore();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState("");
@@ -228,6 +229,17 @@ export function TaskSheet({
                 <div className="bg-[#f4f4f6] rounded-2xl px-3 py-2 text-sm flex-1">
                   <b className="font-medium">{users.find((u) => u.id === c.userId)?.name}</b>
                   <div>{c.text}</div>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {EMOJIS.map((e) => {
+                      const n = (c.reactions ?? []).filter((r) => r.emoji === e).length;
+                      const mine = (c.reactions ?? []).some((r) => r.emoji === e && r.userId === current.id);
+                      return (
+                        <button key={e} type="button" className={`text-sm px-1 rounded ${mine ? "bg-white" : ""}`} onClick={() => toggleReaction(c.id, e)}>
+                          {e}{n ? ` ${n}` : ""}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             ))}

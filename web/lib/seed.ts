@@ -2720,14 +2720,16 @@ export const seed: AppState = {
       "userId": "u-cpo",
       "text": "Новый бэклог: 90 задач, старт 15 сен",
       "createdAt": "2026-09-15T09:00:00",
-      "read": false
+      "read": false,
+      "kind": "task_new"
     },
     {
       "id": "n2",
       "userId": "u-armen",
       "text": "WAFL 15 окт · kitchen+COMX 30 окт · CAFE 15 дек",
       "createdAt": "2026-09-15T09:00:00",
-      "read": false
+      "read": false,
+      "kind": "task_new"
     }
   ],
   "contacts": [
@@ -2767,5 +2769,11 @@ export const seed: AppState = {
       "whatsapp": "",
       "kind": "partner"
     }
-  ]
+  ],
+  "broadcast": {
+    "text": "Сегодня строим окно. Маленький шаг — тоже путь.",
+    "emoji": "💪",
+    "authorId": "u-cpo",
+    "updatedAt": "2026-09-15T09:00:00"
+  }
 };

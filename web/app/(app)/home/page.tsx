@@ -3,20 +3,24 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { canSeeTask, isActual, isOverdue, sortActual, taskZones } from "@/lib/access";
+import { canManagePeople, canSeeTask, isActual, isOverdue, sortActual, taskZones } from "@/lib/access";
 import { zoneTaskProgress } from "@/lib/readiness";
 import { FitnessRings } from "@/components/FitnessRings";
 import { TaskCard } from "@/components/TaskCard";
+import { EMOJIS } from "@/lib/emoji";
 
 function dayNum(iso: string) {
   return Math.floor(new Date(iso + "T00:00:00").getTime() / 86400000);
 }
 
 export default function HomePage() {
-  const { current, tasks, zones, users, setPreviewId } = useStore();
+  const { current, tasks, zones, users, setPreviewId, broadcast, setBroadcast } = useStore();
   const now = new Date();
   const [calOpen, setCalOpen] = useState(false);
   const [picked, setPicked] = useState(now.toISOString().slice(0, 10));
+  const [msgEdit, setMsgEdit] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [msgEmoji, setMsgEmoji] = useState("💪");
   if (!current) return null;
 
   const visible = tasks.filter((t) => canSeeTask(current, t));
@@ -58,14 +62,41 @@ export default function HomePage() {
 
   return (
     <div className="space-y-4">
-      <div className="relative flex items-center gap-2">
+      <div className="relative flex flex-col sm:flex-row sm:items-center gap-2">
         <button
           type="button"
           onClick={() => setCalOpen((v) => !v)}
-          className="pill bg-black text-white px-4 py-2 text-sm capitalize"
+          className="pill bg-black text-white px-4 py-2 text-sm capitalize self-start"
         >
           {dateLabel}
         </button>
+        <div className="flex-1 rounded-2xl bg-[#f4f4f6] px-3 py-2 text-sm min-w-0">
+          {msgEdit && canManagePeople(current) ? (
+            <div>
+              <div className="flex gap-1 mb-1 flex-wrap">
+                {EMOJIS.map((e) => (
+                  <button key={e} type="button" className={`text-lg ${msgEmoji===e?"scale-125":""}`} onClick={() => setMsgEmoji(e)}>{e}</button>
+                ))}
+              </div>
+              <textarea className="w-full text-sm min-h-[64px]" maxLength={300} value={msg} onChange={(e)=>setMsg(e.target.value.slice(0,300))} />
+              <div className="flex justify-between text-[11px] text-[#9a9aa0] mt-1">
+                <span>{msg.length}/300</span>
+                <span>
+                  <button type="button" className="mr-2" onClick={()=>setMsgEdit(false)}>Отмена</button>
+                  <button type="button" className="font-semibold text-black" onClick={()=>{ setBroadcast(msg, msgEmoji); setMsgEdit(false); }}>Сохранить</button>
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-start gap-2">
+              <span className="text-lg">{broadcast?.emoji || "💪"}</span>
+              <p className="flex-1">{broadcast?.text || "Сегодня хороший день, чтобы закрыть одну задачу."}</p>
+              {canManagePeople(current) && (
+                <button type="button" className="text-[11px] underline shrink-0" onClick={()=>{ setMsg(broadcast?.text||""); setMsgEmoji(broadcast?.emoji||"💪"); setMsgEdit(true); }}>Изменить</button>
+              )}
+            </div>
+          )}
+        </div>
         {calOpen && (
           <div className="absolute left-0 top-12 z-20 w-[min(20rem,100%)] bg-white rounded-2xl shadow-lg border border-black/5 p-4">
             <div className="grid grid-cols-7 text-center text-[11px] text-[#9a9aa0] mb-2">
