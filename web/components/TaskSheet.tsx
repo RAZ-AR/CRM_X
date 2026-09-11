@@ -5,6 +5,7 @@ import { useStore } from "@/lib/store";
 import { canEditTask, canSeeTask, columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
 import { filesToAttachments } from "@/lib/files";
 import type { Priority } from "@/lib/types";
+import { formatDate } from "@/lib/dates";
 import { Flame, X } from "lucide-react";
 import { EMOJIS } from "@/lib/emoji";
 
@@ -126,8 +127,8 @@ export function TaskSheet({
         <div className="grid grid-cols-2 gap-3 text-sm">
           <Meta k="Исполнитель" v={assignee?.name ?? "—"} />
           <Meta k="Создал" v={author?.name ?? "—"} />
-          <Meta k="Начало" v={task.startDate || "—"} />
-          <Meta k="Конец" v={task.due} />
+          <Meta k="Начало" v={formatDate(task.startDate)} />
+          <Meta k="Конец" v={formatDate(task.due)} />
           <Meta k="Срочность" v={task.priority} />
           <Meta k="Поток" v={task.workstream || "—"} />
         </div>

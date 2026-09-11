@@ -4,6 +4,7 @@ import { useState } from "react";
 import { columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
 import { useStore } from "@/lib/store";
 import type { Task, TaskStatus, User, Zone } from "@/lib/types";
+import { formatDate } from "@/lib/dates";
 import { Check, Flame, X } from "lucide-react";
 
 export function TaskCard({
@@ -51,7 +52,7 @@ export function TaskCard({
             {a?.name}
           </span>
         </div>
-        <div className="text-[11px] text-gray-400 mt-1">{task.startDate} → {task.due}</div>
+        <div className="text-[11px] text-gray-400 mt-1">{formatDate(task.startDate)} → {formatDate(task.due)}</div>
       </button>
       {pending && pending !== task.status ? (
         <div className="mt-2 flex items-center gap-2">

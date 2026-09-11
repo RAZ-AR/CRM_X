@@ -7,6 +7,7 @@ import { canManagePeople, canSeeTask, isActual, isOverdue, sortActual, taskZones
 import { zoneTaskProgress } from "@/lib/readiness";
 import { FitnessRings } from "@/components/FitnessRings";
 import { TaskCard } from "@/components/TaskCard";
+import { formatDate } from "@/lib/dates";
 import { EMOJIS } from "@/lib/emoji";
 
 function dayNum(iso: string) {
@@ -21,9 +22,12 @@ export default function HomePage() {
   const [msgEdit, setMsgEdit] = useState(false);
   const [msg, setMsg] = useState("");
   const [msgEmoji, setMsgEmoji] = useState("💪");
+  const [assignee, setAssignee] = useState("all");
   if (!current) return null;
 
-  const visible = tasks.filter((t) => canSeeTask(current, t, users));
+  let visible = tasks.filter((t) => canSeeTask(current, t, users));
+  if (assignee !== "all") visible = visible.filter((t) => t.assigneeId === assignee);
+  const people = users.filter((u) => tasks.some((x) => x.assigneeId === u.id && canSeeTask(current, x, users)));
   const zoneList = zones;
   const dayTasks = sortActual(visible.filter((t) => isActual(t, picked)), picked);
 
@@ -54,11 +58,7 @@ export default function HomePage() {
     return zones.find((z) => z.slug === zs[0])?.color ?? "#9ca3af";
   }
 
-  const dateLabel = new Date(picked + "T12:00:00").toLocaleDateString("ru-RU", {
-    weekday: "short",
-    day: "numeric",
-    month: "long",
-  });
+  const dateLabel = formatDate(picked);
 
   return (
     <div className="space-y-4">
@@ -66,10 +66,16 @@ export default function HomePage() {
         <button
           type="button"
           onClick={() => setCalOpen((v) => !v)}
-          className="pill bg-black text-white px-4 py-2 text-sm capitalize self-start"
+          className="pill bg-black text-white px-4 py-2 text-sm self-start"
         >
           {dateLabel}
         </button>
+        <select className="pill bg-white border border-black/10 px-3 py-2 text-sm self-start" value={assignee} onChange={(e) => setAssignee(e.target.value)}>
+          <option value="all">Все исполнители</option>
+          {people.map((u) => (
+            <option key={u.id} value={u.id}>{u.name}</option>
+          ))}
+        </select>
         <div className="flex-1 rounded-2xl bg-[#f4f4f6] px-3 py-2 text-sm min-w-0">
           {msgEdit && canManagePeople(current) ? (
             <div>
@@ -187,7 +193,7 @@ export default function HomePage() {
                 const d = new Date((dayNum(minD) + i * 7) * 86400000);
                 return (
                   <div key={i} className="shrink-0" style={{ width: 7 * dayW }}>
-                    {d.toLocaleDateString("ru-RU", { day: "numeric", month: "short" })}
+                    {formatDate(d.toISOString().slice(0, 10)).slice(0, 5)}
                   </div>
                 );
               })}

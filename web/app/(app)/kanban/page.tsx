@@ -7,11 +7,13 @@ import { canSeeTask, columns, sortActual, statusMeta } from "@/lib/access";
 import { AddTaskModal } from "@/components/AddTaskModal";
 import { TaskCard } from "@/components/TaskCard";
 import type { ZoneSlug } from "@/lib/types";
+import { formatDate } from "@/lib/dates";
 
 export default function KanbanPage() {
   const { current, tasks, zones, users, updateTask } = useStore();
   const [zone, setZone] = useState<ZoneSlug | "all">("all");
   const [due, setDue] = useState<string | null>(null);
+  const [assignee, setAssignee] = useState("all");
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -26,14 +28,22 @@ export default function KanbanPage() {
   let list = sortActual(tasks.filter((t) => canSeeTask(current, t, users)));
   if (zone !== "all") list = list.filter((t) => t.zone === zone);
   if (due) list = list.filter((t) => t.due === due);
+  if (assignee !== "all") list = list.filter((t) => t.assigneeId === assignee);
+  const people = users.filter((u) => tasks.some((x) => x.assigneeId === u.id && canSeeTask(current, x, users)));
   const zobj = zones.find((z) => z.slug === zone);
 
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <h1 className="text-xl font-semibold flex-1">
-          Доска {zobj ? `· ${zobj.emoji} ${zobj.name}` : "· все проекты"}{due ? ` · ${due}` : ""}
+          Доска {zobj ? `· ${zobj.emoji} ${zobj.name}` : "· все проекты"}{due ? ` · ${formatDate(due)}` : ""}
         </h1>
+        <select className="text-sm" value={assignee} onChange={(e) => setAssignee(e.target.value)}>
+          <option value="all">Все исполнители</option>
+          {people.map((u) => (
+            <option key={u.id} value={u.id}>{u.name}</option>
+          ))}
+        </select>
         <select
           className="text-sm"
           value={zone}

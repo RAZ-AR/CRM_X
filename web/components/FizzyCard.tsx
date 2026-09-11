@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { statusMeta } from "@/lib/access";
 import type { Task, User } from "@/lib/types";
+import { formatDate } from "@/lib/dates";
 
 export function FizzyCard({
   task,
@@ -23,7 +24,7 @@ export function FizzyCard({
         <span className="font-medium flex-1">{task.title}</span>
       </div>
       <div className="text-xs text-gray-400 mt-1">
-        {zoneName} · {a?.name} · {task.due}
+        {zoneName} · {a?.name} · {formatDate(task.due)}
       </div>
     </>
   );
