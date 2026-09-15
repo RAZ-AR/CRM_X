@@ -1,6 +1,6 @@
 export type Role = "cpo" | "employee";
 
-export type TaskStatus = "todo" | "in_progress" | "review" | "done";
+export type TaskStatus = "todo" | "in_progress" | "blocked" | "review" | "done";
 
 export type Priority = "low" | "medium" | "high" | "critical";
 
@@ -98,6 +98,7 @@ export type Task = {
   wave: "A" | "B" | "C" | "";
   workstream: string;
   dependsOn: string[];
+  blockReason?: string;
 };
 
 export type WikiPage = {

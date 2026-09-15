@@ -18,6 +18,7 @@ model User {
   avatar      String
   permissions Json
   boardZones  Json
+  managerId   String?
 }
 
 model Zone {
@@ -51,6 +52,7 @@ model Task {
   wave           String  @default("")
   workstream     String  @default("")
   dependsOn      Json
+  blockReason    String  @default("")
 }
 
 model Comment {
@@ -59,6 +61,7 @@ model Comment {
   userId    String
   text      String
   createdAt String
+  reactions Json   @default("[]")
 }
 
 model Subtask {
@@ -77,14 +80,16 @@ model WikiPage {
 }
 
 model Contact {
-  id      String @id
-  name    String
-  company String @default("")
-  title   String @default("")
-  phone   String @default("")
-  email   String @default("")
-  zone    String
-  kind    String
+  id       String @id
+  name     String
+  company  String @default("")
+  title    String @default("")
+  phone    String @default("")
+  email    String @default("")
+  telegram String @default("")
+  whatsapp String @default("")
+  zone     String
+  kind     String
 }
 
 model Notice {
@@ -94,4 +99,14 @@ model Notice {
   taskId    String?
   createdAt String
   read      Boolean @default(false)
+  readAt    String?
+  kind      String?
+}
+
+model Broadcast {
+  id        String @id @default("main")
+  text      String
+  emoji     String
+  authorId  String
+  updatedAt String
 }

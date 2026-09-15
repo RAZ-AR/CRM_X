@@ -68,7 +68,11 @@ export function TaskCard({
             type="button"
             className="h-9 w-9 rounded-full bg-black text-white grid place-items-center"
             onClick={() => {
-              updateTask(task.id, { status: pending });
+              const r = updateTask(task.id, { status: pending });
+              if (!r.ok) {
+                alert(r.error);
+                return;
+              }
               setPending(null);
             }}
             aria-label="Сохранить"

@@ -31,16 +31,27 @@ export function subordinateIds(userId: string, users: User[]): string[] {
   return out;
 }
 
-/** Свои назначенные + задачи подчинённых. CPO видит всё. */
+/** Назначенный, участник, автор, подчинённые. CPO видит всё. */
 export function canSeeTask(user: User, task: Task, users: User[] = []) {
   if (isCpo(user)) return true;
   if (task.assigneeId === user.id) return true;
+  if (task.authorId === user.id) return true;
+  if ((task.participantIds ?? []).includes(user.id)) return true;
   if (users.length && subordinateIds(user.id, users).includes(task.assigneeId)) return true;
   return false;
 }
 
+/** Срок, вес, critical path, название — автор / CPO / Armen. */
 export function canEditTask(user: User, task: Task) {
   return isCpo(user) || canManagePeople(user) || task.authorId === user.id;
+}
+
+/** Статус, чеклист, комментарий, вложение — исполнитель и участники тоже. */
+export function canWorkTask(user: User, task: Task) {
+  if (canEditTask(user, task)) return true;
+  if (task.assigneeId === user.id) return true;
+  if ((task.participantIds ?? []).includes(user.id)) return true;
+  return false;
 }
 
 export function canSeeWiki(user: User, page: WikiPage) {
@@ -130,8 +141,9 @@ export const statusMeta: Record<
 > = {
   todo: { label: "Не начато · бэклог", emoji: "", color: "#E5E7EB" },
   in_progress: { label: "В работе", emoji: "🔵", color: "#BFDBFE" },
+  blocked: { label: "Заблокировано", emoji: "⛔", color: "#FECACA" },
   review: { label: "На проверке", emoji: "🟣", color: "#DDD6FE" },
   done: { label: "Готово", emoji: "🟢", color: "#BBF7D0" },
 };
 
-export const columns: Task["status"][] = ["todo", "in_progress", "review", "done"];
+export const columns: Task["status"][] = ["todo", "in_progress", "blocked", "review", "done"];

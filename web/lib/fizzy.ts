@@ -3,6 +3,7 @@ import type { TaskStatus } from "./types";
 export const COL: Record<TaskStatus, { title: string; color: string }> = {
   todo: { title: "Не начато · бэклог", color: "#E5E7EB" },
   in_progress: { title: "В работе", color: "#BFDBFE" },
+  blocked: { title: "Заблокировано", color: "#FECACA" },
   review: { title: "На проверке", color: "#DDD6FE" },
   done: { title: "Готово", color: "#BBF7D0" },
 };

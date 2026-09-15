@@ -60,6 +60,18 @@ export default function HomePage() {
 
   const dateLabel = formatDate(picked);
 
+  const waveA = visible.filter((t) => t.wave === "A");
+  const cp = waveA.filter((t) => t.criticalPath);
+  const cpTotal = cp.reduce((s, t) => s + t.weight, 0) || 1;
+  const cpDone = cp.filter((t) => t.status === "done").reduce((s, t) => s + t.weight, 0);
+  const cpPct = Math.round((cpDone / cpTotal) * 100);
+  const blockedCp = visible.filter((t) => t.criticalPath && t.status === "blocked").length;
+  const overdue2 = visible.filter((t) => isOverdue(t, picked) && t.status !== "done").length;
+  const reviewOld = visible.filter((t) => t.status === "review").length;
+  const daysA = Math.max(0, dayNum("2026-10-10") - dayNum(picked));
+  const daysB = Math.max(0, dayNum("2026-10-31") - dayNum(picked));
+  const daysC = Math.max(0, dayNum("2027-01-10") - dayNum(picked));
+
   return (
     <div className="space-y-4">
       <div className="relative flex flex-col sm:flex-row sm:items-center gap-2">
@@ -139,6 +151,24 @@ export default function HomePage() {
           </div>
         )}
       </div>
+
+      {canManagePeople(current) && (
+        <section className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          {[
+            ["до A", `${daysA}д`],
+            ["до B", `${daysB}д`],
+            ["до C", `${daysC}д`],
+            ["critical A", `${cpPct}%`],
+            ["блок CP", String(blockedCp)],
+            ["просрочка / проверка", `${overdue2} / ${reviewOld}`],
+          ].map(([k, v]) => (
+            <div key={k} className="rounded-2xl bg-white border border-black/5 px-3 py-2">
+              <div className="text-[10px] text-[#9a9aa0]">{k}</div>
+              <div className="font-semibold text-sm">{v}</div>
+            </div>
+          ))}
+        </section>
+      )}
 
       <section className="grid grid-cols-2 gap-3">
         {zoneList.map((z) => {

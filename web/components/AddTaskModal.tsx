@@ -38,12 +38,13 @@ export function AddTaskModal({
       status: "todo",
       weight: 1,
       criticalPath: false,
-      result: "",
+      result: String(fd.get("result") || ""),
       attachments,
       code: "",
       wave: "",
       workstream: "",
       dependsOn: [],
+      blockReason: "",
       zones: [zone],
     }) as unknown as string;
     const comment = String(fd.get("comment") || "").trim();
@@ -89,6 +90,7 @@ export function AddTaskModal({
           ))}
         </select>
         <textarea name="description" placeholder="Описание" className="w-full" />
+        <textarea name="result" placeholder="Готово когда… (критерий закрытия)" className="w-full" />
         <textarea name="comment" placeholder="Комментарий к задаче" className="w-full" />
         <label className="text-xs text-gray-500 block">
           Файл или фото

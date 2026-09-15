@@ -27,12 +27,14 @@ export default function LoginPage() {
     <div className="min-h-screen grid place-items-center p-6">
       <div className="bg-white rounded-[30px] w-full max-w-md p-8">
         <h1 className="text-2xl font-semibold mb-1">CRM X</h1>
-        <p className="text-sm text-[#757575] mb-5">логин = пароль</p>
+        <p className="text-sm text-[#757575] mb-5">логин и PIN — по 4 цифры</p>
         <form
           className="flex flex-col gap-3"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            if (login(email, password)) router.push("/home");
+            setErr("");
+            const ok = await login(email, password);
+            if (ok) router.push("/home");
             else setErr("Неверный логин или пароль");
           }}
         >

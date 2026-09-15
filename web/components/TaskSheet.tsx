@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { canEditTask, canSeeTask, columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
+import { canEditTask, canSeeTask, canWorkTask, columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
+import { openDeps, unlockedBy } from "@/lib/taskRules";
 import { filesToAttachments } from "@/lib/files";
 import type { Priority } from "@/lib/types";
 import { formatDate } from "@/lib/dates";
@@ -31,7 +32,10 @@ export function TaskSheet({
     );
   }
   const isAuthor = task.authorId === current.id;
-  const canEdit = isAuthor || canEditTask(current, task);
+  const canEdit = canEditTask(current, task);
+  const canWork = canWorkTask(current, task);
+  const waiting = openDeps(task, tasks);
+  const unlocks = unlockedBy(task, tasks);
   const comms = comments.filter((c) => c.taskId === task.id);
   const subs = subtasks.filter((s) => s.taskId === task.id);
   const author = users.find((u) => u.id === task.authorId);
@@ -99,13 +103,49 @@ export function TaskSheet({
           <Meta k="Вложения" v={files.length ? String(files.length) : "нет"} />
         </div>
 
+        {canWork && (
+          <div className="space-y-2">
+            <label className="text-xs text-[#9a9aa0] block">Статус
+              <select
+                className="w-full mt-1"
+                value={task.status}
+                onChange={(e) => {
+                  const status = e.target.value as typeof task.status;
+                  const r = updateTask(task.id, { status });
+                  if (!r.ok) {
+                    alert(r.error);
+                    e.target.value = task.status;
+                  }
+                }}
+              >
+                {columns.map((c) => (
+                  <option key={c} value={c}>{statusMeta[c].label}</option>
+                ))}
+              </select>
+            </label>
+            <label className="text-xs text-[#9a9aa0] block">Готово когда
+              <textarea
+                className="w-full mt-1 min-h-16"
+                defaultValue={task.result}
+                placeholder="Критерий закрытия. Без этого нельзя «на проверку» и «готово»"
+                onBlur={(e) => updateTask(task.id, { result: e.target.value })}
+              />
+            </label>
+            {task.status === "blocked" && (
+              <label className="text-xs text-[#9a9aa0] block">Почему блок
+                <input
+                  className="w-full mt-1"
+                  defaultValue={task.blockReason ?? ""}
+                  placeholder="ждём NOR-xxx / подрядчик / разрешение"
+                  onBlur={(e) => updateTask(task.id, { blockReason: e.target.value })}
+                />
+              </label>
+            )}
+          </div>
+        )}
+
         {editing && canEdit && (
           <div className="grid sm:grid-cols-2 gap-2">
-            <select value={task.status} onChange={(e) => updateTask(task.id, { status: e.target.value as typeof task.status })}>
-              {columns.map((c) => (
-                <option key={c} value={c}>{statusMeta[c].label}</option>
-              ))}
-            </select>
             <select value={task.assigneeId} onChange={(e) => updateTask(task.id, { assigneeId: e.target.value })}>
               {users.map((u) => (
                 <option key={u.id} value={u.id}>{u.name}</option>
@@ -133,6 +173,10 @@ export function TaskSheet({
           />
         )}
 
+        {waiting.length > 0 && task.status !== "done" && (
+          <p className="text-sm text-[#b91c1c]">Закрытие ждёт: {waiting.map((t) => t.code || t.title).join(", ")}</p>
+        )}
+
         {(task.dependsOn ?? []).length > 0 && (
           <div>
             <div className="text-xs text-[#9a9aa0] mb-1">Ждёт</div>
@@ -147,6 +191,17 @@ export function TaskSheet({
                   <span key={code} className="text-xs">{code}</span>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {unlocks.length > 0 && (
+          <div>
+            <div className="text-xs text-[#9a9aa0] mb-1">Открывает</div>
+            <div className="flex flex-wrap gap-2">
+              {unlocks.map((d) => (
+                <span key={d.id} className="pill bg-[#f4f4f6] px-3 py-1 text-xs">{d.code} {d.title}</span>
+              ))}
             </div>
           </div>
         )}

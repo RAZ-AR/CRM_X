@@ -15,6 +15,7 @@ export default function KanbanPage() {
   const [due, setDue] = useState<string | null>(null);
   const [assignee, setAssignee] = useState("all");
   const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
 
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
@@ -29,6 +30,15 @@ export default function KanbanPage() {
   if (zone !== "all") list = list.filter((t) => t.zone === zone);
   if (due) list = list.filter((t) => t.due === due);
   if (assignee !== "all") list = list.filter((t) => t.assigneeId === assignee);
+  if (q.trim()) {
+    const s = q.trim().toLowerCase();
+    list = list.filter(
+      (t) =>
+        t.title.toLowerCase().includes(s) ||
+        (t.code || "").toLowerCase().includes(s) ||
+        (t.workstream || "").toLowerCase().includes(s),
+    );
+  }
   const people = users.filter((u) => tasks.some((x) => x.assigneeId === u.id && canSeeTask(current, x, users)));
   const zobj = zones.find((z) => z.slug === zone);
 
@@ -59,6 +69,12 @@ export default function KanbanPage() {
             <option key={z.slug} value={z.slug}>{z.emoji} {z.name}</option>
           ))}
         </select>
+        <input
+          className="text-sm px-3 py-2 rounded-full bg-white border border-black/10 w-40"
+          placeholder="NOR-001 / поиск"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
         <button className="pill bg-black text-white px-4 py-2 text-sm flex items-center gap-1" onClick={() => setOpen(true)}>
           <Plus size={16} /> Добавить задачу
         </button>
@@ -81,7 +97,10 @@ export default function KanbanPage() {
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   const id = e.dataTransfer.getData("id");
-                  if (id) updateTask(id, { status: col });
+                  if (id) {
+                    const r = updateTask(id, { status: col });
+                    if (!r.ok) alert(r.error);
+                  }
                 }}
               >
                 {list

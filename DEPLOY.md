@@ -31,4 +31,8 @@ curl -X POST https://ТВОЙ-ДОМЕН/api/state -H 'content-type: application
 
 Логины как на экране входа: **1111 / 1111** Owner, **2222 / 2222** Armen, …
 
+С `DATABASE_URL` приложение само читает `GET /api/state` и пишет `PUT /api/state` (~0.6с после правки). Два браузера видят одну доску.
+
 Пока `DATABASE_URL` нет — сайт живёт, данные остаются в браузере (localStorage).
+
+После смены схемы: `cd web && npx prisma db push`.
