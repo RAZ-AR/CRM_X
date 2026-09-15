@@ -29,6 +29,7 @@ type Store = AppState & {
   current: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  cloud: boolean;
   addTask: (t: Omit<Task, "id" | "createdAt">) => string;
   updateTask: (id: string, patch: Partial<Task>) => { ok: true } | { ok: false; error: string };
   addComment: (taskId: string, text: string) => void;
@@ -178,6 +179,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const me = hydrated.users.find((x) => x.id === data.user.id) ?? data.user;
         setCurrent(me);
       } else {
+        setRemote(false);
         setCurrent(data.user);
       }
       localStorage.setItem(USER_KEY, data.user.id);
@@ -565,6 +567,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     () => ({
       ...state,
       current,
+      cloud: remote,
       login,
       logout,
       addTask,
@@ -593,6 +596,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [
       state,
       current,
+      remote,
       login,
       logout,
       addTask,

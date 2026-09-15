@@ -35,7 +35,7 @@ const icons: Record<string, React.ReactNode> = {
 };
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { current, logout, notices, markRead, markAllRead, users, setPreviewId } = useStore();
+  const { current, logout, notices, markRead, markAllRead, users, setPreviewId, cloud } = useStore();
   const path = usePathname();
   const router = useRouter();
   const [bell, setBell] = useState(false);
@@ -169,6 +169,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </span>
               )}
             </button>
+            <span className={`hidden sm:inline text-[10px] px-2 py-1 rounded-full ${cloud ? "bg-[#d4f5e4] text-[#166534]" : "bg-[#fee2e2] text-[#991b1b]"}`}>
+              {cloud ? "облако" : "только этот браузер"}
+            </span>
             <span className="hidden sm:grid h-10 w-10 rounded-full bg-[#d4f5e4] place-items-center font-semibold shrink-0">
               {current.avatar}
             </span>
@@ -199,6 +202,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </div>
             )}
           </header>
+          {!cloud && (
+            <div className="mx-3 md:mx-6 mb-2 rounded-2xl bg-[#fee2e2] text-[#991b1b] text-sm px-4 py-3">
+              Общая база сейчас недоступна (Vercel не видит Postgres). Статусы живут только в этом браузере.
+              В Aiven → сервис Postgres → Allowed IP addresses поставь <b>0.0.0.0/0</b> и подожди минуту.
+            </div>
+          )}
           <main className="flex-1 px-3 pb-4 md:px-6 md:pb-6 min-w-0">{children}</main>
           <TaskModal />
         </div>
