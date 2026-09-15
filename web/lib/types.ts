@@ -99,6 +99,9 @@ export type Task = {
   workstream: string;
   dependsOn: string[];
   blockReason?: string;
+  /** ISO date or "forever" */
+  blockUntil?: string;
+  blockFromStatus?: TaskStatus;
 };
 
 export type WikiPage = {

@@ -69,7 +69,7 @@ export function TaskCard({
           )}
         </div>
       </button>
-      {pending && pending !== task.status ? (
+      {task.status !== "blocked" && pending && pending !== task.status ? (
         <div className="mt-2 flex items-center gap-2 min-w-0">
           <span className="flex-1 min-w-0 truncate text-xs text-[#757575]">→ {SHORT[pending]}</span>
           <button
@@ -96,7 +96,7 @@ export function TaskCard({
             <X size={14} />
           </button>
         </div>
-      ) : (
+      ) : task.status !== "blocked" ? (
         <div className="mt-2 grid grid-cols-[32px_1fr_32px] items-center gap-1 min-w-0">
           <button
             type="button"
@@ -118,7 +118,7 @@ export function TaskCard({
             <ChevronRight size={16} />
           </button>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

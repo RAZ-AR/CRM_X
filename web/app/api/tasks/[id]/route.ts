@@ -5,7 +5,7 @@ import { canMoveStatus } from "@/lib/taskRules";
 import { loadSharedState, saveSharedState } from "@/lib/blobState";
 import type { Task } from "@/lib/types";
 
-const WORK = ["status", "result", "blockReason", "attachments"] as const;
+const WORK = ["status", "result", "blockReason", "blockUntil", "blockFromStatus", "attachments"] as const;
 
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const user = await sessionUser();
@@ -30,6 +30,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
     const check = canMoveStatus(prev, nextPatch.status, state.tasks, user, {
       result: nextPatch.result,
       blockReason: nextPatch.blockReason,
+      blockUntil: nextPatch.blockUntil,
     });
     if (!check.ok) return NextResponse.json({ ok: false, error: check.error }, { status: 400 });
   }

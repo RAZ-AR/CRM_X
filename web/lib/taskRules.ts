@@ -28,11 +28,12 @@ export function canMoveStatus(
   next: TaskStatus,
   tasks: Task[],
   user: User | null,
-  extra?: { result?: string; blockReason?: string },
+  extra?: { result?: string; blockReason?: string; blockUntil?: string },
 ): { ok: true } | { ok: false; error: string } {
   if (next === task.status) return { ok: true };
   const result = (extra?.result ?? task.result ?? "").trim();
-  const reason = (extra?.blockReason ?? (task as Task & { blockReason?: string }).blockReason ?? "").trim();
+  const reason = (extra?.blockReason ?? task.blockReason ?? "").trim();
+  const until = extra?.blockUntil ?? task.blockUntil ?? "";
   const override = user ? isCpo(user) || canManagePeople(user) : false;
   const blockedBy = openDeps(task, tasks);
 
@@ -45,8 +46,9 @@ export function canMoveStatus(
     return { ok: false, error: "Заполните «готово когда» — без этого на проверку и в готово нельзя" };
   }
 
-  if (next === "blocked" && !reason && !blockedBy.length) {
-    return { ok: false, error: "Укажите, почему задача заблокирована" };
+  if (next === "blocked") {
+    if (!until) return { ok: false, error: "Выбери срок блока: день, неделя, месяц или навсегда" };
+    if (!reason) return { ok: false, error: "Напиши комментарий, почему блок" };
   }
 
   return { ok: true };

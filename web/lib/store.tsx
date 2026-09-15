@@ -296,6 +296,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const check = canMoveStatus(prev, patch.status, s.tasks, current, {
           result: patch.result,
           blockReason: patch.blockReason,
+          blockUntil: patch.blockUntil,
         });
         if (!check.ok) {
           result = check;

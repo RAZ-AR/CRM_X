@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { canSeeTask, columns, sortActual, statusMeta } from "@/lib/access";
+import { boardColumns, canSeeTask, columns, sortActual, statusMeta } from "@/lib/access";
 import { AddTaskModal } from "@/components/AddTaskModal";
 import { TaskCard } from "@/components/TaskCard";
 import type { ZoneSlug } from "@/lib/types";
@@ -87,7 +87,7 @@ export default function KanbanPage() {
       )}
       <div className="overflow-x-auto pb-4 -mx-3 px-3 snap-x snap-mandatory">
         <div className="flex gap-3 min-w-[72rem]">
-          {columns.map((col) => (
+          {boardColumns.map((col) => (
             <div key={col} className="card p-3 w-[min(85vw,18rem)] md:w-auto md:flex-1 md:min-w-[13.5rem] shrink-0 snap-center min-w-0">
               <div className="text-sm font-medium mb-2 px-1">
                 {statusMeta[col].emoji} {statusMeta[col].label}
@@ -97,10 +97,9 @@ export default function KanbanPage() {
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   const id = e.dataTransfer.getData("id");
-                  if (id) {
-                    const r = updateTask(id, { status: col });
-                    if (!r.ok) alert(r.error);
-                  }
+                  if (!id || col === "blocked") return;
+                  const r = updateTask(id, { status: col });
+                  if (!r.ok) alert(r.error);
                 }}
               >
                 {list

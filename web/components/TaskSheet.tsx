@@ -24,6 +24,9 @@ export function TaskSheet({
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState("");
   const [sub, setSub] = useState("");
+  const [blockOpen, setBlockOpen] = useState(false);
+  const [blockFor, setBlockFor] = useState<"day" | "week" | "month" | "forever">("day");
+  const [blockNote, setBlockNote] = useState("");
   if (!current) return null;
   const task = tasks.find((t) => t.id === taskId);
   if (!task || !canSeeTask(current, task, users)) {
@@ -105,6 +108,7 @@ export function TaskSheet({
 
         {canWork && (
           <div className="space-y-2">
+            {task.status !== "blocked" && (
             <label className="text-xs text-[#9a9aa0] block">Статус
               <select
                 className="w-full mt-1"
@@ -123,6 +127,7 @@ export function TaskSheet({
                 ))}
               </select>
             </label>
+            )}
             <label className="text-xs text-[#9a9aa0] block">Готово когда
               <textarea
                 className="w-full mt-1 min-h-16"
@@ -131,15 +136,79 @@ export function TaskSheet({
                 onBlur={(e) => updateTask(task.id, { result: e.target.value })}
               />
             </label>
-            {task.status === "blocked" && (
-              <label className="text-xs text-[#9a9aa0] block">Почему блок
-                <input
-                  className="w-full mt-1"
-                  defaultValue={task.blockReason ?? ""}
-                  placeholder="ждём NOR-xxx / подрядчик / разрешение"
-                  onBlur={(e) => updateTask(task.id, { blockReason: e.target.value })}
-                />
-              </label>
+            {task.status === "blocked" ? (
+              <div className="rounded-2xl bg-[#fee2e2] px-3 py-3 text-sm space-y-2">
+                <div className="font-medium">Заблокировано {task.blockUntil === "forever" ? "навсегда" : task.blockUntil ? `до ${formatDate(task.blockUntil)}` : ""}</div>
+                {task.blockReason && <p className="text-[#7f1d1d]">{task.blockReason}</p>}
+                <button
+                  type="button"
+                  className="pill bg-black text-white px-3 py-1.5 text-xs"
+                  onClick={() => {
+                    const back = task.blockFromStatus && task.blockFromStatus !== "blocked" ? task.blockFromStatus : "todo";
+                    const r = updateTask(task.id, { status: back, blockReason: "", blockUntil: "" });
+                    if (!r.ok) alert(r.error);
+                  }}
+                >
+                  Снять блок
+                </button>
+              </div>
+            ) : (
+              <div>
+                {!blockOpen ? (
+                  <button type="button" className="text-sm underline text-[#b91c1c]" onClick={() => setBlockOpen(true)}>
+                    Заблокировать…
+                  </button>
+                ) : (
+                  <div className="rounded-2xl border border-black/10 p-3 space-y-2">
+                    <div className="text-xs text-[#9a9aa0]">На сколько</div>
+                    <div className="flex flex-wrap gap-2">
+                      {([["day", "на день"], ["week", "на неделю"], ["month", "на месяц"], ["forever", "навсегда"]] as const).map(([id, label]) => (
+                        <button
+                          key={id}
+                          type="button"
+                          className={`pill px-3 py-1.5 text-sm ${blockFor === id ? "bg-black text-white" : "bg-[#f4f4f6]"}`}
+                          onClick={() => setBlockFor(id)}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    <textarea
+                      className="w-full min-h-16"
+                      placeholder="Комментарий: почему блок"
+                      value={blockNote}
+                      onChange={(e) => setBlockNote(e.target.value)}
+                    />
+                    <div className="flex gap-2 justify-end">
+                      <button type="button" className="pill px-3 py-1.5 bg-[#f4f4f6] text-sm" onClick={() => setBlockOpen(false)}>Отмена</button>
+                      <button
+                        type="button"
+                        className="pill bg-black text-white px-3 py-1.5 text-sm"
+                        onClick={() => {
+                          const note = blockNote.trim();
+                          const d = new Date();
+                          let until = "forever";
+                          if (blockFor === "day") { d.setDate(d.getDate() + 1); until = d.toISOString().slice(0, 10); }
+                          if (blockFor === "week") { d.setDate(d.getDate() + 7); until = d.toISOString().slice(0, 10); }
+                          if (blockFor === "month") { d.setMonth(d.getMonth() + 1); until = d.toISOString().slice(0, 10); }
+                          const r = updateTask(task.id, {
+                            status: "blocked",
+                            blockReason: note,
+                            blockUntil: until,
+                            blockFromStatus: task.status,
+                          });
+                          if (!r.ok) { alert(r.error); return; }
+                          if (note) addComment(task.id, `Блок ${blockFor === "forever" ? "навсегда" : "до " + until}: ${note}`);
+                          setBlockOpen(false);
+                          setBlockNote("");
+                        }}
+                      >
+                        Заблокировать
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         )}

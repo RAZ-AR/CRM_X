@@ -146,4 +146,8 @@ export const statusMeta: Record<
   done: { label: "Готово", emoji: "🟢", color: "#BBF7D0" },
 };
 
-export const columns: Task["status"][] = ["todo", "in_progress", "blocked", "review", "done"];
+/** Путь исполнения — без блока. */
+export const columns: Task["status"][] = ["todo", "in_progress", "review", "done"];
+
+/** Доска: блок отдельной колонкой справа, не шаг пайплайна. */
+export const boardColumns: Task["status"][] = ["todo", "in_progress", "review", "done", "blocked"];
