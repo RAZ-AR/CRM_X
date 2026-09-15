@@ -7,7 +7,7 @@ export function getPrisma(): PrismaClient | null {
     const { PrismaClient: PC } = require("@prisma/client");
     const g = globalThis as unknown as { prisma?: PrismaClient };
     if (!g.prisma) g.prisma = new PC();
-    return g.prisma;
+    return g.prisma ?? null;
   } catch {
     return null;
   }

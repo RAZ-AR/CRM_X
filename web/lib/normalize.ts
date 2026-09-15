@@ -14,7 +14,7 @@ export function normalizeState(raw: Partial<AppState> | null | undefined): AppSt
     })),
     tasks: (parsed.tasks ?? seed.tasks).map((task) => ({
       ...task,
-      status: (task.status === "waiting" ? "blocked" : task.status) as Task["status"],
+      status: ((task.status as string) === "waiting" ? "blocked" : task.status) as Task["status"],
       blockReason: task.blockReason ?? "",
       dependsOn: task.dependsOn ?? [],
       zones: task.zones?.length ? task.zones : task.zone ? [task.zone] : [],

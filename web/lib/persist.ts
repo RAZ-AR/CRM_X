@@ -44,10 +44,10 @@ export async function loadDbState(prisma: PrismaClient): Promise<AppState> {
       attachments: j(t.attachments, [] as Task["attachments"]),
       dependsOn: j(t.dependsOn, [] as string[]),
     })),
-    comments: comments.map((c) => ({
-      ...(c as unknown as Comment),
-      reactions: j((c as { reactions?: Comment["reactions"] }).reactions, []),
-    })),
+    comments: comments.map((c) => {
+      const row = c as unknown as Comment;
+      return { ...row, reactions: j(row.reactions as unknown as Comment["reactions"], []) };
+    }),
     subtasks,
     wiki: wiki as WikiPage[],
     contacts: contacts.map((c) => ({
