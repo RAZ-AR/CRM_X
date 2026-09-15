@@ -33,34 +33,34 @@ export async function saveBlobState(state: AppState) {
 }
 
 export async function loadSharedState(): Promise<{ state: AppState; via: "db" | "blob" | "seed" }> {
+  const blob = await loadBlobState();
+  if (blob) return { state: blob, via: "blob" };
   const { getPrisma } = await import("./prisma");
-  const { loadDbState } = await import("./persist");
+  const { loadDbState, saveDbState } = await import("./persist");
   const prisma = getPrisma();
   if (prisma) {
     try {
       await prisma.$queryRaw`SELECT 1`;
       const count = await prisma.user.count();
       if (count === 0) {
-        const { saveDbState } = await import("./persist");
         await saveDbState(prisma, seed);
+        await saveBlobState(seed);
         return { state: seed, via: "db" };
       }
-      return { state: await loadDbState(prisma), via: "db" };
+      const state = await loadDbState(prisma);
+      await saveBlobState(state);
+      return { state, via: "db" };
     } catch {
       /* Aiven unreachable from Vercel */
     }
   }
-  const blob = await loadBlobState();
-  if (blob) return { state: blob, via: "blob" };
-  try {
-    await saveBlobState(seed);
-  } catch {
-    /* ignore */
-  }
+  await saveBlobState(seed);
   return { state: seed, via: "seed" };
 }
 
 export async function saveSharedState(state: AppState) {
+  let via: "db" | "blob" = "blob";
+  await saveBlobState(state);
   const { getPrisma } = await import("./prisma");
   const { saveDbState } = await import("./persist");
   const prisma = getPrisma();
@@ -68,11 +68,10 @@ export async function saveSharedState(state: AppState) {
     try {
       await prisma.$queryRaw`SELECT 1`;
       await saveDbState(prisma, state);
-      return "db" as const;
+      via = "db";
     } catch {
-      /* blob */
+      /* Vercel often cannot reach Aiven; blob is source of truth */
     }
   }
-  await saveBlobState(state);
-  return "blob" as const;
+  return via;
 }
