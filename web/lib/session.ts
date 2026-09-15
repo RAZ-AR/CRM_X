@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
-import { getPrisma } from "./prisma";
-import { loadDbState } from "./persist";
+import { loadSharedState } from "./blobState";
 import { seed } from "./seed";
 import type { User } from "./types";
 
@@ -11,33 +10,21 @@ export async function readUid() {
   return jar.get(UID_COOKIE)?.value ?? null;
 }
 
-export async function findUserById(id: string): Promise<User | null> {
-  const prisma = getPrisma();
-  if (prisma) {
-    try {
-      const state = await loadDbState(prisma);
-      return state.users.find((u) => u.id === id) ?? null;
-    } catch {
-      /* fall through */
-    }
+export async function allUsers(): Promise<User[]> {
+  try {
+    const { state } = await loadSharedState();
+    return state.users;
+  } catch {
+    return seed.users;
   }
-  return seed.users.find((u) => u.id === id) ?? null;
+}
+
+export async function findUserById(id: string): Promise<User | null> {
+  return (await allUsers()).find((u) => u.id === id) ?? null;
 }
 
 export async function findUserByLogin(email: string, password: string): Promise<User | null> {
-  const prisma = getPrisma();
-  if (prisma) {
-    try {
-      const row = await prisma.user.findFirst({ where: { email, password } });
-      if (row) {
-        const state = await loadDbState(prisma);
-        return state.users.find((u) => u.id === row.id) ?? null;
-      }
-    } catch {
-      /* fall through */
-    }
-  }
-  return seed.users.find((u) => u.email === email && u.password === password) ?? null;
+  return (await allUsers()).find((u) => u.email === email && u.password === password) ?? null;
 }
 
 export async function sessionUser(): Promise<User | null> {
