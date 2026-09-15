@@ -12,7 +12,7 @@ export async function GET() {
   if (!user) return NextResponse.json({ ok: false, auth: true }, { status: 401 });
   try {
     const { state, via } = await loadSharedState();
-    return NextResponse.json({ ok: true, via, state: filterState(state, user) });
+    return NextResponse.json({ ok: true, via, me: user.id, state: filterState(state, user) });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "store";
     return NextResponse.json({ ok: false, local: true, error: msg });

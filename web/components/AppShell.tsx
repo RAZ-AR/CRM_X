@@ -204,8 +204,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </header>
           {!cloud && (
             <div className="mx-3 md:mx-6 mb-2 rounded-2xl bg-[#fee2e2] text-[#991b1b] text-sm px-4 py-3">
-              Общая база сейчас недоступна (Vercel не видит Postgres). Статусы живут только в этом браузере.
-              В Aiven → сервис Postgres → Allowed IP addresses поставь <b>0.0.0.0/0</b> и подожди минуту.
+              Это старый вход только в браузере. Нажми <b>Выйти</b> и войди снова — доска станет общей.
             </div>
           )}
           <main className="flex-1 px-3 pb-4 md:px-6 md:pb-6 min-w-0">{children}</main>

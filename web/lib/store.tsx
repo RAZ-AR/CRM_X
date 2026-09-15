@@ -77,18 +77,28 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const uid = typeof localStorage !== "undefined" ? localStorage.getItem(USER_KEY) : null;
-      const apply = (hydrated: AppState, isRemote: boolean) => {
+      const apply = (hydrated: AppState, isRemote: boolean, userId?: string | null) => {
         if (cancelled) return;
         setState(hydrated);
         setRemote(isRemote);
-        if (uid) setCurrent(hydrated.users.find((u) => u.id === uid) ?? null);
+        if (userId) {
+          const me = hydrated.users.find((u) => u.id === userId) ?? null;
+          setCurrent(me);
+          if (me) localStorage.setItem(USER_KEY, me.id);
+        }
       };
       try {
-        const res = await fetch("/api/state", { cache: "no-store" });
+        const res = await fetch("/api/state", { cache: "no-store", credentials: "same-origin" });
         const data = await res.json();
         if (data?.ok && data.state) {
-          apply(normalizeState(data.state), true);
+          apply(normalizeState(data.state), true, data.me || localStorage.getItem(USER_KEY));
+          setReady(true);
+          return;
+        }
+        if (data?.auth || res.status === 401) {
+          localStorage.removeItem(USER_KEY);
+          setCurrent(null);
+          setRemote(false);
           setReady(true);
           return;
         }
@@ -98,7 +108,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       try {
         const currentRaw = localStorage.getItem(KEY);
         const raw = currentRaw || localStorage.getItem("crmx-norion-v7");
-        if (raw) apply(normalizeState(JSON.parse(raw)), false);
+        const uid = localStorage.getItem(USER_KEY);
+        if (raw) apply(normalizeState(JSON.parse(raw)), false, uid);
         else if (uid) setCurrent(seed.users.find((u) => u.id === uid) ?? null);
       } catch {
         /* ignore */
@@ -116,18 +127,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [state, ready]);
 
   useEffect(() => {
-    if (!ready || !remote || !current) return;
+    if (!ready || !current) return;
     const t = setInterval(async () => {
       try {
-        const res = await fetch("/api/state", { cache: "no-store" });
+        const res = await fetch("/api/state", { cache: "no-store", credentials: "same-origin" });
         const data = await res.json();
-        if (data?.ok && data.state) setState(normalizeState(data.state));
+        if (data?.ok && data.state) {
+          setRemote(true);
+          setState(normalizeState(data.state));
+        }
       } catch {
         /* ignore */
       }
     }, 4000);
     return () => clearInterval(t);
-  }, [ready, remote, current?.id]);
+  }, [ready, current?.id]);
 
   useEffect(() => {
     if (!ready || !current) return;
@@ -160,6 +174,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
@@ -170,7 +185,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem(USER_KEY, u.id);
         return true;
       }
-      const st = await fetch("/api/state", { cache: "no-store" });
+      const st = await fetch("/api/state", { cache: "no-store", credentials: "same-origin" });
       const body = await st.json();
       if (body?.ok && body.state) {
         const hydrated = normalizeState(body.state);
