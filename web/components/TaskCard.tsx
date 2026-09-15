@@ -5,7 +5,15 @@ import { columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
 import { useStore } from "@/lib/store";
 import type { Task, TaskStatus, User, Zone } from "@/lib/types";
 import { formatDate } from "@/lib/dates";
-import { Check, Flame, Paperclip, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Flame, Paperclip, X } from "lucide-react";
+
+const SHORT: Record<TaskStatus, string> = {
+  todo: "Бэклог",
+  in_progress: "В работе",
+  blocked: "Блок",
+  review: "Проверка",
+  done: "Готово",
+};
 
 export function TaskCard({
   task,
@@ -26,7 +34,7 @@ export function TaskCard({
 
   return (
     <div
-      className="rounded-2xl p-3 text-sm"
+      className="rounded-2xl p-3 text-sm min-w-0 overflow-hidden"
       style={{ background: multi ? "#e5e7eb" : "#f4f4f6" }}
       draggable
       onDragStart={(e) => e.dataTransfer.setData("id", task.id)}
@@ -62,11 +70,11 @@ export function TaskCard({
         </div>
       </button>
       {pending && pending !== task.status ? (
-        <div className="mt-2 flex items-center gap-2">
-          <span className="flex-1 text-xs text-[#757575]">→ {statusMeta[pending].label}</span>
+        <div className="mt-2 flex items-center gap-2 min-w-0">
+          <span className="flex-1 min-w-0 truncate text-xs text-[#757575]">→ {SHORT[pending]}</span>
           <button
             type="button"
-            className="h-9 w-9 rounded-full bg-black text-white grid place-items-center"
+            className="h-8 w-8 shrink-0 rounded-full bg-black text-white grid place-items-center"
             onClick={() => {
               const r = updateTask(task.id, { status: pending });
               if (!r.ok) {
@@ -77,35 +85,37 @@ export function TaskCard({
             }}
             aria-label="Сохранить"
           >
-            <Check size={16} />
+            <Check size={14} />
           </button>
           <button
             type="button"
-            className="h-9 w-9 rounded-full bg-white grid place-items-center"
+            className="h-8 w-8 shrink-0 rounded-full bg-white grid place-items-center"
             onClick={() => setPending(null)}
             aria-label="Отмена"
           >
-            <X size={16} />
+            <X size={14} />
           </button>
         </div>
       ) : (
-        <div className="mt-2 flex items-center gap-2">
+        <div className="mt-2 grid grid-cols-[32px_1fr_32px] items-center gap-1 min-w-0">
           <button
             type="button"
-            className="h-8 px-3 rounded-full bg-white text-xs disabled:opacity-30"
+            className="h-8 w-8 rounded-full bg-white grid place-items-center disabled:opacity-30"
             disabled={idx <= 0}
             onClick={() => setPending(columns[idx - 1])}
+            aria-label="Назад"
           >
-            ← {idx > 0 ? statusMeta[columns[idx - 1]].label : ""}
+            <ChevronLeft size={16} />
           </button>
-          <span className="flex-1 text-center text-[11px] text-[#757575]">{statusMeta[show].label}</span>
+          <span className="text-center text-[11px] text-[#757575] truncate px-1">{SHORT[show] ?? statusMeta[show].label}</span>
           <button
             type="button"
-            className="h-8 px-3 rounded-full bg-white text-xs disabled:opacity-30"
+            className="h-8 w-8 rounded-full bg-white grid place-items-center disabled:opacity-30"
             disabled={idx < 0 || idx >= columns.length - 1}
             onClick={() => setPending(columns[idx + 1])}
+            aria-label="Вперёд"
           >
-            {idx < columns.length - 1 ? statusMeta[columns[idx + 1]].label : ""} →
+            <ChevronRight size={16} />
           </button>
         </div>
       )}
