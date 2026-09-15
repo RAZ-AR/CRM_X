@@ -1,4 +1,4 @@
-import { list, put } from "@vercel/blob";
+import { get, put } from "@vercel/blob";
 import type { AppState } from "./types";
 import { normalizeState } from "./normalize";
 import { seed } from "./seed";
@@ -11,12 +11,11 @@ export function blobConfigured() {
 
 export async function loadBlobState(): Promise<AppState | null> {
   try {
-    const { blobs } = await list({ prefix: KEY, limit: 1 });
-    const url = blobs[0]?.downloadUrl || blobs[0]?.url;
-    if (!url) return null;
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) return null;
-    return normalizeState(await res.json());
+    const file = await get(KEY, { access: "private", useCache: false });
+    if (!file?.stream) return null;
+    const text = await new Response(file.stream).text();
+    if (!text) return null;
+    return normalizeState(JSON.parse(text));
   } catch {
     return null;
   }
