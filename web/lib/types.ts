@@ -156,4 +156,6 @@ export type AppState = {
   contacts: Contact[];
   notices: Notice[];
   broadcast: Broadcast | null;
+  /** Версия учёток: при повышении стартовые логины/пароли команды выставляются заново. */
+  authVersion?: number;
 };
