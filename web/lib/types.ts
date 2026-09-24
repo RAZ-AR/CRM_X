@@ -192,6 +192,8 @@ export type AppState = {
   authVersion?: number;
   /** Журнал изменений (пишет только сервер). */
   activity?: Activity[];
+  /** Номер версии: растёт на каждой записи (для порядка копий в Postgres). */
+  rev?: number;
 };
 
 export type ActivityKind = "created" | "status" | "dates" | "assignee" | "edited" | "deleted" | "comment";

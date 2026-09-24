@@ -214,6 +214,11 @@ async function loadVersioned(): Promise<{ state: AppState; etag: string | null; 
   return { state: seed, etag: null, via: "seed", changed: true };
 }
 
+/**
+ * Копия в Postgres. Записи могут финишировать в другом порядке, чем попали в Blob, поэтому после
+ * сохранения сверяемся с Blob: если там уже более новая версия (rev больше), кладём в базу её.
+ * Кто сохраняет последним, тот и видит последнюю версию, так что база не откатывается на старую.
+ */
 async function mirrorToDb(state: AppState) {
   const { getPrisma } = await import("./prisma");
   const { saveDbState } = await import("./persist");
@@ -221,7 +226,13 @@ async function mirrorToDb(state: AppState) {
   if (!prisma) return false;
   try {
     await prisma.$queryRaw`SELECT 1`;
-    await saveDbState(prisma, state);
+    let current = state;
+    for (let i = 0; i < 4; i++) {
+      await saveDbState(prisma, current);
+      const latest = await loadBlobVersioned().catch(() => null);
+      if (!latest || (latest.state.rev ?? 0) <= (current.rev ?? 0)) break;
+      current = latest.state;
+    }
     return true;
   } catch {
     return false;
@@ -251,8 +262,9 @@ export async function updateSharedState<T>(
   for (let attempt = 0; attempt < 8; attempt++) {
     const cur = await loadVersioned();
     const out = await change(cur.state);
-    const next = out.state ?? (cur.changed ? cur.state : undefined);
-    if (!next) return out.result as T & { via?: Via };
+    const changed = out.state ?? (cur.changed ? cur.state : undefined);
+    if (!changed) return out.result as T & { via?: Via };
+    const next = { ...changed, rev: (cur.state.rev ?? 0) + 1 };
     try {
       await writeBlobState(next, cur.etag);
     } catch (e) {
@@ -270,9 +282,10 @@ export async function updateSharedState<T>(
 export async function loadSharedState(): Promise<{ state: AppState; via: Via }> {
   const cur = await loadVersioned();
   if (cur.changed) {
+    const next = { ...cur.state, rev: (cur.state.rev ?? 0) + 1 };
     try {
-      await writeBlobState(cur.state, cur.etag);
-      await mirrorToDb(cur.state);
+      await writeBlobState(next, cur.etag);
+      await mirrorToDb(next);
     } catch (e) {
       if (!isConflict(e)) throw e;
       return loadSharedState(); // кто-то записал раньше — читаем его версию
