@@ -84,7 +84,10 @@ export const seed: AppState = {
         "comx",
         "common"
       ],
-      "managerId": "u-armen"
+      "managerId": "u-armen",
+      "streams": [
+        "BRAND"
+      ]
     },
     {
       "id": "u-karina",
@@ -5462,5 +5465,6 @@ export const seed: AppState = {
     "authorId": "u-armen",
     "updatedAt": "2026-09-24T09:00:00"
   },
-  "authVersion": 2
+  "authVersion": 2,
+  "activity": []
 };

@@ -9,14 +9,17 @@ import { streamProgress, weightedDone, zoneTasks } from "@/lib/readiness";
 import { addDays, diffDays, formatDate, shortDate, todayYerevan, weekStart } from "@/lib/dates";
 import { EMOJIS } from "@/lib/emoji";
 import { Roadmap } from "@/components/Roadmap";
-import type { Task } from "@/lib/types";
+import type { Activity, Task } from "@/lib/types";
+import { dataIssues } from "@/lib/quality";
 import { Flame } from "lucide-react";
 
 const FILTER_KEY = "crmx-home-filters";
 
 /** Главная: фильтры, цифры, сегодня, важное, загрузка команды, проекты, roadmap. */
 export default function HomePage() {
-  const { current, tasks, zones, users, setPreviewId, broadcast, setBroadcast } = useStore();
+  const { current, tasks, zones, users, setPreviewId, broadcast, setBroadcast, activity } = useStore();
+  const [changesDays, setChangesDays] = useState(1);
+  const [openedAt] = useState(() => Date.now());
   const today = todayYerevan();
   const [picked, setPicked] = useState(today);
   // Фильтры храним отдельно для каждого пользователя: один браузер может быть общим.
@@ -103,6 +106,14 @@ export default function HomePage() {
     })
     .sort((a, b) => b.week - a.week);
   const maxWeek = Math.max(1, ...load.map((l) => l.week));
+
+  // Что изменилось: журнал по задачам в текущих фильтрах
+  const scopedIds = new Set(scoped.map((t) => t.id));
+  const sinceIso = new Date(openedAt - changesDays * 86400000).toISOString();
+  const changes = (activity ?? []).filter(
+    (a) => a.at >= sinceIso && (scopedIds.has(a.taskId) || (owner && a.kind === "deleted" && !assigneeId && zone === "all")),
+  );
+  const issues = manager ? dataIssues(scoped, tasks, users) : [];
 
   const projectList = (zone === "all" ? zones : zones.filter((z) => z.slug === zone)).filter(
     (z) => !assigneeId || zoneTasks(z.slug, scoped).length > 0,
@@ -217,6 +228,38 @@ export default function HomePage() {
             <p className="text-sm text-[#9a9aa0] py-4">Ничего срочного</p>
           )}
         </section>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr] min-w-0">
+        <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold">Что изменилось</h3>
+            <div className="flex rounded-full bg-[#f4f4f6] p-0.5 text-xs">
+              {[
+                [1, "24 ч"],
+                [7, "7 дней"],
+              ].map(([d, l]) => (
+                <button key={d} type="button" onClick={() => setChangesDays(Number(d))} className={`rounded-full px-3 py-1 ${changesDays === d ? "bg-black text-white" : "text-[#6b6b70]"}`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+          <Changes list={changes} users={users} open={setPreviewId} />
+        </section>
+        {manager && (
+          <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
+            <div className="flex items-baseline justify-between mb-2">
+              <h3 className="font-semibold">Проверить данные</h3>
+              <span className="text-xs text-[#9a9aa0]">{issues.length} задач</span>
+            </div>
+            {issues.length === 0 ? (
+              <p className="text-sm text-[#9a9aa0] py-4">Все открытые задачи заполнены</p>
+            ) : (
+              <IssueList issues={issues} open={setPreviewId} />
+            )}
+          </section>
+        )}
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1fr_1.3fr] min-w-0">
@@ -334,6 +377,66 @@ function Group({
       {list.length > limit && (
         <button type="button" className="text-[11px] underline text-[#6b6b70] mt-1" onClick={() => setAll(!all)}>
           {all ? "свернуть" : `ещё ${list.length - limit}`}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function when(iso: string) {
+  const d = new Intl.DateTimeFormat("ru-RU", { timeZone: "Asia/Yerevan", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  return d.replace(",", "");
+}
+
+function Changes({ list, users, open }: { list: Activity[]; users: { id: string; name: string; avatar: string }[]; open: (id: string) => void }) {
+  const [all, setAll] = useState(false);
+  if (!list.length) return <p className="text-sm text-[#9a9aa0] py-4">Изменений нет</p>;
+  const shown = all ? list : list.slice(0, 12);
+  return (
+    <div className="space-y-1">
+      {shown.map((a) => {
+        const u = users.find((x) => x.id === a.userId);
+        return (
+          <button
+            key={a.id}
+            type="button"
+            disabled={a.kind === "deleted"}
+            onClick={() => open(a.taskId)}
+            className="w-full text-left rounded-xl bg-[#f4f4f6] px-3 py-1.5 text-sm flex items-start gap-2 disabled:cursor-default"
+          >
+            <span className="h-5 w-5 rounded-full bg-white grid place-items-center text-[9px] font-semibold shrink-0 mt-0.5" title={u?.name}>{u?.avatar ?? "?"}</span>
+            <span className="flex-1 min-w-0">
+              <span className="font-medium">{a.taskTitle}</span>
+              <span className={`block text-xs ${a.criticalPath && a.kind === "dates" && (a.days ?? 0) > 0 ? "text-[#b91c1c]" : "text-[#6b6b70]"}`}>{a.text}</span>
+            </span>
+            <span className="text-[10px] text-[#9a9aa0] shrink-0 mt-0.5">{when(a.at)}</span>
+          </button>
+        );
+      })}
+      {list.length > 12 && (
+        <button type="button" className="text-[11px] underline text-[#6b6b70]" onClick={() => setAll(!all)}>
+          {all ? "свернуть" : `ещё ${list.length - 12}`}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function IssueList({ issues, open }: { issues: { task: Task; problems: string[] }[]; open: (id: string) => void }) {
+  const [all, setAll] = useState(false);
+  const shown = all ? issues : issues.slice(0, 8);
+  return (
+    <div className="space-y-1">
+      {shown.map(({ task, problems }) => (
+        <button key={task.id} type="button" onClick={() => open(task.id)} className="w-full text-left rounded-xl bg-[#fff7ed] px-3 py-1.5 text-sm">
+          <span className="text-[11px] text-[#9a9aa0] mr-1">{task.code}</span>
+          {task.title}
+          <span className="block text-xs text-[#9a3412]">{problems.join(" · ")}</span>
+        </button>
+      ))}
+      {issues.length > 8 && (
+        <button type="button" className="text-[11px] underline text-[#6b6b70]" onClick={() => setAll(!all)}>
+          {all ? "свернуть" : `ещё ${issues.length - 8}`}
         </button>
       )}
     </div>

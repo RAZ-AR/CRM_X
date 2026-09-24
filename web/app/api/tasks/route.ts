@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sessionUser } from "@/lib/session";
 import { loadSharedState, saveSharedState } from "@/lib/blobState";
 import type { Task } from "@/lib/types";
+import { created, withActivity } from "@/lib/activity";
 import { appUrlFrom, escapeHtml, sendTo, taskLink } from "@/lib/telegram";
 import { shortDate } from "@/lib/dates";
 
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
     zones: body.zones?.length ? body.zones : body.zone ? [body.zone] : [],
   };
   const { state } = await loadSharedState();
-  await saveSharedState({ ...state, tasks: [task, ...state.tasks] });
+  await saveSharedState(withActivity({ ...state, tasks: [task, ...state.tasks] }, [created(user, task)]));
   if (task.assigneeId !== user.id) {
     await sendTo(
       state.users.find((u) => u.id === task.assigneeId),

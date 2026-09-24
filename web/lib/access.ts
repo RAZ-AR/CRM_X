@@ -38,7 +38,13 @@ export function canSeeTask(user: User, task: Task, users: User[] = []) {
   if (task.authorId === user.id) return true;
   if ((task.participantIds ?? []).includes(user.id)) return true;
   if (users.length && subordinateIds(user.id, users).includes(task.assigneeId)) return true;
+  if (inMyStreams(user, task)) return true;
   return false;
+}
+
+/** Поток целиком открыт человеку (например, BRAND креативному директору). */
+export function inMyStreams(user: User, task: Task) {
+  return Boolean(task.workstream && (user.streams ?? []).includes(task.workstream as never));
 }
 
 /** Срок, вес, critical path, название — автор / CPO / Armen. */
@@ -56,6 +62,7 @@ export function canWorkTask(user: User, task: Task) {
   if (canEditTask(user, task)) return true;
   if (task.assigneeId === user.id) return true;
   if ((task.participantIds ?? []).includes(user.id)) return true;
+  if (inMyStreams(user, task)) return true;
   return false;
 }
 
@@ -100,6 +107,7 @@ export function cpoNav() {
     { href: "/timeline", label: "Timeline", icon: "timeline" },
     { href: "/kanban", label: "Доска", icon: "kanban" },
     { href: "/zones", label: "Проекты", icon: "zone" },
+    { href: "/meeting", label: "Планёрка", icon: "meeting" },
     { href: "/settings", label: "Команда", icon: "team" },
     { href: "/wiki", label: "Wiki", icon: "wiki" },
     { href: "/contacts", label: "Контакты", icon: "contacts" },

@@ -42,6 +42,8 @@ export type User = {
   permissions: Permission[];
   boardZones: ZoneSlug[];
   managerId: string | null;
+  /** Потоки, которые человек видит целиком (и может вести статус), например BRAND для креативного директора. */
+  streams?: Stream[];
   /** Только на сервере: чат Telegram для уведомлений. */
   telegramChatId?: string;
   /** В браузер приходит только признак «Telegram подключён». */
@@ -162,4 +164,21 @@ export type AppState = {
   broadcast: Broadcast | null;
   /** Версия учёток: при повышении стартовые логины/пароли команды выставляются заново. */
   authVersion?: number;
+  /** Журнал изменений (пишет только сервер). */
+  activity?: Activity[];
+};
+
+export type ActivityKind = "created" | "status" | "dates" | "assignee" | "edited" | "deleted" | "comment";
+
+export type Activity = {
+  id: string;
+  at: string;
+  userId: string;
+  taskId: string;
+  taskTitle: string;
+  kind: ActivityKind;
+  text: string;
+  /** Для сдвигов сроков: на сколько дней сдвинулся конец. */
+  days?: number;
+  criticalPath?: boolean;
 };
