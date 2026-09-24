@@ -5,7 +5,7 @@ import { useStore } from "@/lib/store";
 import { canDeleteTask, canEditTask, canSeeContact, canSeeTask, canWorkTask, isOverdue, statusMeta, taskZones } from "@/lib/access";
 import { openDeps, unlockedBy } from "@/lib/taskRules";
 import { filesToAttachments } from "@/lib/files";
-import { CONTRACTOR_STATUS, STREAMS, type Priority } from "@/lib/types";
+import { CONTRACTOR_STATUS, STREAMS, type Priority, type TaskStatus } from "@/lib/types";
 import { telHref, tgHref } from "@/lib/links";
 import { formatDate } from "@/lib/dates";
 import { Flame, Trash2, X } from "lucide-react";
@@ -27,6 +27,8 @@ export function TaskSheet({
   const [text, setText] = useState("");
   const [sub, setSub] = useState("");
   const [blockOpen, setBlockOpen] = useState(false);
+  /** Статус, который выбрали в карточке и ждёт подтверждения. На доске статус меняется без вопросов. */
+  const [pending, setPending] = useState<TaskStatus | null>(null);
   const [blockFor, setBlockFor] = useState<"day" | "week" | "month" | "forever">("day");
   const [blockNote, setBlockNote] = useState("");
   if (!current) return null;
@@ -127,11 +129,11 @@ export function TaskSheet({
                         onClick={() => {
                           if (on) return;
                           if (c === "blocked") {
+                            setPending(null);
                             setBlockOpen(true);
                             return;
                           }
-                          const r = updateTask(task.id, { status: c });
-                          if (!r.ok) alert(r.error);
+                          setPending(c);
                         }}
                       >
                         <StatusIcon status={c} size={15} />
@@ -140,6 +142,29 @@ export function TaskSheet({
                     );
                   })}
                 </div>
+                {pending && (
+                  <div role="alertdialog" aria-label="Подтверждение смены статуса" className="mt-2 rounded-xl border border-[var(--line)] bg-[var(--soft)] px-3 py-2.5 flex flex-wrap items-center gap-2 text-sm">
+                    <span className="flex items-center gap-1.5 flex-1 min-w-[12rem]">
+                      Перевести в <StatusIcon status={pending} size={15} /> <b>«{STATUS_ICON[pending].short}»</b>?
+                    </span>
+                    <button type="button" className="pill px-3 h-8 text-sm" onClick={() => setPending(null)}>
+                      Отмена
+                    </button>
+                    <button
+                      type="button"
+                      autoFocus
+                      className="pill bg-[var(--ink)] text-white px-4 h-8 text-sm font-medium"
+                      onClick={() => {
+                        const next = pending;
+                        setPending(null);
+                        const r = updateTask(task.id, { status: next });
+                        if (!r.ok) alert(r.error);
+                      }}
+                    >
+                      Да, перевести
+                    </button>
+                  </div>
+                )}
               </div>
             )}
             <label className="text-xs text-[#6F6E69] block">Готово когда
@@ -159,6 +184,7 @@ export function TaskSheet({
                   className="pill bg-black text-white px-3 py-1.5 text-xs"
                   onClick={() => {
                     const back = task.blockFromStatus && task.blockFromStatus !== "blocked" ? task.blockFromStatus : "todo";
+                    if (!confirm(`Снять блок и вернуть в «${STATUS_ICON[back].short}»?`)) return;
                     const r = updateTask(task.id, { status: back, blockReason: "", blockUntil: "" });
                     if (!r.ok) alert(r.error);
                   }}
