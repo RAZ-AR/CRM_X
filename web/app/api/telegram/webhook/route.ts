@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { loadSessionSecret, loadSharedState, saveSharedState } from "@/lib/blobState";
+import { loadSessionSecret, loadSharedState, updateSharedState } from "@/lib/blobState";
 import { appUrlFrom, digestFor, ensureMenuButton, escapeHtml, readLinkCode, sendTo, tg, webhookSecret } from "@/lib/telegram";
 import { shortDate, todayYerevan } from "@/lib/dates";
 import { parseQuickTask, quickTaskToTask } from "@/lib/quickTask";
@@ -34,14 +34,17 @@ export async function POST(req: Request) {
       await reply("Ссылка устарела. Откройте CRM → Мой профиль → «Подключить Telegram» ещё раз.");
       return NextResponse.json({ ok: true });
     }
-    const users = state.users.map((u) =>
-      u.id === user.id ? { ...u, telegramChatId: chatId } : u.telegramChatId === chatId ? { ...u, telegramChatId: undefined } : u,
-    );
-    await saveSharedState({ ...state, users });
+    const { saved } = await updateSharedState((s) => {
+      const users = s.users.map((u) =>
+        u.id === user.id ? { ...u, telegramChatId: chatId } : u.telegramChatId === chatId ? { ...u, telegramChatId: undefined } : u,
+      );
+      const next = { ...s, users };
+      return { state: next, result: { saved: next } };
+    });
     await reply(
       `✅ Готово, ${escapeHtml(user.name)}! Сюда будут приходить новые задачи, смены статусов и утренний список в 9:00.\n\n${HELP}`,
     );
-    await reply(digestFor({ ...state, users }, { ...user, telegramChatId: chatId }, todayYerevan(), appUrlFrom(req)));
+    await reply(digestFor(saved, { ...user, telegramChatId: chatId }, todayYerevan(), appUrlFrom(req)));
     return NextResponse.json({ ok: true });
   }
   if (!linked) {
@@ -58,7 +61,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true });
     }
     const task = quickTaskToTask(q, linked, today, `t-${randomBytes(4).toString("hex")}`);
-    await saveSharedState(withActivity({ ...state, tasks: [task, ...state.tasks] }, [created(linked, task)]));
+    await updateSharedState((s) => ({
+      state: withActivity({ ...s, tasks: [task, ...s.tasks] }, [created(linked, task)]),
+      result: {},
+    }));
     const who = state.users.find((u) => u.id === task.assigneeId);
     const zone = state.zones.find((z) => z.slug === task.zone);
     let delivery = "";
@@ -76,10 +82,10 @@ export async function POST(req: Request) {
         `Добавьте «готово когда» в CRM.${q.note ? `\n${escapeHtml(q.note)}` : ""}${delivery}`,
     );
   } else if (cmd === "/stop") {
-    await saveSharedState({
-      ...state,
-      users: state.users.map((u) => (u.id === linked.id ? { ...u, telegramChatId: undefined } : u)),
-    });
+    await updateSharedState((s) => ({
+      state: { ...s, users: s.users.map((u) => (u.id === linked.id ? { ...u, telegramChatId: undefined } : u)) },
+      result: {},
+    }));
     await reply("Уведомления отключены. Подключить снова: CRM → Мой профиль.");
   } else {
     await reply(HELP);

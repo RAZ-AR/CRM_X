@@ -3,7 +3,7 @@ import { allUsers, findUserByLogin, sessionCookie } from "@/lib/session";
 import { sameLogin } from "@/lib/pin";
 import { publicUser } from "@/lib/publicUser";
 import { isHashed, hashPassword, loginBlocked, loginFailed, loginSucceeded } from "@/lib/auth";
-import { loadSharedState, saveSharedState } from "@/lib/blobState";
+import { updateSharedState } from "@/lib/blobState";
 
 export async function POST(req: Request) {
   try {
@@ -23,13 +23,16 @@ export async function POST(req: Request) {
     loginSucceeded(key);
     if (!isHashed(user.password)) {
       // Старый пароль открытым текстом — перехэшируем при первом входе.
-      const { state } = await loadSharedState();
       const hashed = hashPassword(String(password));
-      await saveSharedState({
-        ...state,
-        users: state.users.map((u) => (u.id === user!.id ? { ...u, password: hashed } : u)),
+      const plain = user.password;
+      const uid = user.id;
+      const stored = await updateSharedState((state) => {
+        const me = state.users.find((u) => u.id === uid);
+        // Пароль уже перехэширован параллельным входом — берём сохранённый.
+        if (!me || me.password !== plain) return { result: { password: me?.password ?? plain } };
+        return { state: { ...state, users: state.users.map((u) => (u.id === uid ? { ...u, password: hashed } : u)) }, result: { password: hashed } };
       });
-      user = { ...user, password: hashed };
+      user = { ...user, password: stored.password };
     }
     const res = NextResponse.json({ ok: true, user: publicUser(user) });
     const c = await sessionCookie(user);
