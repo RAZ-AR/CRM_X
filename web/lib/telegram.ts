@@ -33,14 +33,16 @@ export function escapeHtml(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-export async function sendTo(user: User | undefined, html: string) {
-  if (!user?.telegramChatId) return;
-  await tg("sendMessage", {
+/** true — Telegram принял сообщение. */
+export async function sendTo(user: User | undefined, html: string): Promise<boolean> {
+  if (!user?.telegramChatId) return false;
+  const ok = await tg("sendMessage", {
     chat_id: user.telegramChatId,
     text: html,
     parse_mode: "HTML",
     link_preview_options: { is_disabled: true },
   });
+  return ok !== null;
 }
 
 let username: string | null = null;
@@ -88,15 +90,19 @@ export function digestFor(state: AppState, user: User, today: string, appUrl: st
   const mine = open.filter((t) => t.assigneeId === user.id);
   const overdue = mine.filter((t) => t.due < today).sort((a, b) => a.due.localeCompare(b.due));
   const dueToday = mine.filter((t) => t.due === today);
-  const active = mine
-    .filter((t) => (t.startDate || t.due) <= today && t.due > today)
-    .sort((a, b) => a.due.localeCompare(b.due));
+  const inWindow = (t: Task) => (t.startDate || t.due) <= today && t.due > today;
+  const byDue = (a: Task, b: Task) => a.due.localeCompare(b.due);
+  const active = mine.filter((t) => t.status === "in_progress" && inWindow(t)).sort(byDue);
+  const toStart = mine.filter((t) => t.status === "todo" && inWindow(t)).sort(byDue);
+  const blocked = mine.filter((t) => t.status === "blocked" && t.due >= today).sort(byDue);
 
   let text = `☀️ <b>Доброе утро, ${escapeHtml(user.name)}!</b> ${shortDate(today)}`;
   text += section("🔥 Просрочено", overdue, (t) => `до ${shortDate(t.due)}`);
   text += section("📌 Сдать сегодня", dueToday, () => "сегодня");
   text += section("▶️ В работе", active, (t) => `до ${shortDate(t.due)}`);
-  if (!overdue.length && !dueToday.length && !active.length) text += "\n\nНа сегодня задач нет.";
+  text += section("⏭ Пора начать", toStart, (t) => `до ${shortDate(t.due)}`);
+  text += section("⛔ Заблокировано", blocked, (t) => (t.blockReason ? escapeHtml(t.blockReason) : `до ${shortDate(t.due)}`));
+  if (![overdue, dueToday, active, toStart, blocked].some((l) => l.length)) text += "\n\nНа сегодня задач нет.";
 
   if (isCpo(user)) {
     const team = open.filter((t) => t.due < today && t.assigneeId !== user.id && canSeeTask(user, t, state.users));
@@ -119,12 +125,13 @@ export function digestFor(state: AppState, user: User, today: string, appUrl: st
     .slice(0, 2)
     .map((z) => `до ${z.emoji} ${escapeHtml(z.name)} ${diffDays(today, z.deadline)} дн`);
   if (launches.length) text += `\n\n⏳ ${launches.join(" · ")}`;
-  text += `\n\n<a href="${appUrl}/week">Открыть неделю в CRM</a>`;
+  text += `\n\n<a href="${escapeHtml(appUrl).replace(/"/g, "&quot;")}/week">Открыть неделю в CRM</a>`;
   return text;
 }
 
 export function taskLink(appUrl: string, t: Task) {
-  return `<a href="${appUrl}/tasks/${t.id}">${escapeHtml(t.code ? `${t.code} ` : "")}${escapeHtml(t.title)}</a>`;
+  const href = escapeHtml(`${appUrl}/tasks/${encodeURIComponent(t.id)}`).replace(/"/g, "&quot;");
+  return `<a href="${href}">${escapeHtml(t.code ? `${t.code} ` : "")}${escapeHtml(t.title)}</a>`;
 }
 
 export function appUrlFrom(req: Request) {

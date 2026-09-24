@@ -8,6 +8,6 @@ export async function GET(req: Request) {
   if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
-  const sent = await sendMorningDigests(appUrlFrom(req));
-  return NextResponse.json({ ok: true, sent });
+  const { sent, failed } = await sendMorningDigests(appUrlFrom(req));
+  return NextResponse.json({ ok: failed === 0, sent, failed, error: failed ? `Telegram не принял ${failed} из ${sent + failed}` : undefined });
 }

@@ -59,7 +59,7 @@ function TelegramCard({ linked, owner }: { linked: boolean; owner: boolean }) {
     setNote(null);
     try {
       const res = await fetch(url, { method, credentials: "same-origin" });
-      return (await res.json()) as { ok: boolean; url?: string; error?: string; sent?: number };
+      return (await res.json()) as { ok: boolean; url?: string; error?: string; sent?: number; failed?: number };
     } catch {
       return { ok: false, error: "Нет связи с сервером" };
     } finally {
@@ -109,7 +109,11 @@ function TelegramCard({ linked, owner }: { linked: boolean; owner: boolean }) {
           className="pill bg-[#f4f4f6] py-2 text-sm"
           onClick={async () => {
             const r = await call("/api/telegram/digest", "POST");
-            setNote(r.ok ? { ok: true, text: `Утренний список отправлен: ${r.sent ?? 0} чел.` } : { ok: false, text: r.error || "Не получилось" });
+            setNote(
+              r.ok
+                ? { ok: true, text: `Утренний список отправлен: ${r.sent ?? 0} чел.` }
+                : { ok: false, text: `${r.error || "Не получилось"}${r.sent ? ` (доставлено ${r.sent})` : ""}` },
+            );
           }}
         >
           Разослать утренний список сейчас

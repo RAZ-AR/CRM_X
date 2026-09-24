@@ -9,7 +9,9 @@ export async function POST(req: Request) {
   const user = await sessionUser();
   if (!user) return NextResponse.json({ ok: false, auth: true }, { status: 401 });
   const body = (await req.json()) as Task;
-  if (!body?.id || !body.title) return NextResponse.json({ ok: false }, { status: 400 });
+  if (!body?.id || !body.title || !/^[A-Za-z0-9_-]{1,64}$/.test(body.id)) {
+    return NextResponse.json({ ok: false }, { status: 400 });
+  }
   const task: Task = {
     ...body,
     authorId: user.id,
