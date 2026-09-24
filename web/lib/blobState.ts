@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { get, put } from "@vercel/blob";
 import type { AppState } from "./types";
 import { normalizeState } from "./normalize";
@@ -7,6 +8,50 @@ const KEY = "crmx/state.json";
 
 export function blobConfigured() {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID || process.env.VERCEL);
+}
+
+const SECRET_KEY = "crmx/session-secret.txt";
+let cachedSecret: string | null = null;
+
+async function readSecretBlob() {
+  try {
+    const file = await get(SECRET_KEY, { access: "private", useCache: false });
+    if (!file?.stream) return null;
+    return (await new Response(file.stream).text()).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Ключ подписи сессий: SESSION_SECRET из env, иначе BLOB_READ_WRITE_TOKEN, иначе случайный ключ,
+ * который создаётся один раз и хранится в приватном Blob (для хранилищ с OIDC, где токена нет).
+ */
+export async function loadSessionSecret(): Promise<string> {
+  const env = process.env.SESSION_SECRET || process.env.BLOB_READ_WRITE_TOKEN;
+  if (env) return env;
+  if (cachedSecret) return cachedSecret;
+  let secret = await readSecretBlob();
+  if (!secret) {
+    const fresh = randomBytes(32).toString("hex");
+    try {
+      await put(SECRET_KEY, fresh, {
+        access: "private",
+        addRandomSuffix: false,
+        allowOverwrite: false,
+        contentType: "text/plain",
+      });
+      secret = fresh;
+    } catch {
+      secret = await readSecretBlob(); // другой инстанс успел создать первым
+    }
+  }
+  if (!secret) {
+    if (process.env.VERCEL) throw new Error("Не удалось получить ключ сессий из Blob");
+    secret = "crmx-local-dev-only";
+  }
+  cachedSecret = secret;
+  return secret;
 }
 
 export async function loadBlobState(): Promise<AppState | null> {

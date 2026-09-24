@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   const updated = { ...me, password: hashPassword(password) };
   await saveSharedState({ ...state, users: state.users.map((u) => (u.id === me.id ? updated : u)) });
   const res = NextResponse.json({ ok: true });
-  const c = sessionCookie(updated);
+  const c = await sessionCookie(updated);
   res.cookies.set(c.name, c.value, c.options);
   return res;
 }

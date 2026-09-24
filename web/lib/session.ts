@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { loadSharedState } from "./blobState";
+import { loadSessionSecret, loadSharedState } from "./blobState";
 import { seed } from "./seed";
 import { sameLogin } from "./pin";
 import { createSession, readSession, SESSION_MAX_AGE, verifyPassword } from "./auth";
@@ -23,13 +23,15 @@ export async function findUserByLogin(login: string, password: string): Promise<
 
 export async function sessionUser(): Promise<User | null> {
   const jar = await cookies();
-  return readSession(jar.get(SESSION_COOKIE)?.value, await allUsers());
+  const token = jar.get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+  return readSession(token, await allUsers(), await loadSessionSecret());
 }
 
-export function sessionCookie(user: User) {
+export async function sessionCookie(user: User) {
   return {
     name: SESSION_COOKIE,
-    value: createSession(user),
+    value: createSession(user, await loadSessionSecret()),
     options: {
       httpOnly: true,
       sameSite: "lax" as const,
