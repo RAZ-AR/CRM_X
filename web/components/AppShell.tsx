@@ -31,6 +31,7 @@ import { noticeVisible } from "@/lib/emoji";
 import clsx from "clsx";
 import { TaskModal } from "@/components/TaskSheet";
 import { Reminders } from "@/components/Reminders";
+import { CommandPalette } from "@/components/CommandPalette";
 
 const icons: Record<string, React.ReactNode> = {
   home: <Home size={18} />,
@@ -54,7 +55,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [bell, setBell] = useState(false);
   const [menu, setMenu] = useState(false);
-  const [q, setQ] = useState("");
+  const [cmdk, setCmdk] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setCmdk((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   useEffect(() => {
     if (!current) router.replace("/login");
@@ -157,18 +168,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Menu size={18} />
             </button>
             <Link href="/home" className="md:hidden font-semibold text-sm shrink-0">CRM X</Link>
-            <div className="flex-1 md:flex-none md:w-80 flex items-center gap-2 bg-[var(--card)] border border-[var(--line)] rounded-full px-3 h-10 min-w-0 md:mr-auto">
-              <Search size={16} className="text-[#6F6E69] shrink-0" />
-              <input
-                className="flex-1 !bg-transparent !border-0 !rounded-none !px-0 !py-0 min-w-0 text-sm focus-visible:!outline-none"
-                placeholder="Поиск…"
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") router.push("/kanban");
-                }}
-              />
-            </div>
+            <button
+              type="button"
+              onClick={() => setCmdk(true)}
+              className="flex-1 md:flex-none md:w-80 flex items-center gap-2 bg-[var(--card)] border border-[var(--line)] rounded-full px-3 h-10 min-w-0 md:mr-auto text-left text-sm text-[var(--muted)]"
+              aria-label="Поиск и команды"
+            >
+              <Search size={16} className="shrink-0" />
+              <span className="flex-1 truncate">Поиск и команды…</span>
+              <kbd className="hidden md:inline cap border border-[var(--line)] rounded-md px-1.5">⌘K</kbd>
+            </button>
             <button
               className="h-10 w-10 rounded-full bg-[var(--card)] border border-[var(--line)] grid place-items-center relative shrink-0"
               aria-label="Уведомления"
@@ -220,6 +229,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <main className="flex-1 px-4 pb-6 md:px-8 md:pb-10 min-w-0 w-full max-w-[1440px]">{children}</main>
           <TaskModal />
           <Reminders />
+          <CommandPalette open={cmdk} onClose={() => setCmdk(false)} />
         </div>
       </div>
 
