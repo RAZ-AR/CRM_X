@@ -86,7 +86,7 @@ export const seed: AppState = {
       ],
       "managerId": "u-armen",
       "streams": [
-        "BRAND"
+        "BRAND & MARKETING"
       ]
     },
     {
@@ -136,7 +136,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-01",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -162,7 +162,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-02",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [
         "GEN-01"
       ],
@@ -190,7 +190,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-03",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -216,7 +216,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-04",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [
         "GEN-03"
       ],
@@ -244,7 +244,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-05",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -270,7 +270,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-06",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [
         "GEN-04"
       ],
@@ -298,7 +298,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-07",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -324,7 +324,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-08",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -350,7 +350,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-09",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -376,7 +376,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-10",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [
         "GEN-08",
         "GEN-04"
@@ -405,7 +405,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-11",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -431,7 +431,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-12",
       "wave": "",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -457,7 +457,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-20",
       "wave": "",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -483,7 +483,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-21",
       "wave": "",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -509,7 +509,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-22",
       "wave": "",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -535,7 +535,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-23",
       "wave": "",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -561,7 +561,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-24",
       "wave": "",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -587,7 +587,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-25",
       "wave": "",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "GEN-21",
         "GEN-23"
@@ -616,7 +616,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-26",
       "wave": "",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -642,7 +642,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-27",
       "wave": "",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "GEN-22"
       ],
@@ -670,7 +670,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-28",
       "wave": "",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "GEN-26"
       ],
@@ -698,7 +698,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-29",
       "wave": "",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -724,7 +724,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-30",
       "wave": "",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -750,7 +750,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-40",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -776,7 +776,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-41",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -802,7 +802,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-42",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-40"
       ],
@@ -830,7 +830,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-43",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -856,7 +856,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-44",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-42",
         "GEN-43"
@@ -885,7 +885,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-45",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-44"
       ],
@@ -913,7 +913,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-46",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-45"
       ],
@@ -941,7 +941,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-47",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-45"
       ],
@@ -969,7 +969,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-48",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-46"
       ],
@@ -997,7 +997,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-49",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-46"
       ],
@@ -1025,7 +1025,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-50",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -1051,7 +1051,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-51",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-50"
       ],
@@ -1079,7 +1079,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-52",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-43"
       ],
@@ -1107,7 +1107,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-53",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-46",
         "GEN-52"
@@ -1136,7 +1136,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-54",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-47"
       ],
@@ -1164,7 +1164,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-55",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-46"
       ],
@@ -1192,7 +1192,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-56",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "GEN-46",
         "GEN-51"
@@ -1221,7 +1221,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-57",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -1247,7 +1247,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-58",
       "wave": "",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -1273,7 +1273,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-60",
       "wave": "",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [
         "GEN-04"
       ],
@@ -1301,7 +1301,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-61",
       "wave": "",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -1379,7 +1379,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-80",
       "wave": "",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -1405,7 +1405,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-81",
       "wave": "",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -1431,7 +1431,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "GEN-82",
       "wave": "",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -1457,7 +1457,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-01",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "GEN-02",
         "GEN-22"
@@ -1486,7 +1486,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-02",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-01"
       ],
@@ -1514,7 +1514,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-03",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-02"
       ],
@@ -1542,7 +1542,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-04",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-03",
         "WAF-22"
@@ -1571,7 +1571,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-05",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-03",
         "GEN-25"
@@ -1600,7 +1600,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-06",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-04",
         "GEN-45"
@@ -1629,7 +1629,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-07",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-06",
         "GEN-09"
@@ -1658,7 +1658,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-08",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-07",
         "WAF-05"
@@ -1687,7 +1687,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-09",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-06"
       ],
@@ -1715,7 +1715,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-10",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -1741,7 +1741,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-11",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-10",
         "WAF-01"
@@ -1770,7 +1770,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-12",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-11",
         "GEN-09"
@@ -1799,7 +1799,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-13",
       "wave": "A",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-12"
       ],
@@ -2132,7 +2132,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-40",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -2158,7 +2158,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-41",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "WAF-40"
       ],
@@ -2186,7 +2186,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-42",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -2212,7 +2212,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-43",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "WAF-41",
         "WAF-42"
@@ -2241,7 +2241,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-44",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "WAF-43"
       ],
@@ -2269,7 +2269,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-45",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "WAF-44"
       ],
@@ -2297,7 +2297,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-46",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "WAF-44"
       ],
@@ -2325,7 +2325,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-47",
       "wave": "A",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "WAF-46",
         "GEN-46"
@@ -2354,7 +2354,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-48",
       "wave": "A",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -2380,7 +2380,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-50",
       "wave": "A",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -2406,7 +2406,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-51",
       "wave": "A",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [
         "WAF-50"
       ],
@@ -2434,7 +2434,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-52",
       "wave": "A",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -2460,7 +2460,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-53",
       "wave": "A",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [
         "WAF-52",
         "GEN-60"
@@ -2489,7 +2489,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-54",
       "wave": "A",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [
         "WAF-53"
       ],
@@ -2517,7 +2517,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-55",
       "wave": "A",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [
         "WAF-54",
         "WAF-30"
@@ -2546,7 +2546,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-60",
       "wave": "A",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "WAF-30"
       ],
@@ -2574,7 +2574,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-61",
       "wave": "A",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "WAF-55",
         "WAF-60",
@@ -2605,7 +2605,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-62",
       "wave": "A",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "WAF-61"
       ],
@@ -2633,7 +2633,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "WAF-63",
       "wave": "A",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "WAF-62",
         "APP-16"
@@ -2662,7 +2662,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-01",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -2688,7 +2688,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-02",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -2714,7 +2714,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-03",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -2740,7 +2740,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-04",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "APP-01",
         "APP-02",
@@ -2770,7 +2770,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-05",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "APP-04"
       ],
@@ -2798,7 +2798,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-06",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "APP-05"
       ],
@@ -2826,7 +2826,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-07",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "APP-06",
         "GEN-46"
@@ -2855,7 +2855,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-08",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "APP-06"
       ],
@@ -2883,7 +2883,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-09",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "APP-06",
         "GEN-70"
@@ -2912,7 +2912,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-10",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "APP-06"
       ],
@@ -2940,7 +2940,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-11",
       "wave": "A",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [
         "GEN-04"
       ],
@@ -2968,7 +2968,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-12",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "APP-08",
         "APP-09",
@@ -2998,7 +2998,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-13",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "APP-12"
       ],
@@ -3026,7 +3026,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-14",
       "wave": "A",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "APP-12"
       ],
@@ -3054,7 +3054,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-15",
       "wave": "A",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "APP-06"
       ],
@@ -3082,7 +3082,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "APP-16",
       "wave": "A",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "APP-13",
         "APP-14"
@@ -3111,7 +3111,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-01",
       "wave": "B",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -3137,7 +3137,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-02",
       "wave": "B",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -3163,7 +3163,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-03",
       "wave": "B",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -3189,7 +3189,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-04",
       "wave": "B",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "DK-03"
       ],
@@ -3217,7 +3217,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-05",
       "wave": "B",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "DK-04",
         "DK-01",
@@ -3247,7 +3247,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-06",
       "wave": "B",
-      "workstream": "LEGAL",
+      "workstream": "LEGAL & FINANCE",
       "dependsOn": [
         "DK-05"
       ],
@@ -3275,7 +3275,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-07",
       "wave": "B",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "DK-05"
       ],
@@ -3303,7 +3303,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-08",
       "wave": "B",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "DK-05"
       ],
@@ -3331,7 +3331,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-09",
       "wave": "B",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "DK-08"
       ],
@@ -3359,7 +3359,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-10",
       "wave": "B",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "DK-09"
       ],
@@ -3387,7 +3387,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-11",
       "wave": "B",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "DK-10"
       ],
@@ -3415,7 +3415,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-12",
       "wave": "B",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "DK-10"
       ],
@@ -3497,7 +3497,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-15",
       "wave": "B",
-      "workstream": "BRAND",
+      "workstream": "BRAND & MARKETING",
       "dependsOn": [
         "DK-10"
       ],
@@ -3525,7 +3525,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-16",
       "wave": "B",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "DK-07",
         "GEN-04"
@@ -3554,7 +3554,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-17",
       "wave": "B",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "DK-05"
       ],
@@ -3582,7 +3582,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-20",
       "wave": "B",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "WAF-01",
         "GEN-22"
@@ -3611,7 +3611,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-21",
       "wave": "B",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "DK-20"
       ],
@@ -3639,7 +3639,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-22",
       "wave": "B",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "DK-21"
       ],
@@ -3667,7 +3667,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-23",
       "wave": "B",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "DK-22",
         "DK-30"
@@ -3696,7 +3696,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-24",
       "wave": "B",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "DK-22",
         "GEN-25"
@@ -3725,7 +3725,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-25",
       "wave": "B",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "DK-23"
       ],
@@ -3753,7 +3753,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-26",
       "wave": "B",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "DK-25",
         "DK-24"
@@ -3782,7 +3782,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-27",
       "wave": "B",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "DK-26"
       ],
@@ -3976,7 +3976,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-40",
       "wave": "B",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -4002,7 +4002,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-41",
       "wave": "B",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [
         "DK-40"
       ],
@@ -4030,7 +4030,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-42",
       "wave": "B",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [
         "DK-41",
         "GEN-60"
@@ -4059,7 +4059,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-43",
       "wave": "B",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [
         "DK-42",
         "DK-11"
@@ -4088,7 +4088,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-44",
       "wave": "B",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [
         "DK-43",
         "DK-35"
@@ -4117,7 +4117,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-50",
       "wave": "B",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "DK-35"
       ],
@@ -4145,7 +4145,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-51",
       "wave": "B",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "DK-44",
         "DK-50",
@@ -4175,7 +4175,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-52",
       "wave": "B",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "DK-51"
       ],
@@ -4203,7 +4203,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-53",
       "wave": "B",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "DK-52"
       ],
@@ -4231,7 +4231,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "DK-54",
       "wave": "B",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "DK-53"
       ],
@@ -4259,7 +4259,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "BK-01",
       "wave": "C",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -4285,7 +4285,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "BK-02",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "DK-20"
       ],
@@ -4313,7 +4313,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "BK-03",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "BK-02"
       ],
@@ -4341,7 +4341,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "BK-04",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "BK-03"
       ],
@@ -4369,7 +4369,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "BK-05",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "BK-04"
       ],
@@ -4397,7 +4397,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "BK-06",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "BK-05"
       ],
@@ -4425,7 +4425,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "BK-07",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "BK-06"
       ],
@@ -4509,7 +4509,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "BK-10",
       "wave": "C",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -4535,7 +4535,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "BK-11",
       "wave": "C",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "BK-07",
         "BK-09"
@@ -4564,7 +4564,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "BK-12",
       "wave": "C",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "BK-11"
       ],
@@ -4592,7 +4592,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "CAF-01",
       "wave": "C",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -4618,7 +4618,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "CAF-02",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "BK-02"
       ],
@@ -4646,7 +4646,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "CAF-03",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "CAF-02"
       ],
@@ -4674,7 +4674,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "CAF-04",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "CAF-03"
       ],
@@ -4702,7 +4702,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "CAF-05",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "CAF-04"
       ],
@@ -4730,7 +4730,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "CAF-06",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "CAF-05"
       ],
@@ -4758,7 +4758,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "CAF-07",
       "wave": "C",
-      "workstream": "SPACE",
+      "workstream": "SPACE & BUILD",
       "dependsOn": [
         "CAF-06"
       ],
@@ -4814,7 +4814,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "CAF-09",
       "wave": "C",
-      "workstream": "PRODUCT",
+      "workstream": "PRODUCT & APP",
       "dependsOn": [
         "CAF-01"
       ],
@@ -4842,7 +4842,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "CAF-10",
       "wave": "C",
-      "workstream": "PEOPLE",
+      "workstream": "PEOPLE & TRAINING",
       "dependsOn": [],
       "blockReason": ""
     },
@@ -4868,7 +4868,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "CAF-11",
       "wave": "C",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "CAF-07",
         "CAF-10"
@@ -4897,7 +4897,7 @@ export const seed: AppState = {
       "attachments": [],
       "code": "CAF-12",
       "wave": "C",
-      "workstream": "LAUNCH",
+      "workstream": "LAUNCH & OPS",
       "dependsOn": [
         "CAF-11"
       ],
@@ -5405,7 +5405,7 @@ export const seed: AppState = {
       "title": "Master-план запуска",
       "zone": "all",
       "visibility": "staff",
-      "body": "Старт 24.09.2026. Ремонт по очереди: WAFL → Dark Kitchen → COMX → CAFE (демонтаж → замер → планировка → дизайн → согласование → ремонт).\n\nОткрытия (план): WAFL 28.10.2026 · Dark Kitchen 10.11.2026 · COMX 15.12.2026 · CAFE 15.01.2027. Даты COMX и CAFE — ориентир, уточняются после запуска кухни.\n\n7 потоков: LEGAL · SPACE · BRAND · PRODUCT · EQUIPMENT & SUPPLY · PEOPLE · LAUNCH. Готовность проекта считается из закрытых задач (critical path весит ×3).\n\nКаждый запуск: тест производства → тестовые смены → soft launch → анализ → полноценный запуск.\n\nРезерв: держим 10–15% по времени — 28.10 и 10.11 плановые, не гарантированные даты.\n\nПолный план: data/master-plan.csv в репозитории."
+      "body": "Старт 24.09.2026. Ремонт по очереди: WAFL → Dark Kitchen → COMX → CAFE (демонтаж → замер → планировка → дизайн → согласование → ремонт).\n\nОткрытия (план): WAFL 28.10.2026 · Dark Kitchen 10.11.2026 · COMX 15.12.2026 · CAFE 15.01.2027. Даты COMX и CAFE — ориентир, уточняются после запуска кухни.\n\n7 потоков: LEGAL & FINANCE · SPACE & BUILD · BRAND & MARKETING · PRODUCT & APP · EQUIPMENT & SUPPLY · PEOPLE & TRAINING · LAUNCH & OPS. Готовность проекта считается из закрытых задач (critical path весит ×3).\n\nКаждый запуск: тест производства → тестовые смены → soft launch → анализ → полноценный запуск.\n\nРезерв: держим 10–15% по времени — 28.10 и 10.11 плановые, не гарантированные даты.\n\nПолный план: data/master-plan.csv в репозитории."
     }
   ],
   "notices": [],

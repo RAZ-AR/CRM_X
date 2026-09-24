@@ -1,19 +1,33 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { BookOpen, CircleHelp } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { canSeeWiki, hasPerm, isCpo } from "@/lib/access";
 import type { WikiPage, ZoneSlug } from "@/lib/types";
+import { HelpIndex, OnboardingGuide } from "@/components/Help";
+import { ONBOARDING } from "@/lib/help";
+
+/** Встроенные страницы: онбординг и справка видны всем, даже без доступа к Wiki. */
+const BUILTIN = [
+  { id: "onboarding", title: ONBOARDING.title, icon: <BookOpen size={15} />, render: () => <OnboardingGuide /> },
+  { id: "help", title: "Справка / FAQ по разделам", icon: <CircleHelp size={15} />, render: () => <HelpIndex /> },
+];
 
 export default function WikiPageView() {
   const { current, wiki, zones, addWiki } = useStore();
-  const [open, setOpen] = useState<string | null>(null);
+  const [open, setOpen] = useState<string>(() => (typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("page") || "") || "onboarding");
+  // Ссылка «Вся справка» из панели «?» ведёт на нужный раздел: /wiki?page=help#help-kanban.
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (id) document.getElementById(id)?.scrollIntoView({ block: "start" });
+  }, []);
   if (!current) return null;
-  if (!isCpo(current) && !hasPerm(current, "wiki")) {
-    return <div className="card p-6">Wiki закрыта.</div>;
-  }
-  const pages = wiki.filter((w) => canSeeWiki(current, w));
-  const page = pages.find((p) => p.id === open) ?? pages[0];
+  const full = isCpo(current) || hasPerm(current, "wiki");
+  const pages = full ? wiki.filter((w) => canSeeWiki(current, w)) : [];
+  const builtin = BUILTIN.find((b) => b.id === open);
+  const page = builtin ? null : pages.find((p) => p.id === open) ?? null;
+  const shown = builtin ?? (page ? null : BUILTIN[0]);
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,6 +45,17 @@ export default function WikiPageView() {
     <div className="grid gap-3 lg:grid-cols-12">
       <div className="lg:col-span-4 card p-4 space-y-2">
         <h1 className="page-title m-0 px-1 mb-3">Wiki</h1>
+        {BUILTIN.map((b) => (
+          <button
+            key={b.id}
+            onClick={() => setOpen(b.id)}
+            className={`w-full text-left rounded-2xl px-3 py-2 text-sm flex items-center gap-2 ${shown?.id === b.id ? "bg-black text-white" : "bg-[#F3F2EE]"}`}
+          >
+            {b.icon}
+            {b.title}
+          </button>
+        ))}
+        {pages.length > 0 && <div className="cap px-1 pt-2">Страницы</div>}
         {pages.map((p) => (
           <button
             key={p.id}
@@ -59,15 +84,18 @@ export default function WikiPageView() {
           </form>
         )}
       </div>
-      <div className="lg:col-span-8 card p-6">
-        {page ? (
+      <div className="lg:col-span-8 card p-5 md:p-6 min-w-0">
+        {shown ? (
+          <>
+            <h2 className="text-2xl font-semibold mt-0 mb-4">{shown.title}</h2>
+            {shown.render()}
+          </>
+        ) : page ? (
           <>
             <h2 className="text-2xl font-semibold">{page.title}</h2>
             <p className="mt-4 whitespace-pre-wrap text-gray-700">{page.body}</p>
           </>
-        ) : (
-          <p className="text-[#6F6E69]">Нет страниц</p>
-        )}
+        ) : null}
       </div>
     </div>
   );

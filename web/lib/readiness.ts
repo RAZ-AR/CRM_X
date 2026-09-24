@@ -2,14 +2,14 @@ import type { Stream, Task } from "./types";
 import { STREAMS } from "./types";
 import { taskZones } from "./access";
 
-export const STREAM_META: Record<Stream, { label: string; color: string }> = {
-  LEGAL: { label: "Юр · финансы", color: "#C4B5FD" },
-  SPACE: { label: "Помещение · ремонт", color: "#86EFAC" },
-  BRAND: { label: "Бренд · маркетинг", color: "#FDBA74" },
-  PRODUCT: { label: "Продукт · меню · app", color: "#F9A8D4" },
-  "EQUIPMENT & SUPPLY": { label: "Оборудование · закупки", color: "#FDE68A" },
-  PEOPLE: { label: "Команда", color: "#93C5FD" },
-  LAUNCH: { label: "Запуск", color: "#67E8F9" },
+export const STREAM_META: Record<Stream, { label: string; color: string; short: string }> = {
+  "LEGAL & FINANCE": { label: "Юрлица, договоры, бухгалтерия, банки, финмодель, разрешения", color: "#C4B5FD", short: "LEGAL" },
+  "SPACE & BUILD": { label: "Помещения: осмотр, демонтаж, ремонт, инженерия, безопасность", color: "#86EFAC", short: "SPACE" },
+  "BRAND & MARKETING": { label: "Бренд, айдентика, соцсети, контент, PR, продвижение запуска", color: "#FDBA74", short: "BRAND" },
+  "PRODUCT & APP": { label: "Меню, рецептуры, техкарты, цены, приложение лояльности", color: "#F9A8D4", short: "PRODUCT" },
+  "EQUIPMENT & SUPPLY": { label: "Оборудование, касса, упаковка, поставщики, закупки", color: "#FDE68A", short: "EQUIPMENT" },
+  "PEOPLE & TRAINING": { label: "Структура, найм, договоры, медкнижки, обучение, тестовые смены", color: "#93C5FD", short: "PEOPLE" },
+  "LAUNCH & OPS": { label: "Тест производства, soft launch, стандарты смен, агрегаторы, отчёты", color: "#67E8F9", short: "LAUNCH" },
 };
 
 /** Взвешенный % закрытых задач: обычная 1, critical path 3. */

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
@@ -26,6 +26,7 @@ import {
   PanelLeftOpen,
   Wallet,
   ShieldAlert,
+  CircleHelp,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { cpoNav, employeeNav, isCpo } from "@/lib/access";
@@ -34,6 +35,7 @@ import clsx from "clsx";
 import { TaskModal } from "@/components/TaskSheet";
 import { Reminders } from "@/components/Reminders";
 import { CommandPalette } from "@/components/CommandPalette";
+import { HelpDrawer } from "@/components/Help";
 
 const icons: Record<string, React.ReactNode> = {
   home: <Home size={18} />,
@@ -58,6 +60,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [bell, setBell] = useState(false);
   const [menu, setMenu] = useState(false);
   const [cmdk, setCmdk] = useState(false);
+  const [help, setHelp] = useState(false);
+  const closeHelp = useCallback(() => setHelp(false), []);
   // Свёрнутое меню запоминаем в браузере.
   const [collapsed, setCollapsed] = useState(() => {
     try {
@@ -92,6 +96,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setMenu(false);
     setBell(false);
+    setHelp(false);
   }, [path]);
   if (!current) return null;
 
@@ -224,6 +229,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <kbd className="hidden md:inline cap border border-[var(--line)] rounded-md px-1.5">⌘K</kbd>
             </button>
             <button
+              type="button"
+              className="h-10 w-10 rounded-full bg-[var(--card)] border border-[var(--line)] grid place-items-center shrink-0 text-[var(--muted)] hover:text-[var(--ink)]"
+              aria-label="Справка по разделу"
+              title="Справка по разделу"
+              onClick={() => setHelp(true)}
+            >
+              <CircleHelp size={18} />
+            </button>
+            <button
               className="h-10 w-10 rounded-full bg-[var(--card)] border border-[var(--line)] grid place-items-center relative shrink-0"
               aria-label="Уведомления"
               onClick={() => setBell((v) => !v)}
@@ -275,6 +289,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <TaskModal />
           <Reminders />
           <CommandPalette open={cmdk} onClose={() => setCmdk(false)} />
+          {help && <HelpDrawer path={path} onClose={closeHelp} />}
         </div>
       </div>
 

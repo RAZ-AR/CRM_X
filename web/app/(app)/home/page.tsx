@@ -256,8 +256,8 @@ export default function HomePage() {
           </div>
           <div className="flex flex-col gap-2.5">
             {heroStreams.map((s) => (
-              <div key={s.stream} className="grid grid-cols-[88px_minmax(0,1fr)_36px] md:grid-cols-[110px_minmax(0,1fr)_40px] items-center gap-3">
-                <span className="cap !text-[var(--ink-2)] font-medium truncate" title={s.label}>{s.stream === "EQUIPMENT & SUPPLY" ? "EQUIPMENT" : s.stream}</span>
+              <div key={s.stream} className="grid grid-cols-[80px_minmax(0,1fr)_36px] md:grid-cols-[150px_minmax(0,1fr)_40px] items-center gap-3">
+                <span className="cap !text-[var(--ink-2)] font-medium truncate" title={`${s.stream} · ${s.label}`}><span className="md:hidden">{s.short}</span><span className="hidden md:inline">{s.stream}</span></span>
                 <Meter pct={s.pct} />
                 <span className="cap num text-right !text-[var(--ink)]">{s.pct}%</span>
               </div>
