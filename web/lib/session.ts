@@ -2,14 +2,10 @@ import { cookies } from "next/headers";
 import { loadSharedState } from "./blobState";
 import { seed } from "./seed";
 import { sameLogin } from "./pin";
+import { createSession, readSession, SESSION_MAX_AGE, verifyPassword } from "./auth";
 import type { User } from "./types";
 
-export const UID_COOKIE = "crmx_uid";
-
-export async function readUid() {
-  const jar = await cookies();
-  return jar.get(UID_COOKIE)?.value ?? null;
-}
+export const SESSION_COOKIE = "crmx_session";
 
 export async function allUsers(): Promise<User[]> {
   try {
@@ -20,16 +16,26 @@ export async function allUsers(): Promise<User[]> {
   }
 }
 
-export async function findUserById(id: string): Promise<User | null> {
-  return (await allUsers()).find((u) => u.id === id) ?? null;
-}
-
-export async function findUserByLogin(email: string, password: string): Promise<User | null> {
-  return (await allUsers()).find((u) => sameLogin(u.email, email) && u.password === password) ?? null;
+export async function findUserByLogin(login: string, password: string): Promise<User | null> {
+  const user = (await allUsers()).find((u) => sameLogin(u.email, login));
+  return user && verifyPassword(password, user.password) ? user : null;
 }
 
 export async function sessionUser(): Promise<User | null> {
-  const id = await readUid();
-  if (!id) return null;
-  return findUserById(id);
+  const jar = await cookies();
+  return readSession(jar.get(SESSION_COOKIE)?.value, await allUsers());
+}
+
+export function sessionCookie(user: User) {
+  return {
+    name: SESSION_COOKIE,
+    value: createSession(user),
+    options: {
+      httpOnly: true,
+      sameSite: "lax" as const,
+      path: "/",
+      maxAge: SESSION_MAX_AGE,
+      secure: process.env.NODE_ENV === "production",
+    },
+  };
 }

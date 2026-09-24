@@ -1,4 +1,5 @@
 import type { AppState, User } from "./types";
+import { ensureHashed } from "./auth";
 import {
   canManagePeople,
   canSeeContact,
@@ -71,7 +72,7 @@ export function mergeState(existing: AppState, incoming: AppState, user: User): 
 
   const users = (incoming.users?.length ? incoming.users : existing.users).map((u) => {
     const prev = existing.users.find((x) => x.id === u.id);
-    return { ...u, password: u.password || prev?.password || "" };
+    return { ...u, password: u.password ? ensureHashed(u.password) : prev?.password || "" };
   });
   return {
     ...base,

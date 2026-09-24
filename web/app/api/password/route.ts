@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { sessionUser } from "@/lib/session";
+import { sessionCookie, sessionUser } from "@/lib/session";
 import { loadSharedState, saveSharedState } from "@/lib/blobState";
 import { isValidPassword } from "@/lib/pin";
+import { hashPassword, verifyPassword } from "@/lib/auth";
 
-/** Любой пользователь меняет свой пароль, зная текущий. */
+/** Любой пользователь меняет свой пароль, зная текущий. Другие устройства разлогиниваются. */
 export async function POST(req: Request) {
   const user = await sessionUser();
   if (!user) return NextResponse.json({ ok: false, auth: true }, { status: 401 });
@@ -14,10 +15,13 @@ export async function POST(req: Request) {
   }
   const { state } = await loadSharedState();
   const me = state.users.find((u) => u.id === user.id);
-  if (!me || me.password !== String(current || "")) {
+  if (!me || !verifyPassword(String(current || ""), me.password)) {
     return NextResponse.json({ ok: false, error: "Текущий пароль неверный" }, { status: 403 });
   }
-  const users = state.users.map((u) => (u.id === me.id ? { ...u, password } : u));
-  await saveSharedState({ ...state, users });
-  return NextResponse.json({ ok: true });
+  const updated = { ...me, password: hashPassword(password) };
+  await saveSharedState({ ...state, users: state.users.map((u) => (u.id === me.id ? updated : u)) });
+  const res = NextResponse.json({ ok: true });
+  const c = sessionCookie(updated);
+  res.cookies.set(c.name, c.value, c.options);
+  return res;
 }

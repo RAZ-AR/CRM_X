@@ -9,8 +9,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { seed } from "./seed";
-import { isValidLogin, isValidPassword, loginTaken, sameLogin } from "./pin";
+import { EMPTY_STATE } from "./emptyState";
+import { isValidLogin, isValidPassword, loginTaken } from "./pin";
 import { canMoveStatus } from "./taskRules";
 import { canDeleteTask } from "./access";
 import { normalizeState } from "./normalize";
@@ -28,7 +28,8 @@ import type {
 
 type Store = AppState & {
   current: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  /** true — вошли, строка — текст ошибки. */
+  login: (email: string, password: string) => Promise<true | string>;
   logout: () => void;
   cloud: boolean;
   addTask: (t: Omit<Task, "id" | "createdAt">) => string;
@@ -75,7 +76,7 @@ function syncSlice(s: AppState) {
 const USER_KEY = "crmx-user";
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AppState>(seed);
+  const [state, setState] = useState<AppState>(EMPTY_STATE);
   const [current, setCurrent] = useState<User | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
@@ -137,7 +138,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const raw = currentRaw || localStorage.getItem("crmx-norion-v7");
         const uid = localStorage.getItem(USER_KEY);
         if (raw) apply(normalizeState(JSON.parse(raw)), false, uid);
-        else if (uid) setCurrent(seed.users.find((u) => u.id === uid) ?? null);
       } catch {
         /* ignore */
       }
@@ -220,7 +220,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
   }, [ready, current?.id]);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string): Promise<true | string> => {
     try {
       const res = await fetch("/api/login", {
         method: "POST",
@@ -229,13 +229,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (!res.ok || !data?.ok) {
-        const u = state.users.find((x) => sameLogin(x.email, email) && x.password === password);
-        if (!u) return false;
-        setCurrent(u);
-        localStorage.setItem(USER_KEY, u.id);
-        return true;
-      }
+      if (!res.ok || !data?.ok) return data?.error || "Неверный логин или пароль";
       const st = await fetch("/api/state", { cache: "no-store", credentials: "same-origin" });
       const body = await st.json();
       if (body?.ok && body.state) {
@@ -251,13 +245,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(USER_KEY, data.user.id);
       return true;
     } catch {
-      const u = state.users.find((x) => sameLogin(x.email, email) && x.password === password);
-      if (!u) return false;
-      setCurrent(u);
-      localStorage.setItem(USER_KEY, u.id);
-      return true;
+      return "Нет связи с сервером";
     }
-  }, [state.users]);
+  }, [applyServer]);
 
   const logout = useCallback(() => {
     setCurrent(null);

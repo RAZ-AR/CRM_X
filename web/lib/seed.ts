@@ -2691,7 +2691,7 @@ export const seed: AppState = {
     },
     {
       "id": "t-app-03",
-      "title": "App: платформа и команда разработки",
+      "title": "App: команда разработки Telegram Mini App",
       "description": "",
       "zone": "wafl",
       "zones": [
@@ -2706,7 +2706,7 @@ export const seed: AppState = {
       "status": "todo",
       "weight": 1,
       "criticalPath": false,
-      "result": "Выбрана платформа и разработчик",
+      "result": "Разработчик выбран, есть опыт Mini Apps",
       "createdAt": "2026-09-24",
       "attachments": [],
       "code": "APP-03",
@@ -2717,7 +2717,7 @@ export const seed: AppState = {
     },
     {
       "id": "t-app-04",
-      "title": "App: техническое задание",
+      "title": "App: техническое задание Mini App",
       "description": "",
       "zone": "wafl",
       "zones": [
@@ -2889,7 +2889,7 @@ export const seed: AppState = {
     },
     {
       "id": "t-app-10",
-      "title": "App: клиентская часть (UI поверх прототипа после APP-07)",
+      "title": "App: Mini App — клиентская часть (UI после APP-07)",
       "description": "",
       "zone": "wafl",
       "zones": [
@@ -2904,7 +2904,7 @@ export const seed: AppState = {
       "status": "todo",
       "weight": 1,
       "criticalPath": false,
-      "result": "Все экраны работают",
+      "result": "Все экраны работают в Telegram на iOS и Android",
       "createdAt": "2026-09-24",
       "attachments": [],
       "code": "APP-10",
@@ -3003,7 +3003,7 @@ export const seed: AppState = {
     },
     {
       "id": "t-app-14",
-      "title": "App: публикация (Telegram / сторы / веб)",
+      "title": "App: бот и публикация Mini App в Telegram",
       "description": "",
       "zone": "wafl",
       "zones": [
@@ -3018,7 +3018,7 @@ export const seed: AppState = {
       "status": "todo",
       "weight": 3,
       "criticalPath": true,
-      "result": "Приложение доступно гостям",
+      "result": "Бот с кнопкой Mini App доступен гостям",
       "createdAt": "2026-09-24",
       "attachments": [],
       "code": "APP-14",
@@ -3031,7 +3031,7 @@ export const seed: AppState = {
     },
     {
       "id": "t-app-15",
-      "title": "App: промо — QR на окне и упаковке, стартовая акция",
+      "title": "App: промо — QR на окне и упаковке ведёт в бот, стартовая акция",
       "description": "",
       "zone": "wafl",
       "zones": [
@@ -5272,19 +5272,61 @@ export const seed: AppState = {
     {
       "id": "s-app-04-3",
       "taskId": "t-app-04",
-      "title": "Админка",
+      "title": "Вход через Telegram (без паролей)",
       "done": false
     },
     {
       "id": "s-app-04-4",
       "taskId": "t-app-04",
-      "title": "Интеграция с POS",
+      "title": "Уведомления от бота",
       "done": false
     },
     {
       "id": "s-app-04-5",
       "taskId": "t-app-04",
+      "title": "Админка",
+      "done": false
+    },
+    {
+      "id": "s-app-04-6",
+      "taskId": "t-app-04",
+      "title": "Интеграция с POS",
+      "done": false
+    },
+    {
+      "id": "s-app-04-7",
+      "taskId": "t-app-04",
       "title": "Аналитика",
+      "done": false
+    },
+    {
+      "id": "s-app-14-1",
+      "taskId": "t-app-14",
+      "title": "Бот создан через BotFather",
+      "done": false
+    },
+    {
+      "id": "s-app-14-2",
+      "taskId": "t-app-14",
+      "title": "Название, аватар, описание в айдентике",
+      "done": false
+    },
+    {
+      "id": "s-app-14-3",
+      "taskId": "t-app-14",
+      "title": "Кнопка меню открывает Mini App",
+      "done": false
+    },
+    {
+      "id": "s-app-14-4",
+      "taskId": "t-app-14",
+      "title": "Приветственное сообщение",
+      "done": false
+    },
+    {
+      "id": "s-app-14-5",
+      "taskId": "t-app-14",
+      "title": "Домен Mini App подключён",
       "done": false
     },
     {

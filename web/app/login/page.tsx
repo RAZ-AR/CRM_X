@@ -21,9 +21,9 @@ export default function LoginPage() {
           onSubmit={async (e) => {
             e.preventDefault();
             setErr("");
-            const ok = await login(email, password);
-            if (ok) router.push("/home");
-            else setErr("Неверный логин или пароль");
+            const r = await login(email, password);
+            if (r === true) router.push("/home");
+            else setErr(r);
           }}
         >
           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="логин, например Armen" autoComplete="username" />
