@@ -11,4 +11,5 @@ export const EMPTY_STATE: AppState = {
   contacts: [],
   notices: [],
   broadcast: null,
+  activity: [],
 };

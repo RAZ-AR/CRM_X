@@ -3,7 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { canManagePeople } from "@/lib/access";
-import { type Permission, type ZoneSlug } from "@/lib/types";
+import { STREAMS, type Permission, type ZoneSlug } from "@/lib/types";
 import { unusedFourDigit } from "@/lib/pin";
 
 const PERMS: { id: Permission; label: string }[] = [
@@ -15,7 +15,7 @@ const PERMS: { id: Permission; label: string }[] = [
 ];
 
 export default function SettingsPage() {
-  const { current, users, zones, grant, addUser, setBoardZones, setManager, setUserPin, setUserLogin } = useStore();
+  const { current, users, zones, grant, setStreams, addUser, setBoardZones, setManager, setUserPin, setUserLogin } = useStore();
   const taken = useMemo(() => new Set(users.map((u) => u.email)), [users]);
   const [login, setLogin] = useState("");
   const [pin, setPin] = useState("");
@@ -197,6 +197,22 @@ export default function SettingsPage() {
                   }}
                 >
                   {z.name}
+                </button>
+              );
+            })}
+          </div>
+          <div className="text-xs text-[#757575] mt-3">Видит потоки целиком (все задачи потока, может вести статус)</div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {STREAMS.map((st) => {
+              const on = (u.streams ?? []).includes(st);
+              return (
+                <button
+                  type="button"
+                  key={st}
+                  className={`pill px-3 py-1.5 text-sm ${on ? "bg-black text-white" : "bg-gray-100"}`}
+                  onClick={() => setStreams(u.id, on ? (u.streams ?? []).filter((x) => x !== st) : [...(u.streams ?? []), st])}
+                >
+                  {st}
                 </button>
               );
             })}

@@ -41,6 +41,7 @@ type Store = AppState & {
   addComment: (taskId: string, text: string) => void;
   deleteTask: (id: string) => Promise<{ ok: true } | { ok: false; error: string }>;
   grant: (userId: string, permissions: User["permissions"]) => void;
+  setStreams: (userId: string, streams: NonNullable<User["streams"]>) => void;
   addSubtask: (taskId: string, title: string) => void;
   toggleSubtask: (id: string) => void;
   addWiki: (p: Omit<WikiPage, "id">) => void;
@@ -471,6 +472,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setCurrent((c) => (c?.id === userId ? { ...c, permissions } : c));
   }, []);
 
+  const setStreams = useCallback((userId: string, streams: NonNullable<User["streams"]>) => {
+    setState((s) => ({ ...s, users: s.users.map((u) => (u.id === userId ? { ...u, streams } : u)) }));
+  }, []);
+
   const addSubtask = useCallback((taskId: string, title: string) => {
     const st: Subtask = {
       id: `s-${crypto.randomUUID().slice(0, 8)}`,
@@ -723,6 +728,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       saveTaskDates,
       addComment,
       grant,
+      setStreams,
       addSubtask,
       toggleSubtask,
       addWiki,
@@ -755,6 +761,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       saveTaskDates,
       addComment,
       grant,
+      setStreams,
       addSubtask,
       toggleSubtask,
       addWiki,

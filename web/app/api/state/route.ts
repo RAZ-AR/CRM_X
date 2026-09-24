@@ -4,6 +4,7 @@ import { normalizeState } from "@/lib/normalize";
 import type { AppState } from "@/lib/types";
 import { sessionUser } from "@/lib/session";
 import { filterState, mergeState } from "@/lib/publicUser";
+import { withActivity } from "@/lib/activity";
 
 export async function GET() {
   const user = await sessionUser();
@@ -24,7 +25,18 @@ export async function PUT(req: Request) {
     const body = (await req.json()) as { state?: AppState };
     if (!body.state) return NextResponse.json({ ok: false }, { status: 400 });
     const { state: existing } = await loadSharedState();
-    const merged = mergeState(existing, normalizeState(body.state), user);
+    let merged = mergeState(existing, normalizeState(body.state), user);
+    const known = new Set(existing.comments.map((c) => c.id));
+    const fresh = merged.comments.filter((c) => !known.has(c.id));
+    merged = withActivity(
+      merged,
+      fresh.flatMap((c) => {
+        const t = merged.tasks.find((x) => x.id === c.taskId);
+        return t
+          ? [{ userId: user.id, taskId: t.id, taskTitle: t.title, kind: "comment" as const, text: `💬 ${c.text.slice(0, 120)}`, criticalPath: t.criticalPath }]
+          : [];
+      }),
+    );
     const via = await saveSharedState(merged);
     return NextResponse.json({ ok: true, via, state: filterState(merged, user) });
   } catch (e) {

@@ -35,5 +35,6 @@ export function normalizeState(raw: Partial<AppState> | null | undefined): AppSt
     wiki: parsed.wiki ?? EMPTY_STATE.wiki,
     subtasks: parsed.subtasks ?? EMPTY_STATE.subtasks,
     zones: parsed.zones ?? EMPTY_STATE.zones,
+    activity: parsed.activity ?? [],
   };
 }

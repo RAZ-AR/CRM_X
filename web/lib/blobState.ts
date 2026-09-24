@@ -165,6 +165,11 @@ export async function loadSharedState(): Promise<{ state: AppState; via: "db" | 
     state = resetTeamCredentials(state);
     changed = true;
   }
+  // Креативный директор видит весь поток BRAND (один раз; дальше настраивает Owner).
+  if (state.users.some((u) => u.id === "u-vladimir" && u.streams === undefined)) {
+    state = { ...state, users: state.users.map((u) => (u.id === "u-vladimir" && u.streams === undefined ? { ...u, streams: ["BRAND"] } : u)) };
+    changed = true;
+  }
   if (changed) await saveSharedState(state);
   return { ...loaded, state };
 }
