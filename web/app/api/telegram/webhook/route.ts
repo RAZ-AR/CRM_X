@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { loadSessionSecret, loadSharedState, saveSharedState } from "@/lib/blobState";
-import { appUrlFrom, digestFor, escapeHtml, readLinkCode, tg, webhookSecret } from "@/lib/telegram";
-import { todayYerevan } from "@/lib/dates";
+import { appUrlFrom, digestFor, ensureMenuButton, escapeHtml, readLinkCode, sendTo, tg, webhookSecret } from "@/lib/telegram";
+import { shortDate, todayYerevan } from "@/lib/dates";
+import { parseQuickTask, quickTaskToTask } from "@/lib/quickTask";
+import { created, withActivity } from "@/lib/activity";
+import { randomBytes } from "node:crypto";
 
 type Update = { message?: { chat: { id: number }; text?: string } };
 
 const HELP =
-  "Команды:\n/today — что делать сегодня\n/stop — отключить уведомления\n\nПодключить: CRM → Мой профиль → «Подключить Telegram».";
+  "Напишите задачу обычным сообщением — она попадёт в бэклог:\n«Купить упаковку до 15.10 #wafl @karina»\n(срок: до ДД.ММ / завтра / сегодня, проект: #wafl #kitchen #cafe #comx #common, исполнитель: @логин)\n\nКоманды:\n/today — что делать сегодня\n/stop — отключить уведомления\n\nCRM открывается кнопкой меню «CRM» слева от поля ввода.\nПодключить: CRM → Мой профиль → «Подключить Telegram».";
 
 /** Вебхук бота: /start <код> привязывает чат к пользователю CRM, /today, /stop. */
 export async function POST(req: Request) {
@@ -18,6 +21,7 @@ export async function POST(req: Request) {
   const msg = update.message;
   if (!msg?.text) return NextResponse.json({ ok: true });
   const chatId = String(msg.chat.id);
+  await ensureMenuButton(appUrlFrom(req));
   const reply = (text: string) => tg("sendMessage", { chat_id: chatId, text, parse_mode: "HTML", link_preview_options: { is_disabled: true } });
   const [cmd, arg] = msg.text.trim().split(/\s+/, 2);
   const { state } = await loadSharedState();
@@ -46,6 +50,31 @@ export async function POST(req: Request) {
   }
   if (cmd === "/today") {
     await reply(digestFor(state, linked, todayYerevan(), appUrlFrom(req)));
+  } else if (!cmd.startsWith("/")) {
+    const today = todayYerevan();
+    const q = parseQuickTask(msg.text, today, state.zones, state.users, linked);
+    if ("error" in q) {
+      await reply(q.error);
+      return NextResponse.json({ ok: true });
+    }
+    const task = quickTaskToTask(q, linked, today, `t-${randomBytes(4).toString("hex")}`);
+    await saveSharedState(withActivity({ ...state, tasks: [task, ...state.tasks] }, [created(linked, task)]));
+    const who = state.users.find((u) => u.id === task.assigneeId);
+    const zone = state.zones.find((z) => z.slug === task.zone);
+    let delivery = "";
+    if (who && who.id !== linked.id) {
+      const ok = await sendTo(who, `🆕 Новая задача от ${escapeHtml(linked.name)}: ${escapeHtml(task.title)}\nСрок: ${shortDate(task.due)}`);
+      if (!ok) {
+        delivery = who.telegramChatId
+          ? `\n⚠️ ${escapeHtml(who.name)} не получил(а) уведомление — Telegram не принял сообщение.`
+          : `\n⚠️ ${escapeHtml(who.name)} не подключил(а) Telegram — уведомление не отправлено, предупредите лично.`;
+      }
+    }
+    await reply(
+      `✅ Задача в бэклоге: <a href="${escapeHtml(appUrlFrom(req))}/tasks/${task.id}">${escapeHtml(task.title)}</a>\n` +
+        `Срок ${shortDate(task.due)} · ${escapeHtml(zone ? `${zone.emoji} ${zone.name}` : task.zone)} · ${escapeHtml(who?.name ?? "")}\n` +
+        `Добавьте «готово когда» в CRM.${q.note ? `\n${escapeHtml(q.note)}` : ""}${delivery}`,
+    );
   } else if (cmd === "/stop") {
     await saveSharedState({
       ...state,

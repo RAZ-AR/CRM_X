@@ -1,4 +1,4 @@
-import { createHash, createHmac } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import type { AppState, Task, User } from "./types";
 import { canSeeTask, isCpo } from "./access";
 import { diffDays, shortDate } from "./dates";
@@ -43,6 +43,16 @@ export async function sendTo(user: User | undefined, html: string): Promise<bool
     link_preview_options: { is_disabled: true },
   });
   return ok !== null;
+}
+
+let menuSetFor: string | null = null;
+/** Кнопка меню бота «CRM» → Mini App. Ставится один раз на инстанс. */
+export async function ensureMenuButton(appUrl: string) {
+  if (menuSetFor === appUrl) return;
+  const ok = await tg("setChatMenuButton", {
+    menu_button: { type: "web_app", text: "CRM", web_app: { url: `${appUrl}/tg` } },
+  });
+  if (ok) menuSetFor = appUrl;
 }
 
 let username: string | null = null;
@@ -136,4 +146,28 @@ export function taskLink(appUrl: string, t: Task) {
 
 export function appUrlFrom(req: Request) {
   return process.env.APP_URL || new URL(req.url).origin;
+}
+
+/**
+ * Проверка initData из Telegram Mini App (подпись HMAC от токена бота).
+ * Возвращает id пользователя Telegram, если подпись верна и данным меньше суток.
+ */
+export function verifyInitData(initData: string, maxAgeSec = 24 * 60 * 60): string | null {
+  if (!token() || !initData) return null;
+  const params = new URLSearchParams(initData);
+  const hash = params.get("hash");
+  if (!hash) return null;
+  params.delete("hash");
+  const check = [...params.entries()].map(([k, v]) => `${k}=${v}`).sort().join("\n");
+  const secret = createHmac("sha256", "WebAppData").update(token()).digest();
+  const expected = createHmac("sha256", secret).update(check).digest("hex");
+  if (expected.length !== hash.length || !timingSafeEqual(Buffer.from(expected), Buffer.from(hash))) return null;
+  const authDate = Number(params.get("auth_date"));
+  if (!Number.isFinite(authDate) || Date.now() / 1000 - authDate > maxAgeSec) return null;
+  try {
+    const user = JSON.parse(params.get("user") || "null") as { id?: number } | null;
+    return user?.id ? String(user.id) : null;
+  } catch {
+    return null;
+  }
 }
