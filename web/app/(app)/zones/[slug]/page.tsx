@@ -7,11 +7,11 @@ import { canSeeTask, hasPerm, isCpo } from "@/lib/access";
 import { streamProgress, zoneTaskProgress, zoneTasks } from "@/lib/readiness";
 import { diffDays, formatDate, todayYerevan } from "@/lib/dates";
 import { Meter, Ring } from "@/components/Charts";
-import { StatusIcon } from "@/components/StatusIcon";
+import { TaskRow } from "@/components/TaskRow";
 
 export default function ZonePage() {
   const { slug } = useParams<{ slug: string }>();
-  const { current, zones, tasks, users } = useStore();
+  const { current, zones, tasks, users, setPreviewId } = useStore();
   if (!current) return null;
   const zone = zones.find((z) => z.slug === slug);
   if (!zone) return <div className="card p-6">Нет зоны</div>;
@@ -57,15 +57,20 @@ export default function ZonePage() {
           ))}
         </div>
       )}
-      <div className="card p-5">
-        {visible.map((t) => (
-          <Link key={t.id} href={`/tasks/${t.id}`} className="flex items-center gap-3 py-2.5 text-sm border-t border-[var(--line)] first:border-t-0">
-            <StatusIcon status={t.status} size={14} />
-            <span className="text-[#6F6E69] w-20 shrink-0">{t.code}</span>
-            <span className="flex-1">{t.title}</span>
-            <span className="text-[#6F6E69] shrink-0">{formatDate(t.due).slice(0, 5)}</span>
-          </Link>
-        ))}
+      <div className="card px-4 md:px-5 py-2">
+        {visible.map((t) => {
+          const a = users.find((u) => u.id === t.assigneeId);
+          return (
+            <TaskRow
+              key={t.id}
+              task={t}
+              onOpen={setPreviewId}
+              late={t.status !== "done" && t.due < todayYerevan()}
+              meta={`${t.code ? `${t.code} · ` : ""}${t.workstream || ""}`}
+              avatar={a ? { letter: a.avatar, name: a.name } : undefined}
+            />
+          );
+        })}
       </div>
     </div>
   );
