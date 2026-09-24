@@ -9,9 +9,11 @@ import { STREAMS, type Priority, type ZoneSlug } from "@/lib/types";
 export function AddTaskModal({
   lockZone,
   onClose,
+  initialTitle,
 }: {
   lockZone?: ZoneSlug;
   onClose: () => void;
+  initialTitle?: string;
 }) {
   const { current, zones, users, addTask, addComment } = useStore();
   const [busy, setBusy] = useState(false);
@@ -62,7 +64,7 @@ export function AddTaskModal({
       >
         <h2 className="text-lg font-semibold">Новая задача → бэклог</h2>
         <p className="text-xs text-[#6F6E69]">Статус: Не начато. {lockZone ? `Проект: ${lockZone}` : "Выбери проект."}</p>
-        <input name="title" required placeholder="Название" className="w-full" />
+        <input name="title" required placeholder="Название" className="w-full" defaultValue={initialTitle} autoFocus />
         {!lockZone && (
           <select name="zone" defaultValue={current.zone ?? "wafl"} className="w-full" required>
             {zones.map((z) => (
