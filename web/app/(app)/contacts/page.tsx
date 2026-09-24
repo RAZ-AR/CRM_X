@@ -38,8 +38,8 @@ export default function ContactsPage() {
 
   return (
     <div className="space-y-3">
-      <div className="card p-4 flex flex-wrap items-center gap-2">
-        <h1 className="text-xl font-semibold mr-auto">Контрагенты и контакты</h1>
+      <div className="flex flex-wrap items-end gap-2 pb-1">
+        <h1 className="page-title m-0 mr-auto">Контрагенты и контакты</h1>
         <input className="text-sm" placeholder="Поиск: имя, компания, специализация" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
       <div className="flex flex-wrap gap-1.5 px-1">
@@ -62,13 +62,13 @@ export default function ContactsPage() {
           ) : (
             <div key={c.id} className="card p-5">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400 uppercase flex-1">{CONTACT_KINDS.find((k) => k.id === c.kind)?.label ?? c.kind}</span>
+                <span className="text-xs text-[#6F6E69] uppercase flex-1">{CONTACT_KINDS.find((k) => k.id === c.kind)?.label ?? c.kind}</span>
                 {c.status && c.kind !== "staff" && (
                   <span className="pill text-[11px] px-2 py-0.5" style={{ background: CONTRACTOR_STATUS[c.status].color }}>{CONTRACTOR_STATUS[c.status].label}</span>
                 )}
               </div>
               <div className="font-semibold text-lg mt-1">{c.name}</div>
-              <div className="text-sm text-gray-500">{[c.specialty, c.title, c.company].filter(Boolean).join(" · ")}</div>
+              <div className="text-sm text-[#6F6E69]">{[c.specialty, c.title, c.company].filter(Boolean).join(" · ")}</div>
               <div className="mt-3 space-y-1 text-sm">
                 {c.phone && (
                   <a className="block text-[#2bb673] underline" href={telHref(c.phone)}>
@@ -94,11 +94,11 @@ export default function ContactsPage() {
               {c.notes && <p className="mt-2 text-sm text-[#555] whitespace-pre-wrap">{c.notes}</p>}
               {linked(c.id).length > 0 && (
                 <div className="mt-3">
-                  <div className="text-xs text-[#9a9aa0] mb-1">Задачи · {linked(c.id).length}</div>
+                  <div className="text-xs text-[#6F6E69] mb-1">Задачи · {linked(c.id).length}</div>
                   <div className="space-y-1">
                     {linked(c.id).map((t) => (
-                      <button key={t.id} type="button" onClick={() => setPreviewId(t.id)} className="block w-full text-left text-sm rounded-xl bg-[#f4f4f6] px-2 py-1 truncate">
-                        <span className="text-[11px] text-[#9a9aa0]">{t.code}</span> {t.title}
+                      <button key={t.id} type="button" onClick={() => setPreviewId(t.id)} className="block w-full text-left text-sm rounded-xl bg-[#F3F2EE] px-2 py-1 truncate">
+                        <span className="text-[11px] text-[#6F6E69]">{t.code}</span> {t.title}
                       </button>
                     ))}
                   </div>

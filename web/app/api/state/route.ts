@@ -1,16 +1,24 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { loadSharedState, updateSharedState } from "@/lib/blobState";
 import { normalizeState } from "@/lib/normalize";
 import type { AppState } from "@/lib/types";
 import { sessionUser } from "@/lib/session";
 import { filterState, mergeState } from "@/lib/publicUser";
 import { withActivity } from "@/lib/activity";
+import { sendDueReminders } from "@/lib/reminders";
+import { appUrlFrom } from "@/lib/telegram";
 
-export async function GET() {
+export async function GET(req: Request) {
   const user = await sessionUser();
   if (!user) return NextResponse.json({ ok: false, auth: true }, { status: 401 });
   try {
     const { state, via } = await loadSharedState();
+    try {
+      // Напоминания в Telegram — после ответа, чтобы не задерживать опрос.
+      after(() => sendDueReminders(state, appUrlFrom(req)).catch((e) => console.warn("reminders", e)));
+    } catch {
+      /* вне запроса (тесты) after недоступен */
+    }
     return NextResponse.json({ ok: true, via, me: user.id, state: filterState(state, user) });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "store";

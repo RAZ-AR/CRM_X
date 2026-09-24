@@ -34,8 +34,8 @@ export default function WeekPage() {
 
   return (
     <div className="space-y-3">
-      <div className="card p-4 flex flex-wrap items-center gap-2">
-        <h1 className="text-xl font-semibold mr-auto">Неделя</h1>
+      <div className="flex flex-wrap items-end gap-2 pb-1">
+        <h1 className="page-title m-0 mr-auto">Неделя</h1>
         <select className="text-sm" value={zone} onChange={(e) => setZone(e.target.value)}>
           <option value="all">Все проекты</option>
           {zones.map((z) => (
@@ -43,19 +43,19 @@ export default function WeekPage() {
           ))}
         </select>
         <div className="flex items-center gap-1">
-          <button type="button" className="pill bg-[#f4f4f6] p-2" aria-label="Прошлая неделя" onClick={() => setFrom(addDays(from, -7))}>
+          <button type="button" className="pill bg-[#F3F2EE] p-2" aria-label="Прошлая неделя" onClick={() => setFrom(addDays(from, -7))}>
             <ChevronLeft size={16} />
           </button>
-          <button type="button" className="pill bg-[#f4f4f6] px-3 py-1.5 text-sm" onClick={() => setFrom(weekStart(today))}>
+          <button type="button" className="pill bg-[#F3F2EE] px-3 py-1.5 text-sm" onClick={() => setFrom(weekStart(today))}>
             {shortDate(from)} – {shortDate(to)}
           </button>
-          <button type="button" className="pill bg-[#f4f4f6] p-2" aria-label="Следующая неделя" onClick={() => setFrom(addDays(from, 7))}>
+          <button type="button" className="pill bg-[#F3F2EE] p-2" aria-label="Следующая неделя" onClick={() => setFrom(addDays(from, 7))}>
             <ChevronRight size={16} />
           </button>
         </div>
       </div>
 
-      {people.length === 0 && <div className="card p-6 text-sm text-[#9a9aa0]">На эту неделю открытых задач нет.</div>}
+      {people.length === 0 && <div className="card p-6 text-sm text-[#6F6E69]">На эту неделю открытых задач нет.</div>}
 
       <div className="grid gap-3 lg:grid-cols-2">
         {people.map((u) => {
@@ -65,12 +65,12 @@ export default function WeekPage() {
           return (
             <section key={u.id} className="card p-4">
               <div className="flex items-center gap-2 mb-3">
-                <span className="h-9 w-9 rounded-full bg-[#f4f4f6] grid place-items-center text-sm font-semibold">{u.avatar}</span>
+                <span className="h-9 w-9 rounded-full bg-[#F3F2EE] grid place-items-center text-sm font-semibold">{u.avatar}</span>
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold">{u.name}</div>
-                  <div className="text-xs text-[#9a9aa0]">{u.title}</div>
+                  <div className="text-xs text-[#6F6E69]">{u.title}</div>
                 </div>
-                <div className="text-right text-xs text-[#6b6b70]">
+                <div className="text-right text-xs text-[#6F6E69]">
                   <div>{mine.length} задач · {deadlines} сдать</div>
                   {overdue > 0 && <div className="text-[#b91c1c]">{overdue} просрочено</div>}
                 </div>
@@ -86,12 +86,12 @@ export default function WeekPage() {
                       type="button"
                       onClick={() => setPreviewId(t.id)}
                       className="w-full text-left rounded-2xl px-3 py-2 text-sm flex items-start gap-2"
-                      style={{ background: late(t) ? "#fee2e2" : "#f4f4f6" }}
+                      style={{ background: late(t) ? "#fee2e2" : "#F3F2EE" }}
                     >
                       <span className="shrink-0 mt-0.5">{late(t) ? <Flame size={14} className="text-[#e86a4a]" /> : <StatusIcon status={t.status} size={14} />}</span>
                       <span className="flex-1 min-w-0">
                         <span className="font-medium">{t.title}</span>
-                        <span className="block text-[11px] text-[#6b6b70] mt-0.5">
+                        <span className="block text-[11px] text-[#6F6E69] mt-0.5">
                           {z?.emoji} {t.code} · {shortDate(t.startDate || t.due)}–{shortDate(t.due)}
                           {t.criticalPath && <span className="text-[#b91c1c]"> · critical</span>}
                           {waiting.length > 0 && <span> · ждёт {waiting.map((d) => d.code).join(", ")}</span>}

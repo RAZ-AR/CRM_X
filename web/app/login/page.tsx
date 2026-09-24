@@ -15,7 +15,7 @@ export default function LoginPage() {
     <div className="min-h-screen grid place-items-center p-6">
       <div className="bg-white rounded-[30px] w-full max-w-md p-8">
         <h1 className="text-2xl font-semibold mb-1">CRM X</h1>
-        <p className="text-sm text-[#757575] mb-5">логин — ваше имя, пароль выдаёт Owner</p>
+        <p className="text-sm text-[#6F6E69] mb-5">логин — ваше имя, пароль выдаёт Owner</p>
         <form
           className="flex flex-col gap-3"
           onSubmit={async (e) => {

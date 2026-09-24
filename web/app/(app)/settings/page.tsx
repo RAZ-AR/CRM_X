@@ -73,8 +73,8 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-3 max-w-3xl">
-      <h1 className="text-xl font-semibold">Команда и доступы к доскам</h1>
-      <p className="text-sm text-[#757575]">
+      <h1 className="page-title m-0">Команда и доступы к доскам</h1>
+      <p className="text-sm text-[#6F6E69]">
         Owner создаёт человека с логином (обычно имя) и паролем от 4 символов. Потом человек сам меняет пароль в «Мой профиль».
       </p>
       <form onSubmit={onAdd} className="card p-5 grid sm:grid-cols-2 gap-2">
@@ -93,7 +93,7 @@ export default function SettingsPage() {
         </select>
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="text-xs text-[#757575]">Логин · обычно имя</label>
+            <label className="text-xs text-[#6F6E69]">Логин · обычно имя</label>
             <button type="button" className="text-xs underline" onClick={(e) => suggestLogin(e.currentTarget.form)}>как имя</button>
           </div>
           <input
@@ -106,7 +106,7 @@ export default function SettingsPage() {
         </div>
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="text-xs text-[#757575]">Пароль · от 4 символов</label>
+            <label className="text-xs text-[#6F6E69]">Пароль · от 4 символов</label>
             <button type="button" className="text-xs underline" onClick={suggestPin}>подобрать</button>
           </div>
           <input
@@ -141,7 +141,7 @@ export default function SettingsPage() {
         <div key={u.id} className="card p-5">
           <div className="font-medium">{u.name} · {u.title}</div>
           <div className="mt-2 grid sm:grid-cols-2 gap-2">
-            <label className="text-xs text-[#757575]">
+            <label className="text-xs text-[#6F6E69]">
               Логин
               <input
                 className="mt-1"
@@ -157,7 +157,7 @@ export default function SettingsPage() {
                 }}
               />
             </label>
-            <label className="text-xs text-[#757575]">
+            <label className="text-xs text-[#6F6E69]">
               Новый пароль
               <input
                 className="mt-1"
@@ -173,7 +173,7 @@ export default function SettingsPage() {
               />
             </label>
           </div>
-          <label className="text-xs text-[#757575] mt-2 block">Руководитель (видит задачи этого сотрудника)</label>
+          <label className="text-xs text-[#6F6E69] mt-2 block">Руководитель (видит задачи этого сотрудника)</label>
           <select
             className="mt-1 mb-2"
             value={u.managerId || ""}
@@ -184,7 +184,7 @@ export default function SettingsPage() {
               <option key={m.id} value={m.id}>{m.name}</option>
             ))}
           </select>
-          <div className="text-xs text-[#757575] mt-1">Доски</div>
+          <div className="text-xs text-[#6F6E69] mt-1">Доски</div>
           <div className="mt-2 flex flex-wrap gap-2">
             {zones.map((z) => {
               const on = (u.boardZones ?? []).includes(z.slug);
@@ -202,7 +202,7 @@ export default function SettingsPage() {
               );
             })}
           </div>
-          <div className="text-xs text-[#757575] mt-3">Видит потоки целиком (все задачи потока, может вести статус)</div>
+          <div className="text-xs text-[#6F6E69] mt-3">Видит потоки целиком (все задачи потока, может вести статус)</div>
           <div className="mt-2 flex flex-wrap gap-2">
             {STREAMS.map((st) => {
               const on = (u.streams ?? []).includes(st);

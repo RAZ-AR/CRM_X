@@ -1,12 +1,24 @@
 @import "tailwindcss";
 
+/* Дизайн-система CRM X: тёплый нейтральный фон, белые карточки с тонкой рамкой, один акцент для данных. */
 :root {
-  --bg: #ececee;
-  --ink: #111111;
-  --mint: #2bb673;
-  --coral: #e86a4a;
-  --lavender: #6b7cff;
-  --soft: #f4f4f6;
+  --bg: #f5f4f0;
+  --card: #ffffff;
+  --line: #eceae4;
+  --soft: #f3f2ee;
+  --track: #efede8;
+  --ink: #161614;
+  --ink-2: #55544f;
+  --muted: #6f6e69;
+  --blue: #2a78d6;
+  --blue-soft: #9dc0ec;
+  --orange: #eb6834;
+  --aqua: #1baf7a;
+  --red: #c9302f;
+  /* старые имена, чтобы ничего не сломалось */
+  --mint: #1baf7a;
+  --coral: #eb6834;
+  --lavender: #2a78d6;
 }
 
 html,
@@ -18,12 +30,18 @@ body {
 }
 
 body {
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "tnum" 0;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
 }
 
 .card {
-  background: white;
-  border-radius: 24px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
 }
 
 @media (max-width: 767px) {
@@ -36,16 +54,45 @@ body {
   border-radius: 999px;
 }
 
+.cap {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--muted);
+}
+
+.page-title {
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 767px) {
+  .page-title {
+    font-size: 22px;
+    line-height: 28px;
+  }
+}
+
 input,
 select,
 textarea {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.65rem 1rem;
-  background: white;
+  background: var(--card);
   color: inherit;
   font: inherit;
   max-width: 100%;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
 }
 
 textarea {

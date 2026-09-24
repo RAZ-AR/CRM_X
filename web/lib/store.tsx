@@ -27,7 +27,7 @@ import type {
   ZoneSlug,
 } from "./types";
 
-export type RecordKind = "budget" | "expenses" | "risks" | "fx";
+export type RecordKind = "budget" | "expenses" | "risks" | "fx" | "todos";
 type RecordItem<K extends RecordKind> = K extends "fx" ? FxRates : NonNullable<AppState[Exclude<K, "fx">]>[number];
 
 type Store = AppState & {
@@ -47,6 +47,8 @@ type Store = AppState & {
   /** Деньги и риски: сначала сервер, потом экран. */
   saveRecord: <K extends RecordKind>(kind: K, item: RecordItem<K>) => Promise<{ ok: true } | { ok: false; error: string }>;
   deleteRecord: (kind: Exclude<RecordKind, "fx">, id: string) => Promise<{ ok: true } | { ok: false; error: string }>;
+  /** Напоминание по делу показано: сервер отмечает его или переносит повторяющееся. */
+  ackTodo: (id: string) => Promise<void>;
   grant: (userId: string, permissions: User["permissions"]) => void;
   setStreams: (userId: string, streams: NonNullable<User["streams"]>) => void;
   addSubtask: (taskId: string, title: string) => void;
@@ -763,6 +765,31 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [enqueue],
   );
 
+  const ackTodo = useCallback(
+    async (id: string) => {
+      if (!remoteRef.current) return;
+      try {
+        const res = await enqueue(() =>
+          fetch("/api/records/todos", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ id, ack: true }),
+          }),
+        );
+        const data = await res.json().catch(() => null);
+        if (data?.ok && data.value) {
+          setState((s) => ({ ...s, todos: (s.todos ?? []).map((t) => (t.id === id ? data.value : t)) }));
+        }
+      } catch {
+        /* повторим при следующей проверке */
+      } finally {
+        lastWriteRef.current = Date.now();
+      }
+    },
+    [enqueue],
+  );
+
   const changeOwnPassword = useCallback(
     async (currentPassword: string, next: string): Promise<{ ok: true } | { ok: false; error: string }> => {
       if (!isValidPassword(next)) return { ok: false, error: "Пароль — минимум 4 символа" };
@@ -818,6 +845,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       deleteTask,
       saveRecord,
       deleteRecord,
+      ackTodo,
     }),
     [
       state,
@@ -853,6 +881,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       deleteTask,
       saveRecord,
       deleteRecord,
+      ackTodo,
     ],
   );
 

@@ -30,12 +30,12 @@ export default function WikiPageView() {
   return (
     <div className="grid gap-3 lg:grid-cols-12">
       <div className="lg:col-span-4 card p-4 space-y-2">
-        <h1 className="font-semibold px-1 mb-2">Wiki</h1>
+        <h1 className="page-title m-0 px-1 mb-3">Wiki</h1>
         {pages.map((p) => (
           <button
             key={p.id}
             onClick={() => setOpen(p.id)}
-            className={`w-full text-left rounded-2xl px-3 py-2 text-sm ${page?.id === p.id ? "bg-amber-100" : "bg-gray-50"}`}
+            className={`w-full text-left rounded-2xl px-3 py-2 text-sm ${page?.id === p.id ? "bg-black text-white" : "bg-[#F3F2EE]"}`}
           >
             {p.title}
           </button>
@@ -66,7 +66,7 @@ export default function WikiPageView() {
             <p className="mt-4 whitespace-pre-wrap text-gray-700">{page.body}</p>
           </>
         ) : (
-          <p className="text-gray-400">Нет страниц</p>
+          <p className="text-[#6F6E69]">Нет страниц</p>
         )}
       </div>
     </div>

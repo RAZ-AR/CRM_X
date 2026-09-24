@@ -36,6 +36,7 @@ export function filterState(state: AppState, user: User): AppState {
     fx: canSeeFinance(user) ? state.fx : undefined,
     // Риски видят все; ссылки на недоступные задачи не отдаём.
     risks: (state.risks ?? []).map((r) => ({ ...r, taskIds: r.taskIds.filter((id) => ids.has(id)) })),
+    todos: (state.todos ?? []).filter((t) => t.userId === user.id),
   };
 }
 

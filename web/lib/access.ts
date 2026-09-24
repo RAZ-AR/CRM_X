@@ -86,6 +86,7 @@ export function canSeeContact(user: User, c: Contact) {
 export function employeeNav(user: User) {
   const items: { href: string; label: string; icon: string }[] = [
     { href: "/home", label: "Главная", icon: "home" },
+    { href: "/todo", label: "Дела", icon: "todo" },
     { href: "/week", label: "Неделя", icon: "week" },
     { href: "/timeline", label: "Timeline", icon: "timeline" },
     { href: "/kanban", label: "Доска", icon: "kanban" },
@@ -105,6 +106,7 @@ export function employeeNav(user: User) {
 export function cpoNav() {
   return [
     { href: "/home", label: "Главная", icon: "home" },
+    { href: "/todo", label: "Дела", icon: "todo" },
     { href: "/week", label: "Неделя", icon: "week" },
     { href: "/timeline", label: "Timeline", icon: "timeline" },
     { href: "/kanban", label: "Доска", icon: "kanban" },

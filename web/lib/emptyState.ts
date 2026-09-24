@@ -15,4 +15,5 @@ export const EMPTY_STATE: AppState = {
   budget: [],
   expenses: [],
   risks: [],
+  todos: [],
 };

@@ -3,20 +3,21 @@ import { sessionUser } from "@/lib/session";
 import { updateSharedState } from "@/lib/blobState";
 import { canSeeFinance, parseBudgetLine, parseExpense, parseFx } from "@/lib/finance";
 import { canDeleteRisk, canEditRisk, parseRisk } from "@/lib/risks";
-import type { AppState, BudgetLine, Expense, Risk, User } from "@/lib/types";
+import type { AppState, BudgetLine, Expense, Risk, Todo, User } from "@/lib/types";
+import { fireReminders, parseTodo } from "@/lib/todos";
 
 /**
  * Деньги и риски: по одной записи за запрос, атомарно.
  * PUT — создать или обновить, DELETE ?id= — удалить.
  */
-type Kind = "budget" | "expenses" | "risks" | "fx";
+type Kind = "budget" | "expenses" | "risks" | "fx" | "todos";
 type Fail = { error: string; status: number };
 type Out = { fail?: Fail; value?: unknown };
 
-const KINDS: Kind[] = ["budget", "expenses", "risks", "fx"];
+const KINDS: Kind[] = ["budget", "expenses", "risks", "fx", "todos"];
 
 function allowed(user: User, kind: Kind) {
-  return kind === "risks" ? true : canSeeFinance(user);
+  return kind === "risks" || kind === "todos" ? true : canSeeFinance(user);
 }
 
 function upsert<T extends { id: string }>(list: T[] | undefined, item: T) {
@@ -40,6 +41,19 @@ function put(state: AppState, user: User, kind: Kind, body: unknown): { state?: 
     const r = parseExpense(raw, state, user, prev);
     return r.ok ? { state: { ...state, expenses: upsert(state.expenses, r.value) }, result: { value: r.value } } : fail(r.error);
   }
+  if (kind === "todos") {
+    const raw = body as Partial<Todo> & { ack?: boolean };
+    const prev = (state.todos ?? []).find((x) => x.id === raw?.id);
+    if (prev && prev.userId !== user.id) return fail("Это чужое дело", 403);
+    // Напоминание показано в браузере: отметить его (повторяющееся — перенести на следующий раз).
+    if (raw?.ack) {
+      if (!prev) return fail("Нет такого дела", 404);
+      const r = fireReminders(state, Date.now(), (t) => t.id === prev.id);
+      return r.state ? { state: r.state, result: { value: r.state.todos?.find((t) => t.id === prev.id) } } : { result: { value: prev } };
+    }
+    const r = parseTodo(raw, state, user, prev);
+    return r.ok ? { state: { ...state, todos: upsert(state.todos, r.value) }, result: { value: r.value } } : fail(r.error);
+  }
   const raw = body as Partial<Risk>;
   const prev = (state.risks ?? []).find((x) => x.id === raw?.id);
   if (prev && !canEditRisk(user, prev)) return fail("Менять риск может автор, ответственный или Owner", 403);
@@ -53,6 +67,12 @@ function remove(state: AppState, user: User, kind: Kind, id: string): { state?: 
     if (!risk) return { result: {} };
     if (!canDeleteRisk(user, risk)) return { result: { fail: { error: "Удалить может автор или Owner", status: 403 } } };
     return { state: { ...state, risks: (state.risks ?? []).filter((x) => x.id !== id) }, result: {} };
+  }
+  if (kind === "todos") {
+    const todo = (state.todos ?? []).find((x) => x.id === id);
+    if (!todo) return { result: {} };
+    if (todo.userId !== user.id) return { result: { fail: { error: "Это чужое дело", status: 403 } } };
+    return { state: { ...state, todos: (state.todos ?? []).filter((x) => x.id !== id) }, result: {} };
   }
   if (kind === "budget") return { state: { ...state, budget: (state.budget ?? []).filter((x) => x.id !== id) }, result: {} };
   if (kind === "expenses") return { state: { ...state, expenses: (state.expenses ?? []).filter((x) => x.id !== id) }, result: {} };

@@ -7,7 +7,7 @@ import type { TaskStatus } from "@/lib/types";
 
 /** Иконка и цвет каждого статуса — одинаковые во всём приложении. */
 export const STATUS_ICON: Record<TaskStatus, { Icon: typeof Circle; color: string; short: string }> = {
-  todo: { Icon: Circle, color: "#9a9aa0", short: "Не начато" },
+  todo: { Icon: Circle, color: "#6F6E69", short: "Не начато" },
   in_progress: { Icon: PlayCircle, color: "#2383e2", short: "В работе" },
   review: { Icon: Eye, color: "#7c3aed", short: "На проверке" },
   done: { Icon: CheckCircle2, color: "#16a34a", short: "Готово" },
@@ -77,7 +77,7 @@ export function StatusPicker({
               key={s}
               type="button"
               role="menuitem"
-              className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-left hover:bg-[#f4f4f6] ${s === status ? "font-semibold" : ""}`}
+              className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-left hover:bg-[#F3F2EE] ${s === status ? "font-semibold" : ""}`}
               onClick={(e) => {
                 e.stopPropagation();
                 setOpen(false);
@@ -88,7 +88,7 @@ export function StatusPicker({
             >
               <StatusIcon status={s} />
               {STATUS_ICON[s].short}
-              {s === "blocked" && <span className="text-[10px] text-[#9a9aa0] ml-auto">причина…</span>}
+              {s === "blocked" && <span className="text-[10px] text-[#6F6E69] ml-auto">причина…</span>}
             </button>
           ))}
         </span>

@@ -57,7 +57,7 @@ export function TaskSheet({
       <div className="px-7 pt-5 pb-3 flex items-start gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap gap-1.5 mb-2">
-            {task.code && <span className="text-[11px] text-[#9a9aa0]">{task.code}</span>}
+            {task.code && <span className="text-[11px] text-[#6F6E69]">{task.code}</span>}
             {task.wave && <span className="pill bg-black text-white text-[10px] px-2 py-0.5">волна {task.wave}</span>}
             {zs.map((slug) => {
               const z = zones.find((x) => x.slug === slug);
@@ -84,14 +84,14 @@ export function TaskSheet({
         </div>
         {canEdit && (
           <button
-            className={`pill px-4 py-2 text-sm ${editing ? "bg-black text-white" : "bg-[#f4f4f6]"}`}
+            className={`pill px-4 py-2 text-sm ${editing ? "bg-black text-white" : "bg-[#F3F2EE]"}`}
             onClick={() => setEditing((v) => !v)}
           >
             {editing ? "Готово" : "Редактировать"}
           </button>
         )}
         {onClose && (
-          <button className="h-9 w-9 rounded-full bg-[#f4f4f6] grid place-items-center" onClick={onClose}>
+          <button className="h-9 w-9 rounded-full bg-[#F3F2EE] grid place-items-center" onClick={onClose}>
             <X size={16} />
           </button>
         )}
@@ -113,7 +113,7 @@ export function TaskSheet({
           <div className="space-y-2">
             {task.status !== "blocked" && (
               <div>
-                <div className="text-xs text-[#9a9aa0] mb-1">Статус</div>
+                <div className="text-xs text-[#6F6E69] mb-1">Статус</div>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5" role="radiogroup" aria-label="Статус задачи">
                   {STATUS_ORDER.map((c) => {
                     const on = task.status === c;
@@ -123,7 +123,7 @@ export function TaskSheet({
                         type="button"
                         role="radio"
                         aria-checked={on}
-                        className={`flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-1.5 py-2 text-xs border ${on ? "bg-black text-white border-black" : "bg-white border-black/10 hover:bg-[#f4f4f6]"}`}
+                        className={`flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-1.5 py-2 text-xs border ${on ? "bg-black text-white border-black" : "bg-white border-black/10 hover:bg-[#F3F2EE]"}`}
                         onClick={() => {
                           if (on) return;
                           if (c === "blocked") {
@@ -142,7 +142,7 @@ export function TaskSheet({
                 </div>
               </div>
             )}
-            <label className="text-xs text-[#9a9aa0] block">Готово когда
+            <label className="text-xs text-[#6F6E69] block">Готово когда
               <textarea
                 className="w-full mt-1 min-h-16"
                 defaultValue={task.result}
@@ -174,13 +174,13 @@ export function TaskSheet({
                   </button>
                 ) : (
                   <div className="rounded-2xl border border-black/10 p-3 space-y-2">
-                    <div className="text-xs text-[#9a9aa0]">На сколько</div>
+                    <div className="text-xs text-[#6F6E69]">На сколько</div>
                     <div className="flex flex-wrap gap-2">
                       {([["day", "на день"], ["week", "на неделю"], ["month", "на месяц"], ["forever", "навсегда"]] as const).map(([id, label]) => (
                         <button
                           key={id}
                           type="button"
-                          className={`pill px-3 py-1.5 text-sm ${blockFor === id ? "bg-black text-white" : "bg-[#f4f4f6]"}`}
+                          className={`pill px-3 py-1.5 text-sm ${blockFor === id ? "bg-black text-white" : "bg-[#F3F2EE]"}`}
                           onClick={() => setBlockFor(id)}
                         >
                           {label}
@@ -194,7 +194,7 @@ export function TaskSheet({
                       onChange={(e) => setBlockNote(e.target.value)}
                     />
                     <div className="flex gap-2 justify-end">
-                      <button type="button" className="pill px-3 py-1.5 bg-[#f4f4f6] text-sm" onClick={() => setBlockOpen(false)}>Отмена</button>
+                      <button type="button" className="pill px-3 py-1.5 bg-[#F3F2EE] text-sm" onClick={() => setBlockOpen(false)}>Отмена</button>
                       <button
                         type="button"
                         className="pill bg-black text-white px-3 py-1.5 text-sm"
@@ -292,12 +292,12 @@ export function TaskSheet({
 
         {(task.dependsOn ?? []).length > 0 && (
           <div>
-            <div className="text-xs text-[#9a9aa0] mb-1">Ждёт</div>
+            <div className="text-xs text-[#6F6E69] mb-1">Ждёт</div>
             <div className="flex flex-wrap gap-2">
               {(task.dependsOn ?? []).map((code) => {
                 const d = tasks.find((x) => x.code === code);
                 return d ? (
-                  <span key={code} className="pill bg-[#f4f4f6] px-3 py-1 text-xs">
+                  <span key={code} className="pill bg-[#F3F2EE] px-3 py-1 text-xs">
                     {code} {d.status === "done" ? "✓" : "●"} {d.title}
                   </span>
                 ) : (
@@ -310,17 +310,17 @@ export function TaskSheet({
 
         {unlocks.length > 0 && (
           <div>
-            <div className="text-xs text-[#9a9aa0] mb-1">Открывает</div>
+            <div className="text-xs text-[#6F6E69] mb-1">Открывает</div>
             <div className="flex flex-wrap gap-2">
               {unlocks.map((d) => (
-                <span key={d.id} className="pill bg-[#f4f4f6] px-3 py-1 text-xs">{d.code} {d.title}</span>
+                <span key={d.id} className="pill bg-[#F3F2EE] px-3 py-1 text-xs">{d.code} {d.title}</span>
               ))}
             </div>
           </div>
         )}
 
         <div>
-          <div className="text-xs text-[#9a9aa0] mb-2">Контрагенты</div>
+          <div className="text-xs text-[#6F6E69] mb-2">Контрагенты</div>
           {(() => {
             const visible = contacts.filter((c) => canSeeContact(current, c));
             const ids = task.contactIds ?? [];
@@ -328,10 +328,10 @@ export function TaskSheet({
             const free = visible.filter((c) => !ids.includes(c.id)).sort((a, b) => Number(a.kind === "staff") - Number(b.kind === "staff") || a.name.localeCompare(b.name));
             return (
               <>
-                {linked.length === 0 && <p className="text-sm text-[#9a9aa0]">Не привязаны</p>}
+                {linked.length === 0 && <p className="text-sm text-[#6F6E69]">Не привязаны</p>}
                 <div className="flex flex-wrap gap-2">
                   {linked.map((c) => (
-                    <span key={c.id} className="pill bg-[#f4f4f6] px-3 py-1.5 text-xs flex items-center gap-2">
+                    <span key={c.id} className="pill bg-[#F3F2EE] px-3 py-1.5 text-xs flex items-center gap-2">
                       <span>
                         <b className="font-medium">{c.name}</b>
                         {c.specialty ? ` · ${c.specialty}` : ""}
@@ -365,11 +365,11 @@ export function TaskSheet({
         </div>
 
         <div>
-          <div className="text-xs text-[#9a9aa0] mb-2">Чеклист</div>
+          <div className="text-xs text-[#6F6E69] mb-2">Чеклист</div>
           {subs.map((s) => (
             <label key={s.id} className="flex items-center gap-2 py-1 text-sm">
               <input type="checkbox" checked={s.done} onChange={() => toggleSubtask(s.id)} />
-              <span className={s.done ? "line-through text-[#9a9aa0]" : ""}>{s.title}</span>
+              <span className={s.done ? "line-through text-[#6F6E69]" : ""}>{s.title}</span>
             </label>
           ))}
           <form className="flex gap-2 mt-1" onSubmit={(e) => { e.preventDefault(); if (!sub.trim()) return; addSubtask(task.id, sub.trim()); setSub(""); }}>
@@ -378,17 +378,17 @@ export function TaskSheet({
         </div>
 
         <div>
-          <div className="text-xs text-[#9a9aa0] mb-2">Вложения {files.length ? `· ${files.length}` : ""}</div>
-          {files.length === 0 && <p className="text-sm text-[#9a9aa0]">Файлов нет</p>}
+          <div className="text-xs text-[#6F6E69] mb-2">Вложения {files.length ? `· ${files.length}` : ""}</div>
+          {files.length === 0 && <p className="text-sm text-[#6F6E69]">Файлов нет</p>}
           <div className="flex flex-wrap gap-2">
             {files.map((f) =>
               f.type.startsWith("image/") ? (
                 <a key={f.id} href={f.dataUrl} target="_blank" rel="noreferrer" className="block">
                   <img src={f.dataUrl} alt={f.name} className="h-16 w-16 object-cover rounded-xl" />
-                  <div className="text-[10px] text-[#757575] truncate max-w-16">{f.name}</div>
+                  <div className="text-[10px] text-[#6F6E69] truncate max-w-16">{f.name}</div>
                 </a>
               ) : (
-                <a key={f.id} href={f.dataUrl} download={f.name} className="text-xs underline bg-[#f4f4f6] rounded-xl px-3 py-2">{f.name}</a>
+                <a key={f.id} href={f.dataUrl} download={f.name} className="text-xs underline bg-[#F3F2EE] rounded-xl px-3 py-2">{f.name}</a>
               ),
             )}
           </div>
@@ -403,14 +403,14 @@ export function TaskSheet({
         </div>
 
         <div className="border-t border-black/5 pt-4">
-          <div className="text-xs text-[#9a9aa0] mb-2">Комментарии</div>
+          <div className="text-xs text-[#6F6E69] mb-2">Комментарии</div>
           <div className="space-y-2 mb-3">
             {comms.map((c) => (
               <div key={c.id} className="flex gap-2">
-                <span className="h-7 w-7 rounded-full bg-[#f4f4f6] grid place-items-center text-[10px] font-semibold shrink-0">
+                <span className="h-7 w-7 rounded-full bg-[#F3F2EE] grid place-items-center text-[10px] font-semibold shrink-0">
                   {users.find((u) => u.id === c.userId)?.avatar}
                 </span>
-                <div className="bg-[#f4f4f6] rounded-2xl px-3 py-2 text-sm flex-1">
+                <div className="bg-[#F3F2EE] rounded-2xl px-3 py-2 text-sm flex-1">
                   <b className="font-medium">{users.find((u) => u.id === c.userId)?.name}</b>
                   <div>{c.text}</div>
                   <div className="flex flex-wrap gap-1 mt-2">
@@ -441,7 +441,7 @@ export function TaskSheet({
 function Meta({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="bg-[#f7f7f8] rounded-2xl px-3 py-2">
-      <div className="text-[10px] text-[#9a9aa0]">{k}</div>
+      <div className="text-[10px] text-[#6F6E69]">{k}</div>
       <div className="font-medium">{v}</div>
     </div>
   );

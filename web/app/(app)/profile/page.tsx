@@ -30,10 +30,10 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-3 max-w-md">
-      <h1 className="text-xl font-semibold">Мой профиль</h1>
+      <h1 className="page-title m-0">Мой профиль</h1>
       <div className="card p-5">
         <div className="font-medium">{current.name}</div>
-        <div className="text-sm text-[#757575]">логин {current.email} · {current.title}</div>
+        <div className="text-sm text-[#6F6E69]">логин {current.email} · {current.title}</div>
       </div>
       <form onSubmit={onSubmit} className="card p-5 flex flex-col gap-2">
         <div className="font-medium">Сменить пароль</div>
@@ -70,7 +70,7 @@ function TelegramCard({ linked, owner }: { linked: boolean; owner: boolean }) {
   return (
     <div className="card p-5 flex flex-col gap-2">
       <div className="font-medium">Telegram</div>
-      <p className="text-sm text-[#757575]">
+      <p className="text-sm text-[#6F6E69]">
         Бот пишет, когда вам назначают задачу, когда ваша задача ушла на проверку, готова или заблокирована,
         и каждое утро в 9:00 присылает список дел.
       </p>
@@ -93,7 +93,7 @@ function TelegramCard({ linked, owner }: { linked: boolean; owner: boolean }) {
         <button
           type="button"
           disabled={busy}
-          className="pill bg-[#f4f4f6] py-2 text-sm"
+          className="pill bg-[#F3F2EE] py-2 text-sm"
           onClick={async () => {
             const r = await call("/api/telegram/unlink", "POST");
             setNote(r.ok ? { ok: true, text: "Отключено. Обновите страницу." } : { ok: false, text: r.error || "Не получилось" });
@@ -106,7 +106,7 @@ function TelegramCard({ linked, owner }: { linked: boolean; owner: boolean }) {
         <button
           type="button"
           disabled={busy}
-          className="pill bg-[#f4f4f6] py-2 text-sm"
+          className="pill bg-[#F3F2EE] py-2 text-sm"
           onClick={async () => {
             const r = await call("/api/telegram/digest", "POST");
             setNote(
