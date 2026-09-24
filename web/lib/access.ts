@@ -96,6 +96,8 @@ export function employeeNav(user: User) {
   }
   if (hasPerm(user, "wiki")) items.push({ href: "/wiki", label: "Wiki", icon: "wiki" });
   if (hasPerm(user, "contacts")) items.push({ href: "/contacts", label: "Контрагенты", icon: "contacts" });
+  items.push({ href: "/risks", label: "Риски", icon: "risks" });
+  if (user.permissions.includes("finance")) items.push({ href: "/money", label: "Деньги", icon: "money" });
   if (canManagePeople(user)) items.push({ href: "/settings", label: "Команда", icon: "team" });
   return items;
 }
@@ -108,6 +110,8 @@ export function cpoNav() {
     { href: "/kanban", label: "Доска", icon: "kanban" },
     { href: "/zones", label: "Проекты", icon: "zone" },
     { href: "/meeting", label: "Планёрка", icon: "meeting" },
+    { href: "/money", label: "Деньги", icon: "money" },
+    { href: "/risks", label: "Риски", icon: "risks" },
     { href: "/settings", label: "Команда", icon: "team" },
     { href: "/wiki", label: "Wiki", icon: "wiki" },
     { href: "/contacts", label: "Контрагенты", icon: "contacts" },

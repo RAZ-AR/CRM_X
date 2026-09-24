@@ -18,6 +18,7 @@ import type {
   AppState,
   Comment,
   Contact,
+  FxRates,
   Notice,
   Subtask,
   Task,
@@ -25,6 +26,9 @@ import type {
   WikiPage,
   ZoneSlug,
 } from "./types";
+
+export type RecordKind = "budget" | "expenses" | "risks" | "fx";
+type RecordItem<K extends RecordKind> = K extends "fx" ? FxRates : NonNullable<AppState[Exclude<K, "fx">]>[number];
 
 type Store = AppState & {
   current: User | null;
@@ -40,6 +44,9 @@ type Store = AppState & {
   ) => Promise<{ ok: true } | { ok: false; error: string; saved: number }>;
   addComment: (taskId: string, text: string) => void;
   deleteTask: (id: string) => Promise<{ ok: true } | { ok: false; error: string }>;
+  /** Деньги и риски: сначала сервер, потом экран. */
+  saveRecord: <K extends RecordKind>(kind: K, item: RecordItem<K>) => Promise<{ ok: true } | { ok: false; error: string }>;
+  deleteRecord: (kind: Exclude<RecordKind, "fx">, id: string) => Promise<{ ok: true } | { ok: false; error: string }>;
   grant: (userId: string, permissions: User["permissions"]) => void;
   setStreams: (userId: string, streams: NonNullable<User["streams"]>) => void;
   addSubtask: (taskId: string, title: string) => void;
@@ -101,6 +108,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     queueRef.current = p.catch(() => undefined);
     return p;
   }, []);
+  /** Когда закончилась последняя запись через API: ответы опроса, начатого раньше, устарели. */
+  const lastWriteRef = useRef(0);
   const applyServer = useCallback((st: AppState) => {
     serverSliceRef.current = syncSlice(st);
     setState(st);
@@ -162,10 +171,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (!ready || !current) return;
     const t = setInterval(async () => {
       try {
+        const startedAt = Date.now();
         const res = await fetch("/api/state", { cache: "no-store", credentials: "same-origin" });
         const data = await res.json();
         if (data?.ok && data.state) {
           setRemote(true);
+          if (startedAt <= lastWriteRef.current) return;
           // Есть локальные несохранённые правки — не затираем, PUT ниже их отправит.
           if (serverSliceRef.current !== null && syncSlice(stateRef.current) !== serverSliceRef.current) return;
           applyServer(normalizeState(data.state));
@@ -696,6 +707,62 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [current, enqueue],
   );
 
+  const saveRecord = useCallback(
+    async <K extends RecordKind>(kind: K, item: RecordItem<K>): Promise<{ ok: true } | { ok: false; error: string }> => {
+      let saved: unknown = item;
+      if (remoteRef.current) {
+        try {
+          const res = await enqueue(() =>
+            fetch(`/api/records/${kind}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              credentials: "same-origin",
+              body: JSON.stringify(item),
+            }),
+          );
+          const data = await res.json().catch(() => null);
+          if (!res.ok || !data?.ok) return { ok: false, error: data?.error || `Сервер не сохранил (${res.status})` };
+          saved = data.value ?? item;
+        } catch {
+          return { ok: false, error: "Нет связи с сервером" };
+        } finally {
+          lastWriteRef.current = Date.now();
+        }
+      }
+      setState((s) => {
+        if (kind === "fx") return { ...s, fx: saved as FxRates };
+        const key = kind as Exclude<RecordKind, "fx">;
+        const x = saved as { id: string };
+        const list = (s[key] ?? []) as { id: string }[];
+        const next = list.some((y) => y.id === x.id) ? list.map((y) => (y.id === x.id ? x : y)) : [x, ...list];
+        return { ...s, [key]: next };
+      });
+      return { ok: true };
+    },
+    [enqueue],
+  );
+
+  const deleteRecord = useCallback(
+    async (kind: Exclude<RecordKind, "fx">, id: string): Promise<{ ok: true } | { ok: false; error: string }> => {
+      if (remoteRef.current) {
+        try {
+          const res = await enqueue(() =>
+            fetch(`/api/records/${kind}?id=${encodeURIComponent(id)}`, { method: "DELETE", credentials: "same-origin" }),
+          );
+          const data = await res.json().catch(() => null);
+          if (!res.ok || !data?.ok) return { ok: false, error: data?.error || "Не получилось удалить" };
+        } catch {
+          return { ok: false, error: "Нет связи с сервером" };
+        } finally {
+          lastWriteRef.current = Date.now();
+        }
+      }
+      setState((s) => ({ ...s, [kind]: ((s[kind] ?? []) as { id: string }[]).filter((x) => x.id !== id) }));
+      return { ok: true };
+    },
+    [enqueue],
+  );
+
   const changeOwnPassword = useCallback(
     async (currentPassword: string, next: string): Promise<{ ok: true } | { ok: false; error: string }> => {
       if (!isValidPassword(next)) return { ok: false, error: "Пароль — минимум 4 символа" };
@@ -749,6 +816,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setManager,
       changeOwnPassword,
       deleteTask,
+      saveRecord,
+      deleteRecord,
     }),
     [
       state,
@@ -782,6 +851,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setManager,
       changeOwnPassword,
       deleteTask,
+      saveRecord,
+      deleteRecord,
     ],
   );
 

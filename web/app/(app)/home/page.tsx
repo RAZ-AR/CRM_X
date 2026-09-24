@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
-import { canManagePeople, canSeeTask, isCpo, statusMeta, subordinateIds, taskZones } from "@/lib/access";
+import { canManagePeople, canSeeTask, canWorkTask, isCpo, subordinateIds, taskZones } from "@/lib/access";
+import { StatusPicker } from "@/components/StatusIcon";
 import { openDeps } from "@/lib/taskRules";
 import { streamProgress, weightedDone, zoneTasks } from "@/lib/readiness";
 import { addDays, diffDays, formatDate, shortDate, todayYerevan, weekStart } from "@/lib/dates";
@@ -12,12 +13,14 @@ import { Roadmap } from "@/components/Roadmap";
 import type { Activity, Task } from "@/lib/types";
 import { dataIssues } from "@/lib/quality";
 import { Flame } from "lucide-react";
+import { canSeeFinance, DEFAULT_FX, money, totals, upcomingPayments } from "@/lib/finance";
+import { riskScore, scoreColor, topRisks } from "@/lib/risks";
 
 const FILTER_KEY = "crmx-home-filters";
 
 /** Главная: фильтры, цифры, сегодня, важное, загрузка команды, проекты, roadmap. */
 export default function HomePage() {
-  const { current, tasks, zones, users, setPreviewId, broadcast, setBroadcast, activity } = useStore();
+  const { current, tasks, zones, users, setPreviewId, broadcast, setBroadcast, activity, risks = [], budget = [], expenses = [], fx } = useStore();
   const [changesDays, setChangesDays] = useState(1);
   // «Сейчас» для окна «24 ч / 7 дней»: обновляется раз в минуту и при переключении.
   const [now, setNow] = useState(() => Date.now());
@@ -235,6 +238,12 @@ export default function HomePage() {
         </section>
       </div>
 
+      <RisksAndMoney
+        risks={topRisks(risks.filter((r) => zone === "all" || r.zone === zone))}
+        users={users}
+        finance={canSeeFinance(current) ? { budget, expenses, fx: fx ?? DEFAULT_FX, zone, today } : null}
+      />
+
       <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr] min-w-0">
         <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
           <div className="flex items-center justify-between mb-2">
@@ -350,7 +359,12 @@ function Group({
   red?: boolean;
   limit?: number;
 }) {
+  const { current, updateTask } = useStore();
   const [all, setAll] = useState(false);
+  const canWork = (t: Task) => Boolean(current && canWorkTask(current, t));
+  // Выход из блока через меню — как «Снять блок» в карточке: причина и срок очищаются.
+  const setStatus = (t: Task, status: Task["status"]) =>
+    updateTask(t.id, t.status === "blocked" ? { status, blockReason: "", blockUntil: "" } : { status });
   if (!list.length) return null;
   const shown = all ? list : list.slice(0, limit);
   return (
@@ -360,22 +374,34 @@ function Group({
         {shown.map((t) => {
           const a = users.find((u) => u.id === t.assigneeId);
           return (
-            <button
+            <div
               key={t.id}
-              type="button"
-              onClick={() => open(t.id)}
-              className="w-full text-left rounded-xl px-3 py-1.5 text-sm flex items-center gap-2"
+              className="w-full rounded-xl pl-1.5 pr-3 py-1 text-sm flex items-center gap-1.5"
               style={{ background: red ? "#fee2e2" : "#f4f4f6" }}
             >
-              <span className="shrink-0 w-4 text-center">{red ? <Flame size={13} className="text-[#e86a4a] inline" /> : statusMeta[t.status].emoji || "⚪"}</span>
-              <span className="hidden sm:inline text-[11px] text-[#9a9aa0] w-14 shrink-0">{t.code}</span>
-              <span className="flex-1 min-w-0 truncate">
-                {t.title}
-                {t.criticalPath && <span className="text-[#b91c1c] text-[10px]"> ●</span>}
-              </span>
-              <span className="text-[11px] text-[#6b6b70] shrink-0 max-w-[35%] truncate">{tail(t)}</span>
-              <span className="h-5 w-5 rounded-full bg-white grid place-items-center text-[9px] font-semibold shrink-0" title={a?.name}>{a?.avatar}</span>
-            </button>
+              <StatusPicker
+                status={t.status}
+                disabled={!canWork(t)}
+                onPick={(st) => {
+                  const r = setStatus(t, st);
+                  if (!r.ok) {
+                    alert(r.error);
+                    if (r.error.includes("готово когда")) open(t.id);
+                  }
+                }}
+                onBlock={() => open(t.id)}
+              />
+              <button type="button" onClick={() => open(t.id)} className="flex-1 min-w-0 text-left flex items-center gap-2">
+                {red && <Flame size={13} className="text-[#e86a4a] shrink-0" />}
+                <span className="hidden sm:inline text-[11px] text-[#9a9aa0] w-14 shrink-0">{t.code}</span>
+                <span className="flex-1 min-w-0 truncate">
+                  {t.title}
+                  {t.criticalPath && <span className="text-[#b91c1c] text-[10px]"> ●</span>}
+                </span>
+                <span className="text-[11px] text-[#6b6b70] shrink-0 max-w-[35%] truncate">{tail(t)}</span>
+                <span className="h-5 w-5 rounded-full bg-white grid place-items-center text-[9px] font-semibold shrink-0" title={a?.name}>{a?.avatar}</span>
+              </button>
+            </div>
           );
         })}
       </div>
@@ -443,6 +469,74 @@ function IssueList({ issues, open }: { issues: { task: Task; problems: string[] 
         <button type="button" className="text-[11px] underline text-[#6b6b70]" onClick={() => setAll(!all)}>
           {all ? "свернуть" : `ещё ${issues.length - 8}`}
         </button>
+      )}
+    </div>
+  );
+}
+
+function RisksAndMoney({
+  risks,
+  users,
+  finance,
+}: {
+  risks: import("@/lib/types").Risk[];
+  users: { id: string; name: string }[];
+  finance: { budget: import("@/lib/types").BudgetLine[]; expenses: import("@/lib/types").Expense[]; fx: import("@/lib/types").FxRates; zone: string; today: string } | null;
+}) {
+  const inZone = (x: { zone: string }) => !finance || finance.zone === "all" || x.zone === finance.zone;
+  const sum = finance ? totals(finance.budget, finance.expenses, "AMD", finance.fx, inZone) : null;
+  const due = finance ? upcomingPayments(finance.expenses.filter(inZone), finance.today, 7) : [];
+  return (
+    <div className={`grid gap-4 min-w-0 ${finance ? "xl:grid-cols-[1.3fr_1fr]" : ""}`}>
+      <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
+        <div className="flex items-baseline justify-between mb-2">
+          <h3 className="font-semibold">Главные риски</h3>
+          <Link href="/risks" className="text-xs underline text-[#6b6b70]">все риски →</Link>
+        </div>
+        {risks.length === 0 ? (
+          <p className="text-sm text-[#9a9aa0] py-2">Открытых рисков нет — или их ещё не записали.</p>
+        ) : (
+          <div className="space-y-2">
+            {risks.map((r) => (
+              <Link key={r.id} href="/risks" className="flex items-start gap-2 text-sm">
+                <span className="w-7 h-7 rounded-lg grid place-items-center text-xs font-semibold shrink-0" style={{ background: scoreColor(riskScore(r)) }}>{riskScore(r)}</span>
+                <span className="flex-1 min-w-0">
+                  <span className="font-medium">{r.title}</span>
+                  <span className="block text-xs text-[#757575] truncate">
+                    {users.find((u) => u.id === r.ownerId)?.name ?? "—"}
+                    {r.decideBy ? ` · решить до ${shortDate(r.decideBy)}` : ""}
+                    {r.planB ? ` · план Б: ${r.planB}` : ""}
+                  </span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+      {finance && sum && (
+        <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
+          <div className="flex items-baseline justify-between mb-2">
+            <h3 className="font-semibold">Деньги</h3>
+            <Link href="/money" className="text-xs underline text-[#6b6b70]">подробно →</Link>
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-sm">
+            <div><div className="text-[10px] text-[#757575]">План</div><div className="font-semibold">{money(sum.plan, "AMD")}</div></div>
+            <div><div className="text-[10px] text-[#757575]">Оплачено + ждёт</div><div className="font-semibold">{money(sum.paid + sum.committed, "AMD")}</div></div>
+            <div><div className="text-[10px] text-[#757575]">Остаток</div><div className={`font-semibold ${sum.left < 0 ? "text-red-500" : ""}`}>{money(sum.left, "AMD")}</div></div>
+          </div>
+          {due.length > 0 && (
+            <div className="mt-3 space-y-1 text-sm">
+              <div className="text-xs text-[#757575]">Оплатить за 7 дней</div>
+              {due.slice(0, 4).map((x) => (
+                <div key={x.id} className="flex gap-2">
+                  <span className={`w-12 ${x.date < finance.today ? "text-red-500" : "text-[#757575]"}`}>{shortDate(x.date)}</span>
+                  <span className="flex-1 truncate">{x.title}</span>
+                  <span className="font-medium">{money(x.amount, x.currency)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       )}
     </div>
   );

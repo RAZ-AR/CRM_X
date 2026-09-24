@@ -1,5 +1,6 @@
 import type { AppState, User } from "./types";
 import { ensureHashed } from "./auth";
+import { canSeeFinance } from "./finance";
 import {
   hasPerm,
   canManagePeople,
@@ -30,6 +31,11 @@ export function filterState(state: AppState, user: User): AppState {
     activity: (state.activity ?? []).filter((a) => ids.has(a.taskId) || (user.role === "cpo" && a.kind === "deleted")),
     wiki: state.wiki.filter((p) => canSeeWiki(user, p)),
     contacts: state.contacts.filter((c) => canSeeContact(user, c)),
+    budget: canSeeFinance(user) ? (state.budget ?? []) : [],
+    expenses: canSeeFinance(user) ? (state.expenses ?? []) : [],
+    fx: canSeeFinance(user) ? state.fx : undefined,
+    // Риски видят все; ссылки на недоступные задачи не отдаём.
+    risks: (state.risks ?? []).map((r) => ({ ...r, taskIds: r.taskIds.filter((id) => ids.has(id)) })),
   };
 }
 

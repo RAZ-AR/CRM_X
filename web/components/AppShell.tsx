@@ -21,6 +21,8 @@ import {
   CalendarDays,
   GanttChart,
   ClipboardList,
+  Wallet,
+  ShieldAlert,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { cpoNav, employeeNav, isCpo } from "@/lib/access";
@@ -39,6 +41,8 @@ const icons: Record<string, React.ReactNode> = {
   team: <Users size={18} />,
   wiki: <BookOpen size={18} />,
   contacts: <Contact size={18} />,
+  money: <Wallet size={18} />,
+  risks: <ShieldAlert size={18} />,
 };
 
 export function AppShell({ children }: { children: React.ReactNode }) {

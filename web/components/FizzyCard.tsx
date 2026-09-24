@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { statusMeta } from "@/lib/access";
 import type { Task, User } from "@/lib/types";
 import { formatDate } from "@/lib/dates";
+import { StatusIcon } from "@/components/StatusIcon";
 
 export function FizzyCard({
   task,
@@ -20,7 +20,7 @@ export function FizzyCard({
   const body = (
     <>
       <div className="flex items-center gap-2">
-        <span>{statusMeta[task.status].emoji}</span>
+        <StatusIcon status={task.status} size={14} />
         <span className="font-medium flex-1">{task.title}</span>
       </div>
       <div className="text-xs text-gray-400 mt-1">
