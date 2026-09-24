@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import { BlobPreconditionFailedError, get as blobGet, put as blobPut } from "@vercel/blob";
+import { BlobNotFoundError, BlobPreconditionFailedError, get as blobGet, head as blobHead, put as blobPut } from "@vercel/blob";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { AppState } from "./types";
@@ -97,12 +97,38 @@ export async function loadSessionSecret(): Promise<string> {
 }
 
 /** Состояние из Blob вместе с ETag версии (null — файла ещё нет). */
-async function loadBlobVersioned(): Promise<{ state: AppState; etag: string | null } | null> {
+/**
+ * Версия файла для условной записи. Берём её у самого хранилища (head), а не из ответа CDN на get:
+ * CDN может отдать изменённый (weak/сжатый) ETag, и тогда ifMatch никогда не совпадёт.
+ */
+async function storeEtag(key: string): Promise<string | null> {
+  if (LOCAL) {
+    try {
+      return hashOf(readFileSync(localPath(key)));
+    } catch {
+      return null;
+    }
+  }
+  try {
+    return (await blobHead(key)).etag || null;
+  } catch (e) {
+    if (e instanceof BlobNotFoundError || (e instanceof Error && e.name === "BlobNotFoundError")) return null;
+    throw e;
+  }
+}
+
+/**
+ * withEtag — нужна версия для записи. Берём её ДО чтения: если файл поменялся после этого,
+ * запись с ifMatch не пройдёт и updateSharedState повторит всё на свежих данных. Так содержимое
+ * никогда не окажется новее версии, с которой мы пишем.
+ */
+async function loadBlobVersioned(withEtag = false): Promise<{ state: AppState; etag: string | null } | null> {
+  const before = withEtag ? await storeEtag(KEY) : null;
   const file = await get(KEY, { access: "private", useCache: false });
   if (!file?.stream) return null;
   const text = await new Response(file.stream).text();
   if (!text) return null;
-  return { state: normalizeState(JSON.parse(text)), etag: file.etag };
+  return { state: normalizeState(JSON.parse(text)), etag: withEtag ? before : file.etag };
 }
 
 export async function loadBlobState(): Promise<AppState | null> {
@@ -195,8 +221,8 @@ function applyMigrations(input: AppState): { state: AppState; changed: boolean }
 type Via = "db" | "blob" | "seed";
 
 /** Текущая версия: из Blob, иначе из Postgres (если доступен), иначе seed. etag null — Blob ещё пуст. */
-async function loadVersioned(): Promise<{ state: AppState; etag: string | null; via: Via; changed: boolean }> {
-  const blob = await loadBlobVersioned();
+async function loadVersioned(withEtag = false): Promise<{ state: AppState; etag: string | null; via: Via; changed: boolean }> {
+  const blob = await loadBlobVersioned(withEtag);
   if (blob) return { ...applyMigrations(blob.state), etag: blob.etag, via: "blob" };
   const { getPrisma } = await import("./prisma");
   const { loadDbState } = await import("./persist");
@@ -260,7 +286,7 @@ export async function updateSharedState<T>(
   change: (state: AppState) => { state?: AppState; result: T } | Promise<{ state?: AppState; result: T }>,
 ): Promise<T & { via?: Via }> {
   for (let attempt = 0; attempt < 8; attempt++) {
-    const cur = await loadVersioned();
+    const cur = await loadVersioned(true);
     const out = await change(cur.state);
     const changed = out.state ?? (cur.changed ? cur.state : undefined);
     if (!changed) return out.result as T & { via?: Via };
@@ -282,14 +308,9 @@ export async function updateSharedState<T>(
 export async function loadSharedState(): Promise<{ state: AppState; via: Via }> {
   const cur = await loadVersioned();
   if (cur.changed) {
-    const next = { ...cur.state, rev: (cur.state.rev ?? 0) + 1 };
-    try {
-      await writeBlobState(next, cur.etag);
-      await mirrorToDb(next);
-    } catch (e) {
-      if (!isConflict(e)) throw e;
-      return loadSharedState(); // кто-то записал раньше — читаем его версию
-    }
+    // Миграции сохраняем той же безопасной записью (с повторами), затем отдаём сохранённое.
+    const saved = await updateSharedState((state) => ({ state, result: { state } }));
+    return { state: saved.state, via: cur.via };
   }
   return { state: cur.state, via: cur.via };
 }

@@ -94,9 +94,16 @@ async function handle(req: Request, ctx: { params: Promise<{ kind: string }> }, 
     }
   }
   const id = new URL(req.url).searchParams.get("id") || "";
-  const out = await updateSharedState<Out>((state) =>
-    method === "PUT" ? put(state, user, kind as Kind, body) : remove(state, user, kind as Kind, id),
-  );
+  let out: Out;
+  try {
+    out = await updateSharedState<Out>((state) =>
+      method === "PUT" ? put(state, user, kind as Kind, body) : remove(state, user, kind as Kind, id),
+    );
+  } catch (e) {
+    console.error("records", kind, e);
+    const msg = e instanceof Error ? e.message : "store";
+    return NextResponse.json({ ok: false, error: `Не удалось сохранить: ${msg}` }, { status: 500 });
+  }
   if (out.fail) return NextResponse.json({ ok: false, error: out.fail.error }, { status: out.fail.status });
   return NextResponse.json({ ok: true, value: out.value });
 }
