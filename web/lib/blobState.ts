@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { BlobNotFoundError, BlobPreconditionFailedError, get as blobGet, head as blobHead, put as blobPut } from "@vercel/blob";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import type { AppState } from "./types";
+import { LEGACY_STREAMS, type AppState } from "./types";
 import { normalizeState } from "./normalize";
 import { seed } from "./seed";
 
@@ -212,7 +212,23 @@ function applyMigrations(input: AppState): { state: AppState; changed: boolean }
   }
   // Креативный директор видит весь поток BRAND (один раз; дальше настраивает Owner).
   if (state.users.some((u) => u.id === "u-vladimir" && u.streams === undefined)) {
-    state = { ...state, users: state.users.map((u) => (u.id === "u-vladimir" && u.streams === undefined ? { ...u, streams: ["BRAND"] } : u)) };
+    state = { ...state, users: state.users.map((u) => (u.id === "u-vladimir" && u.streams === undefined ? { ...u, streams: ["BRAND & MARKETING"] } : u)) };
+    changed = true;
+  }
+  // Потоки переименованы (BRAND → BRAND & MARKETING и т.д.): переносим задачи и доступы людей.
+  const renamed = (x: string) => (Object.hasOwn(LEGACY_STREAMS, x) ? LEGACY_STREAMS[x] : x);
+  if (state.tasks.some((t) => Object.hasOwn(LEGACY_STREAMS, t.workstream)) || state.users.some((u) => (u.streams ?? []).some((x) => Object.hasOwn(LEGACY_STREAMS, x)))) {
+    state = {
+      ...state,
+      tasks: state.tasks.map((t) => (Object.hasOwn(LEGACY_STREAMS, t.workstream) ? { ...t, workstream: renamed(t.workstream) } : t)),
+      users: state.users.map((u) => (u.streams?.length ? { ...u, streams: [...new Set(u.streams.map((x) => renamed(x)))] as typeof u.streams } : u)),
+    };
+    changed = true;
+  }
+  // Master-план в Wiki со старыми названиями потоков — обновляем из seed (страницу w1 в UI не редактируют).
+  const plan = seed.wiki.find((w) => w.id === "w1");
+  if (plan && state.wiki.some((w) => w.id === "w1" && w.body !== plan.body && !w.body.includes("BRAND & MARKETING"))) {
+    state = { ...state, wiki: state.wiki.map((w) => (w.id === "w1" ? { ...w, body: plan.body } : w)) };
     changed = true;
   }
   return { state, changed };

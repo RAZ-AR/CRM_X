@@ -42,8 +42,8 @@ export default function ZonePage() {
         <div className="card p-5 md:p-6 flex flex-col gap-3">
           <div className="cap">Готовность по потокам · считается из задач</div>
           {streams.map((s) => (
-            <div key={s.stream} className="grid grid-cols-[minmax(0,180px)_minmax(0,1fr)_72px] items-center gap-3 text-sm">
-              <span className="truncate">{s.stream} <span className="cap">· {s.label}</span></span>
+            <div key={s.stream} className="grid grid-cols-[minmax(0,200px)_minmax(0,1fr)_72px] items-center gap-3 text-sm">
+              <span className="truncate" title={`${s.stream} · ${s.label}`}>{s.stream}</span>
               <Meter pct={s.pct} />
               <span className="cap num text-right !text-[var(--ink)]">{s.total ? `${s.pct}% · ${s.done}/${s.total}` : "—"}</span>
             </div>

@@ -20,14 +20,24 @@ export type ZoneSlug = string;
 
 /** 7 потоков запуска. Готовность проекта считается по задачам каждого потока. */
 export const STREAMS = [
-  "LEGAL",
-  "SPACE",
-  "BRAND",
-  "PRODUCT",
+  "LEGAL & FINANCE",
+  "SPACE & BUILD",
+  "BRAND & MARKETING",
+  "PRODUCT & APP",
   "EQUIPMENT & SUPPLY",
-  "PEOPLE",
-  "LAUNCH",
+  "PEOPLE & TRAINING",
+  "LAUNCH & OPS",
 ] as const;
+
+/** Старые названия потоков → новые (задачи и доступы переносятся миграцией). */
+export const LEGACY_STREAMS: Record<string, (typeof STREAMS)[number]> = {
+  LEGAL: "LEGAL & FINANCE",
+  SPACE: "SPACE & BUILD",
+  BRAND: "BRAND & MARKETING",
+  PRODUCT: "PRODUCT & APP",
+  PEOPLE: "PEOPLE & TRAINING",
+  LAUNCH: "LAUNCH & OPS",
+};
 
 export type Stream = (typeof STREAMS)[number];
 
