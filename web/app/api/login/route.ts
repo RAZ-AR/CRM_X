@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { findUserByLogin, sessionCookie } from "@/lib/session";
+import { allUsers, findUserByLogin, sessionCookie } from "@/lib/session";
+import { sameLogin } from "@/lib/pin";
 import { publicUser } from "@/lib/publicUser";
 import { isHashed, hashPassword, loginBlocked, loginFailed, loginSucceeded } from "@/lib/auth";
 import { loadSharedState, saveSharedState } from "@/lib/blobState";
@@ -14,6 +15,7 @@ export async function POST(req: Request) {
   }
   let user = await findUserByLogin(login, String(password || ""));
   if (!user) {
+    console.warn("login failed", { login, known: (await allUsers()).some((u) => sameLogin(u.email, login)) });
     loginFailed(key);
     return NextResponse.json({ ok: false }, { status: 401 });
   }

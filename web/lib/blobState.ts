@@ -59,11 +59,35 @@ export function migrateLegacyState(state: AppState): AppState {
   };
 }
 
+/**
+ * Один раз выставляет команде стартовые логины и пароли из seed (Armen 1111, Vladimir 2222,
+ * Karina 3333) и добавляет недостающих. Нужно, потому что перенос 24.09 оставил Armen старый
+ * демо-пароль. После этого смена пароля в «Мой профиль» больше не перезаписывается.
+ */
+export const AUTH_VERSION = 2;
+
+export function resetTeamCredentials(state: AppState): AppState {
+  const users = state.users.map((u) => {
+    const s = seed.users.find((x) => x.id === u.id);
+    return s ? { ...u, email: s.email, password: s.password, role: s.role } : u;
+  });
+  for (const s of seed.users) if (!users.some((u) => u.id === s.id)) users.push(s);
+  return { ...state, users, authVersion: AUTH_VERSION };
+}
+
 export async function loadSharedState(): Promise<{ state: AppState; via: "db" | "blob" | "seed" }> {
   const loaded = await loadStoredState();
-  if (!isLegacyState(loaded.state)) return loaded;
-  const state = migrateLegacyState(loaded.state);
-  await saveSharedState(state);
+  let state = loaded.state;
+  let changed = false;
+  if (isLegacyState(state)) {
+    state = migrateLegacyState(state);
+    changed = true;
+  }
+  if ((state.authVersion ?? 0) < AUTH_VERSION) {
+    state = resetTeamCredentials(state);
+    changed = true;
+  }
+  if (changed) await saveSharedState(state);
   return { ...loaded, state };
 }
 

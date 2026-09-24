@@ -5461,5 +5461,6 @@ export const seed: AppState = {
     "emoji": "🚀",
     "authorId": "u-armen",
     "updatedAt": "2026-09-24T09:00:00"
-  }
+  },
+  "authVersion": 2
 };
