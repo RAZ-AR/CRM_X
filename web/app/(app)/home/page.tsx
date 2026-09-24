@@ -44,8 +44,8 @@ export default function HomePage() {
 
   const roadmapTasks = sortActual(visible.filter((t) => t.status !== "done"));
 
-  const minD = "2026-09-10";
-  const maxD = "2027-01-15";
+  const minD = "2026-09-21";
+  const maxD = "2027-01-20";
   const span = dayNum(maxD) - dayNum(minD);
   const dayW = 12;
   const width = span * dayW;
@@ -60,17 +60,18 @@ export default function HomePage() {
 
   const dateLabel = formatDate(picked);
 
-  const waveA = visible.filter((t) => t.wave === "A");
-  const cp = waveA.filter((t) => t.criticalPath);
+  const cp = visible.filter((t) => t.criticalPath);
   const cpTotal = cp.reduce((s, t) => s + t.weight, 0) || 1;
   const cpDone = cp.filter((t) => t.status === "done").reduce((s, t) => s + t.weight, 0);
   const cpPct = Math.round((cpDone / cpTotal) * 100);
   const blockedCp = visible.filter((t) => t.criticalPath && t.status === "blocked").length;
   const overdue2 = visible.filter((t) => isOverdue(t, picked) && t.status !== "done").length;
   const reviewOld = visible.filter((t) => t.status === "review").length;
-  const daysA = Math.max(0, dayNum("2026-10-10") - dayNum(picked));
-  const daysB = Math.max(0, dayNum("2026-10-31") - dayNum(picked));
-  const daysC = Math.max(0, dayNum("2027-01-10") - dayNum(picked));
+  const launches = zones
+    .filter((z) => z.slug !== "common" && z.deadline)
+    .sort((a, b) => a.deadline.localeCompare(b.deadline))
+    .slice(0, 3)
+    .map((z) => [`до ${z.name}`, `${Math.max(0, dayNum(z.deadline) - dayNum(picked))}д`]);
 
   return (
     <div className="space-y-4">
@@ -155,10 +156,8 @@ export default function HomePage() {
       {canManagePeople(current) && (
         <section className="grid grid-cols-3 sm:grid-cols-6 gap-2">
           {[
-            ["до A", `${daysA}д`],
-            ["до B", `${daysB}д`],
-            ["до C", `${daysC}д`],
-            ["critical A", `${cpPct}%`],
+            ...launches,
+            ["critical path", `${cpPct}%`],
             ["блок CP", String(blockedCp)],
             ["просрочка / проверка", `${overdue2} / ${reviewOld}`],
           ].map(([k, v]) => (

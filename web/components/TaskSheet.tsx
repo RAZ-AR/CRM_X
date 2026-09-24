@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { canEditTask, canSeeTask, canWorkTask, columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
+import { canDeleteTask, canEditTask, canSeeTask, canWorkTask, columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
 import { openDeps, unlockedBy } from "@/lib/taskRules";
 import { filesToAttachments } from "@/lib/files";
-import type { Priority } from "@/lib/types";
+import { STREAMS, type Priority } from "@/lib/types";
 import { formatDate } from "@/lib/dates";
-import { Flame, X } from "lucide-react";
+import { Flame, Trash2, X } from "lucide-react";
 import { EMOJIS } from "@/lib/emoji";
 
 export function TaskSheet({
@@ -19,7 +19,7 @@ export function TaskSheet({
 }) {
   const {
     current, tasks, users, zones, comments, subtasks,
-    updateTask, addComment, addSubtask, toggleSubtask, toggleReaction,
+    updateTask, addComment, addSubtask, toggleSubtask, toggleReaction, deleteTask, setPreviewId,
   } = useStore();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState("");
@@ -37,6 +37,7 @@ export function TaskSheet({
   const isAuthor = task.authorId === current.id;
   const canEdit = canEditTask(current, task);
   const canWork = canWorkTask(current, task);
+  const canDelete = canDeleteTask(current, task);
   const waiting = openDeps(task, tasks);
   const unlocks = unlockedBy(task, tasks);
   const comms = comments.filter((c) => c.taskId === task.id);
@@ -228,7 +229,37 @@ export function TaskSheet({
               <option value="high">высокая</option>
               <option value="critical">critical</option>
             </select>
+            <select value={task.workstream || ""} onChange={(e) => updateTask(task.id, { workstream: e.target.value })}>
+              <option value="">Поток: —</option>
+              {STREAMS.map((s) => (
+                <option key={s} value={s}>Поток: {s}</option>
+              ))}
+            </select>
+            <select value={task.zone} onChange={(e) => updateTask(task.id, { zone: e.target.value, zones: [e.target.value] })}>
+              {zones.map((z) => (
+                <option key={z.slug} value={z.slug}>{z.emoji} {z.name}</option>
+              ))}
+            </select>
           </div>
+        )}
+
+        {editing && canDelete && (
+          <button
+            type="button"
+            className="flex items-center gap-2 text-sm text-[#b91c1c]"
+            onClick={async () => {
+              if (!confirm(`Удалить задачу «${task.title}»? Комментарии и чеклист удалятся вместе с ней.`)) return;
+              const r = await deleteTask(task.id);
+              if (!r.ok) {
+                alert(r.error);
+                return;
+              }
+              setPreviewId(null);
+              onClose?.();
+            }}
+          >
+            <Trash2 size={16} /> Удалить задачу
+          </button>
         )}
 
         {!editing && (

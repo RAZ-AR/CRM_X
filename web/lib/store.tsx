@@ -12,6 +12,7 @@ import {
 import { seed } from "./seed";
 import { isValidLogin, isValidPassword, loginTaken, sameLogin } from "./pin";
 import { canMoveStatus } from "./taskRules";
+import { canDeleteTask } from "./access";
 import { normalizeState } from "./normalize";
 import type {
   AppState,
@@ -33,6 +34,7 @@ type Store = AppState & {
   addTask: (t: Omit<Task, "id" | "createdAt">) => string;
   updateTask: (id: string, patch: Partial<Task>) => { ok: true } | { ok: false; error: string };
   addComment: (taskId: string, text: string) => void;
+  deleteTask: (id: string) => Promise<{ ok: true } | { ok: false; error: string }>;
   grant: (userId: string, permissions: User["permissions"]) => void;
   addSubtask: (taskId: string, title: string) => void;
   toggleSubtask: (id: string) => void;
@@ -63,7 +65,13 @@ type Store = AppState & {
 };
 
 const Ctx = createContext<Store | null>(null);
-const KEY = "crmx-v9";
+const KEY = "crmx-v10";
+
+/** Всё, что синкается через PUT /api/state (задачи — отдельно, через /api/tasks). */
+const SYNC_KEYS = ["comments", "subtasks", "notices", "users", "zones", "wiki", "contacts", "broadcast"] as const;
+function syncSlice(s: AppState) {
+  return JSON.stringify(SYNC_KEYS.map((k) => s[k]));
+}
 const USER_KEY = "crmx-user";
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -74,12 +82,30 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [remote, setRemote] = useState(false);
   const remoteRef = useRef(false);
   remoteRef.current = remote;
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+  /** Последний срез, подтверждённый сервером; отличие = есть несохранённые правки. */
+  const serverSliceRef = useRef<string | null>(null);
+  /** Запросы одного браузера идут строго по очереди, чтобы не перезатирать друг друга. */
+  const queueRef = useRef<Promise<unknown>>(Promise.resolve());
+  const enqueue = useCallback(<T,>(fn: () => Promise<T>): Promise<T> => {
+    const p = queueRef.current.then(fn, fn);
+    queueRef.current = p.catch(() => undefined);
+    return p;
+  }, []);
+  const applyServer = useCallback((st: AppState) => {
+    serverSliceRef.current = syncSlice(st);
+    setState(st);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const apply = (hydrated: AppState, isRemote: boolean, userId?: string | null) => {
         if (cancelled) return;
+        if (isRemote) serverSliceRef.current = syncSlice(hydrated);
         setState(hydrated);
         setRemote(isRemote);
         if (userId) {
@@ -135,14 +161,38 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         if (data?.ok && data.state) {
           setRemote(true);
-          setState(normalizeState(data.state));
+          // Есть локальные несохранённые правки — не затираем, PUT ниже их отправит.
+          if (serverSliceRef.current !== null && syncSlice(stateRef.current) !== serverSliceRef.current) return;
+          applyServer(normalizeState(data.state));
         }
       } catch {
         /* ignore */
       }
     }, 4000);
     return () => clearInterval(t);
-  }, [ready, current?.id]);
+  }, [ready, current?.id, applyServer]);
+
+  useEffect(() => {
+    if (!ready || !current || !remote || serverSliceRef.current === null) return;
+    const snap = syncSlice(state);
+    if (snap === serverSliceRef.current) return;
+    const t = setTimeout(() => {
+      enqueue(async () => {
+        const res = await fetch("/api/state", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ state: { ...stateRef.current, tasks: [] } }),
+        });
+        const data = await res.json();
+        if (!data?.ok || !data.state) return;
+        const st = normalizeState(data.state);
+        if (syncSlice(stateRef.current) === snap) applyServer(st);
+        else serverSliceRef.current = syncSlice(st);
+      }).catch(() => undefined);
+    }, 600);
+    return () => clearTimeout(t);
+  }, [state, ready, current, remote, enqueue, applyServer]);
 
   useEffect(() => {
     if (!ready || !current) return;
@@ -190,7 +240,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const body = await st.json();
       if (body?.ok && body.state) {
         const hydrated = normalizeState(body.state);
-        setState(hydrated);
+        applyServer(hydrated);
         setRemote(true);
         const me = hydrated.users.find((x) => x.id === data.user.id) ?? data.user;
         setCurrent(me);
@@ -276,11 +326,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       return { ...s, tasks: [task, ...s.tasks], notices: [...extra, ...(s.notices ?? [])] };
     });
     if (remoteRef.current) {
-      fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(task),
-      }).catch(() => undefined);
+      enqueue(() =>
+        fetch("/api/tasks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(task),
+        }),
+      ).catch(() => undefined);
     }
     return task.id;
   }, [current, state.users]);
@@ -309,11 +361,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
     if (!result.ok) return result;
     if (remoteRef.current) {
-      fetch(`/api/tasks/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patch),
-      }).catch(() => undefined);
+      enqueue(() =>
+        fetch(`/api/tasks/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patch),
+        }),
+      ).catch(() => undefined);
     }
     setState((s) => {
       const t = s.tasks.find((x) => x.id === id);
@@ -464,10 +518,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           emoji: z.emoji || "📁",
           color: z.color || "#E5E7EB",
           deadline: z.deadline,
-          readiness: {
-            SPACE: 10, EQUIPMENT: 10, TEAM: 10, PRODUCT: 10,
-            IT: 10, MARKETING: 10, OPERATIONS: 10, READY: 5,
-          },
+          readiness: {},
         },
       ],
     }));
@@ -580,6 +631,41 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return { ok: true };
   }, [state.users]);
 
+  const deleteTask = useCallback(
+    async (id: string): Promise<{ ok: true } | { ok: false; error: string }> => {
+      const task = stateRef.current.tasks.find((t) => t.id === id);
+      if (!task || !current) return { ok: false, error: "Нет задачи" };
+      if (!canDeleteTask(current, task)) return { ok: false, error: "Удалять можно только свои задачи" };
+      if (remoteRef.current) {
+        try {
+          const res = await enqueue(() =>
+            fetch(`/api/tasks/${id}`, { method: "DELETE", credentials: "same-origin" }),
+          );
+          const data = await res.json();
+          if (!res.ok || !data?.ok) return { ok: false, error: data?.error || "Не получилось удалить" };
+        } catch {
+          return { ok: false, error: "Нет связи с сервером" };
+        }
+      }
+      const strip = (s: AppState): AppState => ({
+        ...s,
+        tasks: s.tasks
+          .filter((t) => t.id !== id)
+          .map((t) =>
+            task.code && (t.dependsOn ?? []).includes(task.code)
+              ? { ...t, dependsOn: t.dependsOn.filter((c) => c !== task.code) }
+              : t,
+          ),
+        comments: s.comments.filter((c) => c.taskId !== id),
+        subtasks: s.subtasks.filter((x) => x.taskId !== id),
+        notices: (s.notices ?? []).filter((n) => n.taskId !== id),
+      });
+      setState(strip);
+      return { ok: true };
+    },
+    [current, enqueue],
+  );
+
   const changeOwnPassword = useCallback(
     async (currentPassword: string, next: string): Promise<{ ok: true } | { ok: false; error: string }> => {
       if (!isValidPassword(next)) return { ok: false, error: "Пароль — минимум 4 символа" };
@@ -630,6 +716,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       toggleReaction,
       setManager,
       changeOwnPassword,
+      deleteTask,
     }),
     [
       state,
@@ -660,6 +747,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       toggleReaction,
       setManager,
       changeOwnPassword,
+      deleteTask,
     ],
   );
 

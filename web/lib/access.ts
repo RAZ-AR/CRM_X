@@ -46,6 +46,11 @@ export function canEditTask(user: User, task: Task) {
   return isCpo(user) || canManagePeople(user) || task.authorId === user.id;
 }
 
+/** Удалить: Owner — любую, остальные — только созданные ими. */
+export function canDeleteTask(user: User, task: Task) {
+  return isCpo(user) || task.authorId === user.id;
+}
+
 /** Статус, чеклист, комментарий, вложение — исполнитель и участники тоже. */
 export function canWorkTask(user: User, task: Task) {
   if (canEditTask(user, task)) return true;

@@ -1,38 +1,43 @@
-import type { Task, Zone } from "./types";
-import { READINESS_BLOCKS } from "./types";
+import type { Stream, Task } from "./types";
+import { STREAMS } from "./types";
+import { taskZones } from "./access";
 
-export function zoneReadiness(zone: Zone) {
-  const vals = READINESS_BLOCKS.map((b) => zone.readiness[b]);
-  return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
-}
-
-export function projectReadiness(zones: Zone[]) {
-  if (!zones.length) return 0;
-  return Math.round(
-    zones.reduce((s, z) => s + zoneReadiness(z), 0) / zones.length,
-  );
-}
-
-export const BLOCK_COLORS: Record<string, string> = {
-  SPACE: "#86EFAC",
-  EQUIPMENT: "#FDE68A",
-  TEAM: "#93C5FD",
-  PRODUCT: "#F9A8D4",
-  IT: "#C4B5FD",
-  MARKETING: "#FDBA74",
-  OPERATIONS: "#67E8F9",
-  READY: "#A7F3D0",
+export const STREAM_META: Record<Stream, { label: string; color: string }> = {
+  LEGAL: { label: "Юр · финансы", color: "#C4B5FD" },
+  SPACE: { label: "Помещение · ремонт", color: "#86EFAC" },
+  BRAND: { label: "Бренд · маркетинг", color: "#FDBA74" },
+  PRODUCT: { label: "Продукт · меню · app", color: "#F9A8D4" },
+  "EQUIPMENT & SUPPLY": { label: "Оборудование · закупки", color: "#FDE68A" },
+  PEOPLE: { label: "Команда", color: "#93C5FD" },
+  LAUNCH: { label: "Запуск", color: "#67E8F9" },
 };
 
-export function zoneTaskProgress(slug: string, tasks: Task[]) {
-  const list = tasks.filter((t) => {
-    const zs = t.zones?.length ? t.zones : t.zone ? [t.zone] : [];
-    return zs.includes(slug);
-  });
+/** Взвешенный % закрытых задач: обычная 1, critical path 3. */
+export function weightedDone(list: Task[]) {
   const total = list.reduce((s, t) => s + (t.weight || 1), 0);
   if (!total) return 0;
-  const done = list
-    .filter((t) => t.status === "done")
-    .reduce((s, t) => s + (t.weight || 1), 0);
+  const done = list.filter((t) => t.status === "done").reduce((s, t) => s + (t.weight || 1), 0);
   return Math.round((done / total) * 100);
+}
+
+export function zoneTasks(slug: string, tasks: Task[]) {
+  return tasks.filter((t) => taskZones(t).includes(slug));
+}
+
+export function zoneTaskProgress(slug: string, tasks: Task[]) {
+  return weightedDone(zoneTasks(slug, tasks));
+}
+
+/** Готовность проекта по 7 потокам — из задач, без ручного ввода. */
+export function streamProgress(tasks: Task[]) {
+  return STREAMS.map((stream) => {
+    const list = tasks.filter((t) => t.workstream === stream);
+    return {
+      stream,
+      ...STREAM_META[stream],
+      total: list.length,
+      done: list.filter((t) => t.status === "done").length,
+      pct: weightedDone(list),
+    };
+  });
 }

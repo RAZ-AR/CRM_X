@@ -32,23 +32,30 @@ export async function saveBlobState(state: AppState) {
 }
 
 /**
- * Старая демо-база: Owner = u-cpo, 90 задач бэклога. Заменяем людей и чистим задачи,
- * зоны / wiki / контакты оставляем. Идемпотентно: после миграции u-cpo нет.
+ * Всё, что было до master-плана от 24.09.2026 (нет проекта «ОБЩИЕ»): заменяем задачи и проекты
+ * на новый план. Пароли людей с теми же id сохраняем, внешние контакты и свои wiki-страницы — тоже.
+ * Идемпотентно: после миграции «common» есть, повторно не срабатывает.
  */
 export function isLegacyState(state: AppState) {
-  return state.users.some((u) => u.id === "u-cpo");
+  return !state.zones.some((z) => z.slug === "common");
 }
 
 export function migrateLegacyState(state: AppState): AppState {
+  const seedIds = new Set(seed.wiki.map((w) => w.id));
   return {
     ...state,
-    users: seed.users,
-    tasks: [],
+    zones: seed.zones,
+    users: seed.users.map((u) => {
+      const prev = state.users.find((x) => x.id === u.id);
+      return { ...u, password: prev?.password || u.password };
+    }),
+    tasks: seed.tasks,
+    subtasks: seed.subtasks,
     comments: [],
-    subtasks: [],
     notices: [],
+    wiki: [...seed.wiki, ...state.wiki.filter((w) => !seedIds.has(w.id) && w.id !== "w1")],
     contacts: [...seed.contacts.filter((c) => c.kind === "staff"), ...state.contacts.filter((c) => c.kind !== "staff")],
-    broadcast: state.broadcast ? { ...state.broadcast, authorId: seed.users[0].id } : seed.broadcast,
+    broadcast: seed.broadcast,
   };
 }
 
