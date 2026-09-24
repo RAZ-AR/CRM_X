@@ -15,12 +15,13 @@ const LABEL_W = 220;
 
 /** Timeline по 7 потокам с вехами запусков и предпросмотром переноса сроков. */
 export default function TimelinePage() {
-  const { current, tasks, users, zones, updateTask, setPreviewId } = useStore();
+  const { current, tasks, users, zones, saveTaskDates, setPreviewId } = useStore();
   const today = todayYerevan();
   const [zone, setZone] = useState("all");
   const [selected, setSelected] = useState<string | null>(null);
   const [draft, setDraft] = useState<{ start: string; due: string } | null>(null);
   const [applying, setApplying] = useState(false);
+  const [error, setError] = useState("");
 
   const visible = useMemo(
     () =>
@@ -60,18 +61,22 @@ export default function TimelinePage() {
   const pick = (id: string) => {
     const t = tasks.find((x) => x.id === id)!;
     setSelected(id);
+    setError("");
     setDraft({ start: t.startDate || t.due, due: t.due });
   };
   const nudge = (n: number) => draft && setDraft({ start: addDays(draft.start, n), due: addDays(draft.due, n) });
   const close = () => {
     setSelected(null);
     setDraft(null);
+    setError("");
   };
   const apply = async () => {
     setApplying(true);
-    for (const s of shifts) updateTask(s.task.id, { startDate: s.toStart, due: s.toDue });
+    setError("");
+    const r = await saveTaskDates(shifts.map((s) => ({ id: s.task.id, startDate: s.toStart, due: s.toDue })));
     setApplying(false);
-    close();
+    if (r.ok) close();
+    else setError(`${r.error}. Сохранено ${r.saved} из ${shifts.length}, остальное не изменено.`);
   };
   const launchMoves = shifts.filter((s) => isMilestone(s.task));
 
@@ -197,10 +202,10 @@ export default function TimelinePage() {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <label className="text-xs text-[#9a9aa0]">Начало
-                <input type="date" className="w-full mt-1" value={draft.start} onChange={(e) => e.target.value && setDraft({ ...draft, start: e.target.value })} />
+                <input type="date" className="w-full mt-1" value={draft.start} onChange={(e) => e.target.value && setDraft({ start: e.target.value, due: e.target.value > draft.due ? e.target.value : draft.due })} />
               </label>
               <label className="text-xs text-[#9a9aa0]">Конец
-                <input type="date" className="w-full mt-1" value={draft.due} onChange={(e) => e.target.value && setDraft({ ...draft, due: e.target.value })} />
+                <input type="date" className="w-full mt-1" min={draft.start} value={draft.due} onChange={(e) => e.target.value && setDraft({ start: draft.start, due: e.target.value < draft.start ? draft.start : e.target.value })} />
               </label>
             </div>
             <div className="flex gap-1.5 mt-2">
@@ -235,11 +240,12 @@ export default function TimelinePage() {
               )}
             </div>
 
+            {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
             <div className="flex gap-2 mt-4">
               <button type="button" className="pill bg-[#f4f4f6] px-4 py-2 text-sm" onClick={() => setPreviewId(task.id)}>Открыть задачу</button>
               {owner ? (
                 <button type="button" disabled={!shifts.length || applying} className="pill bg-black text-white px-4 py-2 text-sm flex-1 disabled:opacity-40" onClick={apply}>
-                  Применить{shifts.length > 1 ? ` (${shifts.length})` : ""}
+                  {applying ? "Сохраняю…" : `Применить${shifts.length > 1 ? ` (${shifts.length})` : ""}`}
                 </button>
               ) : (
                 <span className="text-xs text-[#9a9aa0] self-center">Применить может Owner</span>
