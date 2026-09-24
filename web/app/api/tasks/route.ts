@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { sessionUser } from "@/lib/session";
 import { loadSharedState, saveSharedState } from "@/lib/blobState";
 import type { Task } from "@/lib/types";
+import { appUrlFrom, escapeHtml, sendTo, taskLink } from "@/lib/telegram";
+import { shortDate } from "@/lib/dates";
 
 export async function POST(req: Request) {
   const user = await sessionUser();
@@ -18,5 +20,11 @@ export async function POST(req: Request) {
   };
   const { state } = await loadSharedState();
   await saveSharedState({ ...state, tasks: [task, ...state.tasks] });
+  if (task.assigneeId !== user.id) {
+    await sendTo(
+      state.users.find((u) => u.id === task.assigneeId),
+      `🆕 Новая задача от ${escapeHtml(user.name)}: ${taskLink(appUrlFrom(req), task)}\nСрок: ${shortDate(task.due)}`,
+    );
+  }
   return NextResponse.json({ ok: true, task });
 }

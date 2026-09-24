@@ -9,7 +9,8 @@ import {
 } from "./access";
 
 export function publicUser(u: User): User {
-  return { ...u, password: "" };
+  const { telegramChatId, ...rest } = u;
+  return { ...rest, password: "", telegramLinked: Boolean(telegramChatId) };
 }
 
 export function filterState(state: AppState, user: User): AppState {
@@ -72,7 +73,13 @@ export function mergeState(existing: AppState, incoming: AppState, user: User): 
 
   const users = (incoming.users?.length ? incoming.users : existing.users).map((u) => {
     const prev = existing.users.find((x) => x.id === u.id);
-    return { ...u, password: u.password ? ensureHashed(u.password) : prev?.password || "" };
+    const { telegramLinked: _linked, ...rest } = u;
+    void _linked;
+    return {
+      ...rest,
+      password: u.password ? ensureHashed(u.password) : prev?.password || "",
+      telegramChatId: prev?.telegramChatId,
+    };
   });
   return {
     ...base,
