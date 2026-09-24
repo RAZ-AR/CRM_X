@@ -3,106 +3,164 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { canManagePeople, canSeeTask, isActual, isOverdue, sortActual, taskZones } from "@/lib/access";
-import { zoneTaskProgress } from "@/lib/readiness";
-import { FitnessRings } from "@/components/FitnessRings";
-import { TaskCard } from "@/components/TaskCard";
-import { formatDate } from "@/lib/dates";
+import { canManagePeople, canSeeTask, isCpo, statusMeta, subordinateIds, taskZones } from "@/lib/access";
+import { openDeps } from "@/lib/taskRules";
+import { streamProgress, weightedDone, zoneTasks } from "@/lib/readiness";
+import { addDays, diffDays, formatDate, shortDate, todayYerevan, weekStart } from "@/lib/dates";
 import { EMOJIS } from "@/lib/emoji";
+import { Roadmap } from "@/components/Roadmap";
+import type { Task } from "@/lib/types";
+import { Flame } from "lucide-react";
 
-function dayNum(iso: string) {
-  return Math.floor(new Date(iso + "T00:00:00").getTime() / 86400000);
-}
+const FILTER_KEY = "crmx-home-filters";
 
+/** Главная: фильтры, цифры, сегодня, важное, загрузка команды, проекты, roadmap. */
 export default function HomePage() {
   const { current, tasks, zones, users, setPreviewId, broadcast, setBroadcast } = useStore();
-  const now = new Date();
-  const [calOpen, setCalOpen] = useState(false);
-  const [picked, setPicked] = useState(now.toISOString().slice(0, 10));
+  const today = todayYerevan();
+  const [picked, setPicked] = useState(today);
+  // Фильтры храним отдельно для каждого пользователя: один браузер может быть общим.
+  const filterKey = `${FILTER_KEY}:${current?.id ?? ""}`;
+  const [saved] = useState(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      return (JSON.parse(localStorage.getItem(filterKey) || "null") ?? {}) as { who?: string; zone?: string };
+    } catch {
+      return {};
+    }
+  });
+  const [who, setWho] = useState<string>(saved.who ?? "");
+  const [zone, setZone] = useState(saved.zone ?? "all");
   const [msgEdit, setMsgEdit] = useState(false);
   const [msg, setMsg] = useState("");
   const [msgEmoji, setMsgEmoji] = useState("💪");
-  const [assignee, setAssignee] = useState("all");
+
+  const remember = (next: { who?: string; zone?: string }) => {
+    try {
+      localStorage.setItem(filterKey, JSON.stringify({ who, zone, ...next }));
+    } catch {
+      /* ignore */
+    }
+  };
   if (!current) return null;
 
-  let visible = tasks.filter((t) => canSeeTask(current, t, users));
-  if (assignee !== "all") visible = visible.filter((t) => t.assigneeId === assignee);
-  const people = users.filter((u) => tasks.some((x) => x.assigneeId === u.id && canSeeTask(current, x, users)));
-  const zoneList = zones;
-  const dayTasks = sortActual(visible.filter((t) => isActual(t, picked)), picked);
+  const owner = isCpo(current);
+  const manager = owner || subordinateIds(current.id, users).length > 0;
+  // Сотрудник без подчинённых всегда видит только свои задачи.
+  const whoValue = manager ? who || "all" : "me";
+  const seen = tasks.filter((t) => canSeeTask(current, t, users));
+  const people = users.filter((u) => seen.some((t) => t.assigneeId === u.id));
+  const byZone = zone === "all" ? seen : seen.filter((t) => taskZones(t).includes(zone));
+  const assigneeId = whoValue === "me" ? current.id : whoValue === "all" ? null : whoValue;
+  const scoped = assigneeId ? byZone.filter((t) => t.assigneeId === assigneeId) : byZone;
+  const open = scoped.filter((t) => t.status !== "done");
 
-  const month = now.getMonth();
-  const year = now.getFullYear();
-  const first = new Date(year, month, 1).getDay() || 7;
-  const daysIn = new Date(year, month + 1, 0).getDate();
-  const cal: (number | null)[] = [...Array(first - 1).fill(null), ...Array.from({ length: daysIn }, (_, i) => i + 1)];
-  const prefix = `${year}-${String(month + 1).padStart(2, "0")}`;
-  const dueDays = new Set(visible.filter((t) => t.due.startsWith(prefix)).map((t) => Number(t.due.slice(8, 10))));
-  const overdueDays = new Set(
-    visible.filter((t) => isOverdue(t)).filter((t) => t.due.startsWith(prefix)).map((t) => Number(t.due.slice(8, 10))),
-  );
+  // Сегодня
+  const started = (t: Task) => (t.startDate || t.due) <= picked;
+  const overdue = open.filter((t) => t.due < picked).sort((a, b) => a.due.localeCompare(b.due));
+  const dueToday = open.filter((t) => t.due === picked);
+  const inWork = open.filter((t) => t.status === "in_progress" && started(t) && t.due > picked);
+  const toStart = open.filter((t) => t.status === "todo" && started(t) && t.due > picked);
 
-  const roadmapTasks = sortActual(visible.filter((t) => t.status !== "done"));
+  // Важное
+  const horizon = addDays(picked, 7);
+  const critical = open.filter((t) => t.criticalPath && t.due <= horizon).sort((a, b) => a.due.localeCompare(b.due));
+  const blocked = open.filter((t) => t.status === "blocked");
+  const toReview = scoped.filter((t) => t.status === "review" && (owner || t.authorId === current.id));
+  const ready = open
+    .filter((t) => t.status === "todo" && (t.startDate || t.due) <= addDays(picked, 3) && (t.dependsOn?.length ?? 0) > 0 && !openDeps(t, tasks).length)
+    .sort((a, b) => (a.startDate || a.due).localeCompare(b.startDate || b.due));
 
-  const minD = "2026-09-21";
-  const maxD = "2027-01-20";
-  const span = dayNum(maxD) - dayNum(minD);
-  const dayW = 12;
-  const width = span * dayW;
-  const todayX = (dayNum(picked) - dayNum(minD)) * dayW;
-  const rowH = 32;
-
-  function barColor(t: (typeof roadmapTasks)[0]) {
-    const zs = taskZones(t);
-    if (zs.length !== 1) return "#9ca3af";
-    return zones.find((z) => z.slug === zs[0])?.color ?? "#9ca3af";
-  }
-
-  const dateLabel = formatDate(picked);
-
-  const cp = visible.filter((t) => t.criticalPath);
-  const cpTotal = cp.reduce((s, t) => s + t.weight, 0) || 1;
-  const cpDone = cp.filter((t) => t.status === "done").reduce((s, t) => s + t.weight, 0);
-  const cpPct = Math.round((cpDone / cpTotal) * 100);
-  const blockedCp = visible.filter((t) => t.criticalPath && t.status === "blocked").length;
-  const overdue2 = visible.filter((t) => isOverdue(t, picked) && t.status !== "done").length;
-  const reviewOld = visible.filter((t) => t.status === "review").length;
+  // Цифры
   const launches = zones
-    .filter((z) => z.slug !== "common" && z.deadline)
+    .filter((z) => z.slug !== "common" && z.deadline >= picked && (zone === "all" || z.slug === zone))
     .sort((a, b) => a.deadline.localeCompare(b.deadline))
-    .slice(0, 3)
-    .map((z) => [`до ${z.name}`, `${Math.max(0, dayNum(z.deadline) - dayNum(picked))}д`]);
+    .slice(0, 2);
+  const cp = scoped.filter((t) => t.criticalPath);
+  const kpis: { label: string; value: string; tone?: "red" | "dark"; href?: string }[] = [
+    ...launches.map((z) => ({ label: `до ${z.emoji} ${z.name}`, value: `${diffDays(picked, z.deadline)} дн`, tone: "dark" as const })),
+    { label: "готовность", value: `${weightedDone(scoped)}%` },
+    { label: "critical path", value: `${weightedDone(cp)}%` },
+    { label: "просрочено", value: String(overdue.length), tone: overdue.length ? "red" : undefined },
+    { label: "заблокировано", value: String(blocked.length), tone: blocked.length ? "red" : undefined },
+    { label: "ждут проверки", value: String(toReview.length) },
+  ];
+
+  // Загрузка команды на неделе
+  const ws = weekStart(picked);
+  const we = addDays(ws, 6);
+  const load = people
+    .filter((u) => !assigneeId || u.id === assigneeId)
+    .map((u) => {
+      const mine = byZone.filter((t) => t.assigneeId === u.id && t.status !== "done");
+      return {
+        u,
+        week: mine.filter((t) => (t.startDate || t.due) <= we && t.due >= ws).length,
+        late: mine.filter((t) => t.due < picked).length,
+        blocked: mine.filter((t) => t.status === "blocked").length,
+        open: mine.length,
+      };
+    })
+    .sort((a, b) => b.week - a.week);
+  const maxWeek = Math.max(1, ...load.map((l) => l.week));
+
+  const projectList = (zone === "all" ? zones : zones.filter((z) => z.slug === zone)).filter(
+    (z) => !assigneeId || zoneTasks(z.slug, scoped).length > 0,
+  );
 
   return (
     <div className="space-y-4">
-      <div className="relative flex flex-col sm:flex-row sm:items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setCalOpen((v) => !v)}
-          className="pill bg-black text-white px-4 py-2 text-sm self-start"
-        >
-          {dateLabel}
-        </button>
-        <select className="pill bg-white border border-black/10 px-3 py-2 text-sm self-start" value={assignee} onChange={(e) => setAssignee(e.target.value)}>
-          <option value="all">Все исполнители</option>
-          {people.map((u) => (
-            <option key={u.id} value={u.id}>{u.name}</option>
-          ))}
-        </select>
+      {/* Фильтры + рассылка */}
+      <div className="flex flex-col lg:flex-row lg:items-start gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="date"
+            className="pill bg-black text-white px-3 py-2 text-sm [color-scheme:dark]"
+            value={picked}
+            onChange={(e) => e.target.value && setPicked(e.target.value)}
+          />
+          <select
+            className="pill bg-white border border-black/10 px-3 py-2 text-sm"
+            value={whoValue}
+            onChange={(e) => {
+              setWho(e.target.value);
+              remember({ who: e.target.value });
+            }}
+          >
+            {manager && <option value="all">Все исполнители</option>}
+            <option value="me">Мои задачи</option>
+            {manager && people.filter((u) => u.id !== current.id).map((u) => (
+              <option key={u.id} value={u.id}>{u.name}</option>
+            ))}
+          </select>
+          <select
+            className="pill bg-white border border-black/10 px-3 py-2 text-sm"
+            value={zone}
+            onChange={(e) => {
+              setZone(e.target.value);
+              remember({ zone: e.target.value });
+            }}
+          >
+            <option value="all">Все проекты</option>
+            {zones.map((z) => (
+              <option key={z.slug} value={z.slug}>{z.emoji} {z.name}</option>
+            ))}
+          </select>
+        </div>
         <div className="flex-1 rounded-2xl bg-[#f4f4f6] px-3 py-2 text-sm min-w-0">
           {msgEdit && canManagePeople(current) ? (
             <div>
               <div className="flex gap-1 mb-1 flex-wrap">
                 {EMOJIS.map((e) => (
-                  <button key={e} type="button" className={`text-lg ${msgEmoji===e?"scale-125":""}`} onClick={() => setMsgEmoji(e)}>{e}</button>
+                  <button key={e} type="button" className={`text-lg ${msgEmoji === e ? "scale-125" : ""}`} onClick={() => setMsgEmoji(e)}>{e}</button>
                 ))}
               </div>
-              <textarea className="w-full text-sm min-h-[64px]" maxLength={300} value={msg} onChange={(e)=>setMsg(e.target.value.slice(0,300))} />
+              <textarea className="w-full text-sm min-h-[64px]" maxLength={300} value={msg} onChange={(e) => setMsg(e.target.value.slice(0, 300))} />
               <div className="flex justify-between text-[11px] text-[#9a9aa0] mt-1">
                 <span>{msg.length}/300</span>
                 <span>
-                  <button type="button" className="mr-2" onClick={()=>setMsgEdit(false)}>Отмена</button>
-                  <button type="button" className="font-semibold text-black" onClick={()=>{ setBroadcast(msg, msgEmoji); setMsgEdit(false); }}>Сохранить</button>
+                  <button type="button" className="mr-2" onClick={() => setMsgEdit(false)}>Отмена</button>
+                  <button type="button" className="font-semibold text-black" onClick={() => { setBroadcast(msg, msgEmoji); setMsgEdit(false); }}>Сохранить</button>
                 </span>
               </div>
             </div>
@@ -111,149 +169,173 @@ export default function HomePage() {
               <span className="text-lg">{broadcast?.emoji || "💪"}</span>
               <p className="flex-1">{broadcast?.text || "Сегодня хороший день, чтобы закрыть одну задачу."}</p>
               {canManagePeople(current) && (
-                <button type="button" className="text-[11px] underline shrink-0" onClick={()=>{ setMsg(broadcast?.text||""); setMsgEmoji(broadcast?.emoji||"💪"); setMsgEdit(true); }}>Изменить</button>
+                <button type="button" className="text-[11px] underline shrink-0" onClick={() => { setMsg(broadcast?.text || ""); setMsgEmoji(broadcast?.emoji || "💪"); setMsgEdit(true); }}>Изменить</button>
               )}
             </div>
           )}
         </div>
-        {calOpen && (
-          <div className="absolute left-0 top-12 z-20 w-[min(20rem,100%)] bg-white rounded-2xl shadow-lg border border-black/5 p-4">
-            <div className="grid grid-cols-7 text-center text-[11px] text-[#9a9aa0] mb-2">
-              {["П", "В", "С", "Ч", "П", "С", "В"].map((d, i) => (
-                <div key={i}>{d}</div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 gap-y-1 text-center text-sm">
-              {cal.map((d, i) => {
-                if (!d) return <div key={`e${i}`} />;
-                const iso = `${prefix}-${String(d).padStart(2, "0")}`;
-                const on = iso === picked;
-                const has = dueDays.has(d);
-                const od = overdueDays.has(d);
-                return (
-                  <button
-                    key={d}
-                    type="button"
-                    onClick={() => {
-                      setPicked(iso);
-                      setCalOpen(false);
-                    }}
-                    className="mx-auto h-8 w-8 rounded-full"
-                    style={{
-                      background: on ? "#111" : od ? "#e86a4a" : has ? "#2bb673" : "transparent",
-                      color: on || od || has ? "#fff" : "#111",
-                    }}
-                  >
-                    {d}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </div>
 
-      {canManagePeople(current) && (
-        <section className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-          {[
-            ...launches,
-            ["critical path", `${cpPct}%`],
-            ["блок CP", String(blockedCp)],
-            ["просрочка / проверка", `${overdue2} / ${reviewOld}`],
-          ].map(([k, v]) => (
-            <div key={k} className="rounded-2xl bg-white border border-black/5 px-3 py-2">
-              <div className="text-[10px] text-[#9a9aa0]">{k}</div>
-              <div className="font-semibold text-sm">{v}</div>
-            </div>
-          ))}
-        </section>
-      )}
+      {/* Цифры */}
+      <section className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 gap-2">
+        {kpis.map((k) => (
+          <div
+            key={k.label}
+            className="rounded-2xl px-3 py-2 border border-black/5"
+            style={{ background: k.tone === "dark" ? "#111" : k.tone === "red" ? "#fee2e2" : "#fff", color: k.tone === "dark" ? "#fff" : k.tone === "red" ? "#991b1b" : undefined }}
+          >
+            <div className="text-[10px] opacity-70">{k.label}</div>
+            <div className="font-semibold text-lg leading-tight">{k.value}</div>
+          </div>
+        ))}
+      </section>
 
-      <section className="grid grid-cols-2 gap-3">
-        {zoneList.map((z) => {
-          const n = visible.filter((t) => taskZones(t).includes(z.slug)).length;
-          const p = zoneTaskProgress(z.slug, visible);
+      <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr] min-w-0">
+        {/* Сегодня */}
+        <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
+          <div className="flex items-baseline justify-between mb-2">
+            <h3 className="font-semibold">{picked === today ? "Сегодня" : formatDate(picked)}</h3>
+            <span className="text-xs text-[#9a9aa0]">{overdue.length + dueToday.length + inWork.length + toStart.length} задач</span>
+          </div>
+          <Group title="🔥 Просрочено" list={overdue} tail={(t) => `до ${shortDate(t.due)}`} red open={setPreviewId} users={users} />
+          <Group title="📌 Сдать сегодня" list={dueToday} tail={() => "сегодня"} open={setPreviewId} users={users} />
+          <Group title="▶️ В работе" list={inWork} tail={(t) => `до ${shortDate(t.due)}`} open={setPreviewId} users={users} />
+          <Group title="⏭ Пора начать" list={toStart} tail={(t) => `до ${shortDate(t.due)}`} open={setPreviewId} users={users} />
+          {!overdue.length && !dueToday.length && !inWork.length && !toStart.length && (
+            <p className="text-sm text-[#9a9aa0] py-4">На этот день открытых задач нет</p>
+          )}
+        </section>
+
+        {/* Важное */}
+        <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
+          <h3 className="font-semibold mb-2">Важное</h3>
+          <Group title="🎯 Critical path · 7 дней" list={critical} tail={(t) => `до ${shortDate(t.due)}`} open={setPreviewId} users={users} limit={6} />
+          <Group title="⛔ Заблокировано" list={blocked} tail={(t) => t.blockReason || "без причины"} red open={setPreviewId} users={users} limit={5} />
+          <Group title="🟣 Ждут проверки" list={toReview} tail={(t) => users.find((u) => u.id === t.assigneeId)?.name ?? ""} open={setPreviewId} users={users} limit={5} />
+          <Group title="✅ Можно начинать — зависимости закрыты" list={ready} tail={(t) => `с ${shortDate(t.startDate || t.due)}`} open={setPreviewId} users={users} limit={5} />
+          {!critical.length && !blocked.length && !toReview.length && !ready.length && (
+            <p className="text-sm text-[#9a9aa0] py-4">Ничего срочного</p>
+          )}
+        </section>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[1fr_1.3fr] min-w-0">
+        {/* Загрузка команды */}
+        {manager && load.length > 0 && (
+          <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
+            <div className="flex items-baseline justify-between mb-3">
+              <h3 className="font-semibold">Загрузка на неделе</h3>
+              <Link href="/week" className="text-xs underline text-[#6b6b70]">{shortDate(ws)}–{shortDate(we)} →</Link>
+            </div>
+            <div className="space-y-2.5">
+              {load.map(({ u, week, late, blocked: b, open: o }) => (
+                <div key={u.id} className="text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="h-6 w-6 rounded-full bg-[#f4f4f6] grid place-items-center text-[10px] font-semibold">{u.avatar}</span>
+                    <span className="flex-1">{u.name}</span>
+                    <span className="text-xs text-[#6b6b70]">{week} на неделе · {o} открыто</span>
+                    {late > 0 && <span className="pill bg-[#fee2e2] text-[#991b1b] text-[10px] px-2 py-0.5">🔥 {late}</span>}
+                    {b > 0 && <span className="pill bg-[#fee2e2] text-[#991b1b] text-[10px] px-2 py-0.5">⛔ {b}</span>}
+                  </div>
+                  <div className="h-1.5 rounded-full bg-[#f4f4f6] mt-1 ml-8 overflow-hidden">
+                    <div className="h-full rounded-full bg-black" style={{ width: `${(week / maxWeek) * 100}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Проекты */}
+        <section className={`grid gap-3 sm:grid-cols-2 ${manager && load.length > 0 ? "" : "xl:col-span-2 xl:grid-cols-5"}`}>
+          {projectList.map((z) => {
+            const list = zoneTasks(z.slug, assigneeId ? scoped : byZone);
+            const late = list.filter((t) => t.status !== "done" && t.due < picked).length;
+            const streams = streamProgress(list).filter((s) => s.total > 0);
+            return (
+              <Link key={z.slug} href={`/zones/${z.slug}`} className="rounded-2xl p-4 flex flex-col gap-2" style={{ background: z.color }}>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-sm font-semibold">{z.emoji} {z.name}</span>
+                  {z.slug !== "common" && z.deadline && (
+                    <span className="text-[11px] opacity-70 text-right">{formatDate(z.deadline)}<br />{Math.max(0, diffDays(picked, z.deadline))} дн</span>
+                  )}
+                </div>
+                <div className="flex items-end gap-2">
+                  <span className="text-3xl font-bold leading-none">{weightedDone(list)}%</span>
+                  <span className="text-[11px] opacity-70 pb-0.5">
+                    {list.filter((t) => t.status === "done").length}/{list.length}
+                    {late > 0 && <span className="text-[#991b1b] font-semibold"> · 🔥{late}</span>}
+                  </span>
+                </div>
+                <div className="grid grid-cols-7 gap-0.5" title="7 потоков">
+                  {streams.map((s) => (
+                    <div key={s.stream} className="h-1.5 rounded-full bg-white/60 overflow-hidden" title={`${s.stream}: ${s.pct}%`}>
+                      <div className="h-full bg-black/70" style={{ width: `${s.pct}%` }} />
+                    </div>
+                  ))}
+                </div>
+              </Link>
+            );
+          })}
+        </section>
+      </div>
+
+      <Roadmap tasks={scoped} zones={zones} today={today} onOpen={setPreviewId} />
+    </div>
+  );
+}
+
+function Group({
+  title,
+  list,
+  tail,
+  open,
+  users,
+  red,
+  limit = 12,
+}: {
+  title: string;
+  list: Task[];
+  tail: (t: Task) => string;
+  open: (id: string) => void;
+  users: { id: string; avatar: string; name: string }[];
+  red?: boolean;
+  limit?: number;
+}) {
+  const [all, setAll] = useState(false);
+  if (!list.length) return null;
+  const shown = all ? list : list.slice(0, limit);
+  return (
+    <div className="mb-3">
+      <div className="text-xs text-[#6b6b70] mb-1">{title} · {list.length}</div>
+      <div className="space-y-1">
+        {shown.map((t) => {
+          const a = users.find((u) => u.id === t.assigneeId);
           return (
-            <Link
-              key={z.slug}
-              href={`/kanban?zone=${z.slug}`}
-              className="rounded-2xl p-4 min-h-[110px] flex flex-col"
-              style={{ background: z.color }}
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => open(t.id)}
+              className="w-full text-left rounded-xl px-3 py-1.5 text-sm flex items-center gap-2"
+              style={{ background: red ? "#fee2e2" : "#f4f4f6" }}
             >
-              <div className="text-sm font-semibold">
-                {z.emoji} {z.name}
-              </div>
-              <div className="text-2xl font-bold mt-auto">{p}%</div>
-              <div className="text-[11px] opacity-70">{n} задач</div>
-            </Link>
+              <span className="shrink-0 w-4 text-center">{red ? <Flame size={13} className="text-[#e86a4a] inline" /> : statusMeta[t.status].emoji || "⚪"}</span>
+              <span className="hidden sm:inline text-[11px] text-[#9a9aa0] w-14 shrink-0">{t.code}</span>
+              <span className="flex-1 min-w-0 truncate">
+                {t.title}
+                {t.criticalPath && <span className="text-[#b91c1c] text-[10px]"> ●</span>}
+              </span>
+              <span className="text-[11px] text-[#6b6b70] shrink-0 max-w-[35%] truncate">{tail(t)}</span>
+              <span className="h-5 w-5 rounded-full bg-white grid place-items-center text-[9px] font-semibold shrink-0" title={a?.name}>{a?.avatar}</span>
+            </button>
           );
         })}
-      </section>
-
-      <section className="bg-white rounded-2xl p-4 border border-black/5">
-        <h3 className="font-semibold mb-2 text-sm">Прогресс проектов</h3>
-        <FitnessRings zones={zoneList} tasks={visible} />
-      </section>
-
-      <section>
-        <div className="flex justify-between items-center mb-2 px-1">
-          <h3 className="font-semibold">Задачи на {dateLabel}</h3>
-          <span className="text-xs text-[#9a9aa0]">{dayTasks.length}</span>
-        </div>
-        <div className="flex gap-3 overflow-x-auto snap-x pb-2 -mx-1 px-1">
-          {dayTasks.length === 0 && (
-            <p className="text-sm text-[#9a9aa0] py-6">На эту дату открытых задач нет</p>
-          )}
-          {dayTasks.map((t) => (
-            <div key={t.id} className="min-w-[78%] max-w-[78%] sm:min-w-[280px] snap-center shrink-0">
-              <TaskCard task={t} users={users} zones={zones} />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-white rounded-2xl p-4 border border-black/5">
-        <h3 className="font-semibold mb-2">Roadmap</h3>
-        <div className="overflow-auto max-h-[360px] border border-black/5 rounded-xl">
-          <div className="relative" style={{ width: width + 140, height: 24 + roadmapTasks.length * rowH }}>
-            <div className="sticky top-0 z-10 bg-white/90 h-6 flex text-[10px] text-[#9a9aa0]">
-              <div className="w-[120px] shrink-0" />
-              {Array.from({ length: Math.ceil(span / 7) }, (_, i) => {
-                const d = new Date((dayNum(minD) + i * 7) * 86400000);
-                return (
-                  <div key={i} className="shrink-0" style={{ width: 7 * dayW }}>
-                    {formatDate(d.toISOString().slice(0, 10)).slice(0, 5)}
-                  </div>
-                );
-              })}
-            </div>
-            {todayX >= 0 && todayX <= width && (
-              <div className="absolute top-6 bottom-0 w-px bg-[#e86a4a] z-[1]" style={{ left: 120 + todayX }} />
-            )}
-            {roadmapTasks.map((t, i) => {
-              const x = (dayNum(t.startDate || t.due) - dayNum(minD)) * dayW;
-              const w = Math.max(40, (dayNum(t.due) - dayNum(t.startDate || t.due) + 1) * dayW);
-              return (
-                <div
-                  key={t.id}
-                  className="absolute flex items-center"
-                  style={{ top: 24 + i * rowH, left: 0, width: width + 140, height: rowH }}
-                >
-                  <div className="w-[120px] shrink-0 px-1 text-[10px] truncate text-[#666]">{t.code}</div>
-                  <button
-                    type="button"
-                    onClick={() => setPreviewId(t.id)}
-                    className="h-6 rounded-full px-2 text-[10px] font-medium text-[#111] truncate text-left"
-                    style={{ marginLeft: Math.max(0, x), width: w, background: barColor(t) }}
-                  >
-                    {t.title}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      </div>
+      {list.length > limit && (
+        <button type="button" className="text-[11px] underline text-[#6b6b70] mt-1" onClick={() => setAll(!all)}>
+          {all ? "свернуть" : `ещё ${list.length - limit}`}
+        </button>
+      )}
     </div>
   );
 }
