@@ -1,10 +1,43 @@
 import { randomBytes } from "node:crypto";
-import { get, put } from "@vercel/blob";
+import { get as blobGet, put as blobPut } from "@vercel/blob";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import type { AppState } from "./types";
 import { normalizeState } from "./normalize";
 import { seed } from "./seed";
 
 const KEY = "crmx/state.json";
+
+/** Локальная разработка без Vercel Blob: те же ключи, но в файлах web/.local-store/. */
+const LOCAL = !process.env.VERCEL && !process.env.BLOB_READ_WRITE_TOKEN && !process.env.BLOB_STORE_ID;
+const localPath = (key: string) => join(process.cwd(), ".local-store", key);
+
+type GetOptions = Parameters<typeof blobGet>[1];
+type PutOptions = Parameters<typeof blobPut>[2];
+
+async function get(key: string, options: GetOptions) {
+  if (!LOCAL) return blobGet(key, options);
+  try {
+    return { stream: new Blob([readFileSync(localPath(key))]).stream() };
+  } catch {
+    return null;
+  }
+}
+
+async function put(key: string, body: string, options: PutOptions) {
+  if (!LOCAL) return blobPut(key, body, options);
+  const file = localPath(key);
+  if (options?.allowOverwrite === false) {
+    try {
+      readFileSync(file);
+      throw new Error("exists");
+    } catch (e) {
+      if (e instanceof Error && e.message === "exists") throw e;
+    }
+  }
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, body);
+}
 
 export function blobConfigured() {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID || process.env.VERCEL);
