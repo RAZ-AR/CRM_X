@@ -77,7 +77,7 @@ export function Roadmap({
   const tickEvery = scale === "week" ? 1 : scale === "month" ? 7 : scale === "quarter" ? 14 : 28;
 
   return (
-    <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
+    <section className="bg-white rounded-2xl p-3 sm:p-4 border border-black/5 min-w-0">
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <h3 className="font-semibold mr-auto">Roadmap</h3>
         <div className="flex rounded-full bg-[#f4f4f6] p-0.5 text-xs">
@@ -110,7 +110,7 @@ export function Roadmap({
         </label>
       </div>
 
-      <div className="overflow-auto max-h-[420px] border border-black/5 rounded-xl">
+      <div className="overflow-auto max-h-[280px] sm:max-h-[420px] border border-black/5 rounded-xl">
         <div className="relative" style={{ width: width + LABEL_W, height: 26 + Math.max(1, rows.length) * ROW_H }}>
           <div className="sticky top-0 z-[3] flex h-6 bg-white border-b border-black/5 text-[10px] text-[#9a9aa0]">
             <div className="sticky left-0 z-[4] bg-white shrink-0" style={{ width: LABEL_W }} />

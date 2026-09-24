@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
-import { canManagePeople, canSeeTask, canWorkTask, isCpo, subordinateIds, taskZones } from "@/lib/access";
+import { canManagePeople, canWorkTask, isCpo } from "@/lib/access";
 import { StatusPicker } from "@/components/StatusIcon";
-import { openDeps } from "@/lib/taskRules";
+import { HOME_VIEWS, homeLists, scopeTasks, type HomeView } from "@/lib/homeLists";
 import { streamProgress, weightedDone, zoneTasks } from "@/lib/readiness";
 import { addDays, diffDays, formatDate, shortDate, todayYerevan, weekStart } from "@/lib/dates";
 import { EMOJIS } from "@/lib/emoji";
@@ -56,31 +56,12 @@ export default function HomePage() {
   if (!current) return null;
 
   const owner = isCpo(current);
-  const manager = owner || subordinateIds(current.id, users).length > 0;
-  // Сотрудник без подчинённых всегда видит только свои задачи.
-  const whoValue = manager ? who || "all" : "me";
-  const seen = tasks.filter((t) => canSeeTask(current, t, users));
+  const { seen, byZone, scoped, manager, whoValue, assigneeId } = scopeTasks(tasks, current, users, who, zone);
   const people = users.filter((u) => seen.some((t) => t.assigneeId === u.id));
-  const byZone = zone === "all" ? seen : seen.filter((t) => taskZones(t).includes(zone));
-  const assigneeId = whoValue === "me" ? current.id : whoValue === "all" ? null : whoValue;
-  const scoped = assigneeId ? byZone.filter((t) => t.assigneeId === assigneeId) : byZone;
-  const open = scoped.filter((t) => t.status !== "done");
-
-  // Сегодня
-  const started = (t: Task) => (t.startDate || t.due) <= picked;
-  const overdue = open.filter((t) => t.due < picked).sort((a, b) => a.due.localeCompare(b.due));
-  const dueToday = open.filter((t) => t.due === picked);
-  const inWork = open.filter((t) => t.status === "in_progress" && started(t) && t.due > picked);
-  const toStart = open.filter((t) => t.status === "todo" && started(t) && t.due > picked);
-
-  // Важное
-  const horizon = addDays(picked, 7);
-  const critical = open.filter((t) => t.criticalPath && t.due <= horizon).sort((a, b) => a.due.localeCompare(b.due));
-  const blocked = open.filter((t) => t.status === "blocked");
-  const toReview = scoped.filter((t) => t.status === "review" && (owner || t.authorId === current.id));
-  const ready = open
-    .filter((t) => t.status === "todo" && (t.startDate || t.due) <= addDays(picked, 3) && (t.dependsOn?.length ?? 0) > 0 && !openDeps(t, tasks).length)
-    .sort((a, b) => (a.startDate || a.due).localeCompare(b.startDate || b.due));
+  const L = homeLists(scoped, tasks, picked, { id: current.id, owner });
+  const { overdue, today: dueToday, work: inWork, start: toStart, critical, blocked, review: toReview, ready } = L;
+  // «Все N →» открывает полный список с теми же фильтрами.
+  const more = (view: HomeView) => `/tasks?${new URLSearchParams({ view, who: whoValue, zone, date: picked })}`;
 
   // Цифры
   const launches = zones
@@ -131,15 +112,15 @@ export default function HomePage() {
     <div className="space-y-4">
       {/* Фильтры + рассылка */}
       <div className="flex flex-col lg:flex-row lg:items-start gap-2">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-1.5 sm:gap-2">
           <input
             type="date"
-            className="pill bg-black text-white px-3 py-2 text-sm [color-scheme:dark]"
+            className="pill bg-black text-white !px-2 sm:!px-3 !py-2 !text-xs sm:!text-sm [color-scheme:dark] min-w-0 w-full sm:w-auto"
             value={picked}
             onChange={(e) => e.target.value && setPicked(e.target.value)}
           />
           <select
-            className="pill bg-white border border-black/10 px-3 py-2 text-sm"
+            className="pill bg-white border border-black/10 !px-2 sm:!px-3 !py-2 !text-xs sm:!text-sm min-w-0 w-full sm:w-auto"
             value={whoValue}
             onChange={(e) => {
               setWho(e.target.value);
@@ -153,7 +134,7 @@ export default function HomePage() {
             ))}
           </select>
           <select
-            className="pill bg-white border border-black/10 px-3 py-2 text-sm"
+            className="pill bg-white border border-black/10 !px-2 sm:!px-3 !py-2 !text-xs sm:!text-sm min-w-0 w-full sm:w-auto"
             value={zone}
             onChange={(e) => {
               setZone(e.target.value);
@@ -196,90 +177,58 @@ export default function HomePage() {
       </div>
 
       {/* Цифры */}
-      <section className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 gap-2">
+      <section className="grid grid-cols-4 xl:grid-cols-7 gap-1.5 sm:gap-2">
         {kpis.map((k) => (
           <div
             key={k.label}
-            className="rounded-2xl px-3 py-2 border border-black/5"
+            className="rounded-xl sm:rounded-2xl px-2.5 sm:px-3 py-1.5 sm:py-2 border border-black/5 min-w-0"
             style={{ background: k.tone === "dark" ? "#111" : k.tone === "red" ? "#fee2e2" : "#fff", color: k.tone === "dark" ? "#fff" : k.tone === "red" ? "#991b1b" : undefined }}
           >
-            <div className="text-[10px] opacity-70">{k.label}</div>
-            <div className="font-semibold text-lg leading-tight">{k.value}</div>
+            <div className="text-[10px] opacity-70 truncate">{k.label}</div>
+            <div className="font-semibold text-base sm:text-lg leading-tight">{k.value}</div>
           </div>
         ))}
       </section>
 
-      <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr] min-w-0">
-        {/* Сегодня */}
-        <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
-          <div className="flex items-baseline justify-between mb-2">
-            <h3 className="font-semibold">{picked === today ? "Сегодня" : formatDate(picked)}</h3>
-            <span className="text-xs text-[#9a9aa0]">{overdue.length + dueToday.length + inWork.length + toStart.length} задач</span>
-          </div>
-          <Group title="🔥 Просрочено" list={overdue} tail={(t) => `до ${shortDate(t.due)}`} red open={setPreviewId} users={users} />
-          <Group title="📌 Сдать сегодня" list={dueToday} tail={() => "сегодня"} open={setPreviewId} users={users} />
-          <Group title="▶️ В работе" list={inWork} tail={(t) => `до ${shortDate(t.due)}`} open={setPreviewId} users={users} />
-          <Group title="⏭ Пора начать" list={toStart} tail={(t) => `до ${shortDate(t.due)}`} open={setPreviewId} users={users} />
-          {!overdue.length && !dueToday.length && !inWork.length && !toStart.length && (
-            <p className="text-sm text-[#9a9aa0] py-4">На этот день открытых задач нет</p>
-          )}
+      {/* Проекты: плитка, на телефоне по две в ряд */}
+        <section className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {projectList.map((z) => {
+            const list = zoneTasks(z.slug, assigneeId ? scoped : byZone);
+            const late = list.filter((t) => t.status !== "done" && t.due < picked).length;
+            const streams = streamProgress(list).filter((s) => s.total > 0);
+            return (
+              <Link key={z.slug} href={`/zones/${z.slug}`} className="rounded-2xl p-3 sm:p-4 flex flex-col gap-1.5 sm:gap-2 min-w-0" style={{ background: z.color }}>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-xs sm:text-sm font-semibold truncate">{z.emoji} {z.name}</span>
+                  {z.slug !== "common" && z.deadline && (
+                    <span className="text-[10px] sm:text-[11px] opacity-70 text-right shrink-0">{shortDate(z.deadline)}<br />{Math.max(0, diffDays(picked, z.deadline))} дн</span>
+                  )}
+                </div>
+                <div className="flex items-end gap-2">
+                  <span className="text-2xl sm:text-3xl font-bold leading-none">{weightedDone(list)}%</span>
+                  <span className="text-[11px] opacity-70 pb-0.5">
+                    {list.filter((t) => t.status === "done").length}/{list.length}
+                    {late > 0 && <span className="text-[#991b1b] font-semibold"> · 🔥{late}</span>}
+                  </span>
+                </div>
+                <div className="grid grid-cols-7 gap-0.5" title="7 потоков">
+                  {streams.map((s) => (
+                    <div key={s.stream} className="h-1.5 rounded-full bg-white/60 overflow-hidden" title={`${s.stream}: ${s.pct}%`}>
+                      <div className="h-full bg-black/70" style={{ width: `${s.pct}%` }} />
+                    </div>
+                  ))}
+                </div>
+              </Link>
+            );
+          })}
         </section>
 
-        {/* Важное */}
-        <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
-          <h3 className="font-semibold mb-2">Важное</h3>
-          <Group title="🎯 Critical path · 7 дней" list={critical} tail={(t) => `до ${shortDate(t.due)}`} open={setPreviewId} users={users} limit={6} />
-          <Group title="⛔ Заблокировано" list={blocked} tail={(t) => t.blockReason || "без причины"} red open={setPreviewId} users={users} limit={5} />
-          <Group title="🟣 Ждут проверки" list={toReview} tail={(t) => users.find((u) => u.id === t.assigneeId)?.name ?? ""} open={setPreviewId} users={users} limit={5} />
-          <Group title="✅ Можно начинать — зависимости закрыты" list={ready} tail={(t) => `с ${shortDate(t.startDate || t.due)}`} open={setPreviewId} users={users} limit={5} />
-          {!critical.length && !blocked.length && !toReview.length && !ready.length && (
-            <p className="text-sm text-[#9a9aa0] py-4">Ничего срочного</p>
-          )}
-        </section>
-      </div>
+      <Roadmap tasks={scoped} zones={zones} today={today} onOpen={setPreviewId} />
 
-      <RisksAndMoney
-        risks={topRisks(risks.filter((r) => zone === "all" || r.zone === zone))}
-        users={users}
-        finance={canSeeFinance(current) ? { budget, expenses, fx: fx ?? DEFAULT_FX, zone, today } : null}
-      />
-
-      <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr] min-w-0">
-        <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold">Что изменилось</h3>
-            <div className="flex rounded-full bg-[#f4f4f6] p-0.5 text-xs">
-              {[
-                [1, "24 ч"],
-                [7, "7 дней"],
-              ].map(([d, l]) => (
-                <button key={d} type="button" onClick={() => { setChangesDays(Number(d)); setNow(Date.now()); }} className={`rounded-full px-3 py-1 ${changesDays === d ? "bg-black text-white" : "text-[#6b6b70]"}`}>
-                  {l}
-                </button>
-              ))}
-            </div>
-          </div>
-          <Changes list={changes} users={users} open={setPreviewId} />
-        </section>
-        {manager && (
-          <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
-            <div className="flex items-baseline justify-between mb-2">
-              <h3 className="font-semibold">Проверить данные</h3>
-              <span className="text-xs text-[#9a9aa0]">{issues.length} задач</span>
-            </div>
-            {issues.length === 0 ? (
-              <p className="text-sm text-[#9a9aa0] py-4">Все открытые задачи заполнены</p>
-            ) : (
-              <IssueList issues={issues} open={setPreviewId} />
-            )}
-          </section>
-        )}
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-[1fr_1.3fr] min-w-0">
+      <div className={`grid gap-4 min-w-0 ${manager && load.length > 0 ? "xl:grid-cols-[1fr_1.3fr]" : ""}`}>
         {/* Загрузка команды */}
         {manager && load.length > 0 && (
-          <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
+          <section className="bg-white rounded-2xl p-3 sm:p-4 border border-black/5 min-w-0">
             <div className="flex items-baseline justify-between mb-3">
               <h3 className="font-semibold">Загрузка на неделе</h3>
               <Link href="/week" className="text-xs underline text-[#6b6b70]">{shortDate(ws)}–{shortDate(we)} →</Link>
@@ -302,56 +251,90 @@ export default function HomePage() {
             </div>
           </section>
         )}
+        <RisksAndMoney
+          risks={topRisks(risks.filter((r) => zone === "all" || r.zone === zone))}
+          users={users}
+          finance={canSeeFinance(current) ? { budget, expenses, fx: fx ?? DEFAULT_FX, zone, today } : null}
+        />
+      </div>
 
-        {/* Проекты */}
-        <section className={`grid gap-3 sm:grid-cols-2 ${manager && load.length > 0 ? "" : "xl:col-span-2 xl:grid-cols-5"}`}>
-          {projectList.map((z) => {
-            const list = zoneTasks(z.slug, assigneeId ? scoped : byZone);
-            const late = list.filter((t) => t.status !== "done" && t.due < picked).length;
-            const streams = streamProgress(list).filter((s) => s.total > 0);
-            return (
-              <Link key={z.slug} href={`/zones/${z.slug}`} className="rounded-2xl p-4 flex flex-col gap-2" style={{ background: z.color }}>
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-sm font-semibold">{z.emoji} {z.name}</span>
-                  {z.slug !== "common" && z.deadline && (
-                    <span className="text-[11px] opacity-70 text-right">{formatDate(z.deadline)}<br />{Math.max(0, diffDays(picked, z.deadline))} дн</span>
-                  )}
-                </div>
-                <div className="flex items-end gap-2">
-                  <span className="text-3xl font-bold leading-none">{weightedDone(list)}%</span>
-                  <span className="text-[11px] opacity-70 pb-0.5">
-                    {list.filter((t) => t.status === "done").length}/{list.length}
-                    {late > 0 && <span className="text-[#991b1b] font-semibold"> · 🔥{late}</span>}
-                  </span>
-                </div>
-                <div className="grid grid-cols-7 gap-0.5" title="7 потоков">
-                  {streams.map((s) => (
-                    <div key={s.stream} className="h-1.5 rounded-full bg-white/60 overflow-hidden" title={`${s.stream}: ${s.pct}%`}>
-                      <div className="h-full bg-black/70" style={{ width: `${s.pct}%` }} />
-                    </div>
-                  ))}
-                </div>
-              </Link>
-            );
-          })}
+      <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr] min-w-0">
+        {/* Сегодня */}
+        <section className="bg-white rounded-2xl p-3 sm:p-4 border border-black/5 min-w-0">
+          <div className="flex items-baseline justify-between mb-2">
+            <h3 className="font-semibold">{picked === today ? "Сегодня" : formatDate(picked)}</h3>
+            <span className="text-xs text-[#9a9aa0]">{overdue.length + dueToday.length + inWork.length + toStart.length} задач</span>
+          </div>
+          <Group view="overdue" list={overdue} tail={(t) => `до ${shortDate(t.due)}`} red open={setPreviewId} users={users} href={more} />
+          <Group view="today" list={dueToday} tail={() => "сегодня"} open={setPreviewId} users={users} href={more} />
+          <Group view="work" list={inWork} tail={(t) => `до ${shortDate(t.due)}`} open={setPreviewId} users={users} href={more} />
+          <Group view="start" list={toStart} tail={(t) => `до ${shortDate(t.due)}`} open={setPreviewId} users={users} href={more} />
+          {!overdue.length && !dueToday.length && !inWork.length && !toStart.length && (
+            <p className="text-sm text-[#9a9aa0] py-4">На этот день открытых задач нет</p>
+          )}
+        </section>
+
+        {/* Важное */}
+        <section className="bg-white rounded-2xl p-3 sm:p-4 border border-black/5 min-w-0">
+          <h3 className="font-semibold mb-2">Важное</h3>
+          <Group view="critical" list={critical} tail={(t) => `до ${shortDate(t.due)}`} open={setPreviewId} users={users} href={more} />
+          <Group view="blocked" list={blocked} tail={(t) => t.blockReason || "без причины"} red open={setPreviewId} users={users} href={more} />
+          <Group view="review" list={toReview} tail={(t) => users.find((u) => u.id === t.assigneeId)?.name ?? ""} open={setPreviewId} users={users} href={more} />
+          <Group view="ready" list={ready} tail={(t) => `с ${shortDate(t.startDate || t.due)}`} open={setPreviewId} users={users} href={more} />
+          {!critical.length && !blocked.length && !toReview.length && !ready.length && (
+            <p className="text-sm text-[#9a9aa0] py-4">Ничего срочного</p>
+          )}
         </section>
       </div>
 
-      <Roadmap tasks={scoped} zones={zones} today={today} onOpen={setPreviewId} />
+      <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr] min-w-0">
+        <section className="bg-white rounded-2xl p-3 sm:p-4 border border-black/5 min-w-0">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold">Что изменилось</h3>
+            <div className="flex rounded-full bg-[#f4f4f6] p-0.5 text-xs">
+              {[
+                [1, "24 ч"],
+                [7, "7 дней"],
+              ].map(([d, l]) => (
+                <button key={d} type="button" onClick={() => { setChangesDays(Number(d)); setNow(Date.now()); }} className={`rounded-full px-3 py-1 ${changesDays === d ? "bg-black text-white" : "text-[#6b6b70]"}`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+          <Changes list={changes} users={users} open={setPreviewId} />
+        </section>
+        {manager && (
+          <section className="bg-white rounded-2xl p-3 sm:p-4 border border-black/5 min-w-0">
+            <div className="flex items-baseline justify-between mb-2">
+              <h3 className="font-semibold">Проверить данные</h3>
+              <span className="text-xs text-[#9a9aa0]">{issues.length} задач</span>
+            </div>
+            {issues.length === 0 ? (
+              <p className="text-sm text-[#9a9aa0] py-4">Все открытые задачи заполнены</p>
+            ) : (
+              <IssueList issues={issues} open={setPreviewId} />
+            )}
+          </section>
+        )}
+      </div>
+
     </div>
   );
 }
 
 function Group({
-  title,
+  view,
   list,
   tail,
   open,
   users,
   red,
-  limit = 12,
+  href,
+  limit = 5,
 }: {
-  title: string;
+  view: HomeView;
+  href: (view: HomeView) => string;
   list: Task[];
   tail: (t: Task) => string;
   open: (id: string) => void;
@@ -360,16 +343,15 @@ function Group({
   limit?: number;
 }) {
   const { current, updateTask } = useStore();
-  const [all, setAll] = useState(false);
   const canWork = (t: Task) => Boolean(current && canWorkTask(current, t));
   // Выход из блока через меню — как «Снять блок» в карточке: причина и срок очищаются.
   const setStatus = (t: Task, status: Task["status"]) =>
     updateTask(t.id, t.status === "blocked" ? { status, blockReason: "", blockUntil: "" } : { status });
   if (!list.length) return null;
-  const shown = all ? list : list.slice(0, limit);
+  const shown = list.slice(0, limit);
   return (
     <div className="mb-3">
-      <div className="text-xs text-[#6b6b70] mb-1">{title} · {list.length}</div>
+      <div className="text-xs text-[#6b6b70] mb-1">{HOME_VIEWS[view]} · {list.length}</div>
       <div className="space-y-1">
         {shown.map((t) => {
           const a = users.find((u) => u.id === t.assigneeId);
@@ -406,9 +388,9 @@ function Group({
         })}
       </div>
       {list.length > limit && (
-        <button type="button" className="text-[11px] underline text-[#6b6b70] mt-1" onClick={() => setAll(!all)}>
-          {all ? "свернуть" : `ещё ${list.length - limit}`}
-        </button>
+        <Link href={href(view)} className="inline-block text-[11px] underline text-[#6b6b70] mt-1">
+          все {list.length} →
+        </Link>
       )}
     </div>
   );
@@ -487,8 +469,8 @@ function RisksAndMoney({
   const sum = finance ? totals(finance.budget, finance.expenses, "AMD", finance.fx, inZone) : null;
   const due = finance ? upcomingPayments(finance.expenses.filter(inZone), finance.today, 7) : [];
   return (
-    <div className={`grid gap-4 min-w-0 ${finance ? "xl:grid-cols-[1.3fr_1fr]" : ""}`}>
-      <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
+    <div className="grid gap-4 min-w-0 content-start">
+      <section className="bg-white rounded-2xl p-3 sm:p-4 border border-black/5 min-w-0">
         <div className="flex items-baseline justify-between mb-2">
           <h3 className="font-semibold">Главные риски</h3>
           <Link href="/risks" className="text-xs underline text-[#6b6b70]">все риски →</Link>
@@ -514,7 +496,7 @@ function RisksAndMoney({
         )}
       </section>
       {finance && sum && (
-        <section className="bg-white rounded-2xl p-4 border border-black/5 min-w-0">
+        <section className="bg-white rounded-2xl p-3 sm:p-4 border border-black/5 min-w-0">
           <div className="flex items-baseline justify-between mb-2">
             <h3 className="font-semibold">Деньги</h3>
             <Link href="/money" className="text-xs underline text-[#6b6b70]">подробно →</Link>
