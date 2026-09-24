@@ -19,9 +19,12 @@ export default function HomePage() {
   const { current, tasks, zones, users, setPreviewId, broadcast, setBroadcast } = useStore();
   const today = todayYerevan();
   const [picked, setPicked] = useState(today);
+  // Фильтры храним отдельно для каждого пользователя: один браузер может быть общим.
+  const filterKey = `${FILTER_KEY}:${current?.id ?? ""}`;
   const [saved] = useState(() => {
+    if (typeof window === "undefined") return {};
     try {
-      return (JSON.parse(localStorage.getItem(FILTER_KEY) || "null") ?? {}) as { who?: string; zone?: string };
+      return (JSON.parse(localStorage.getItem(filterKey) || "null") ?? {}) as { who?: string; zone?: string };
     } catch {
       return {};
     }
@@ -34,7 +37,7 @@ export default function HomePage() {
 
   const remember = (next: { who?: string; zone?: string }) => {
     try {
-      localStorage.setItem(FILTER_KEY, JSON.stringify({ who, zone, ...next }));
+      localStorage.setItem(filterKey, JSON.stringify({ who, zone, ...next }));
     } catch {
       /* ignore */
     }
@@ -43,7 +46,8 @@ export default function HomePage() {
 
   const owner = isCpo(current);
   const manager = owner || subordinateIds(current.id, users).length > 0;
-  const whoValue = who || (manager ? "all" : "me");
+  // Сотрудник без подчинённых всегда видит только свои задачи.
+  const whoValue = manager ? who || "all" : "me";
   const seen = tasks.filter((t) => canSeeTask(current, t, users));
   const people = users.filter((u) => seen.some((t) => t.assigneeId === u.id));
   const byZone = zone === "all" ? seen : seen.filter((t) => taskZones(t).includes(zone));
@@ -62,7 +66,7 @@ export default function HomePage() {
   const horizon = addDays(picked, 7);
   const critical = open.filter((t) => t.criticalPath && t.due <= horizon).sort((a, b) => a.due.localeCompare(b.due));
   const blocked = open.filter((t) => t.status === "blocked");
-  const toReview = byZone.filter((t) => t.status === "review" && (owner || t.authorId === current.id));
+  const toReview = scoped.filter((t) => t.status === "review" && (owner || t.authorId === current.id));
   const ready = open
     .filter((t) => t.status === "todo" && (t.startDate || t.due) <= addDays(picked, 3) && (t.dependsOn?.length ?? 0) > 0 && !openDeps(t, tasks).length)
     .sort((a, b) => (a.startDate || a.due).localeCompare(b.startDate || b.due));

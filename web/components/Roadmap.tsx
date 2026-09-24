@@ -31,6 +31,7 @@ export function Roadmap({
   onOpen: (id: string) => void;
 }) {
   const [scale, setScale] = useState<Scale>(() => {
+    if (typeof window === "undefined") return "week";
     try {
       const saved = localStorage.getItem(KEY) as Scale | null;
       return saved && SCALES.some((s) => s.id === saved) ? saved : "week";
