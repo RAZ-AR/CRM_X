@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { sessionUser } from "@/lib/session";
 import { canDeleteTask, canEditTask, canSeeContact, canWorkTask } from "@/lib/access";
 import { canMoveStatus } from "@/lib/taskRules";
-import { loadSharedState, saveSharedState } from "@/lib/blobState";
-import type { Task } from "@/lib/types";
+import { updateSharedState } from "@/lib/blobState";
+import type { Task, User } from "@/lib/types";
 import { deleted, taskChanges, withActivity } from "@/lib/activity";
 import { statusMeta } from "@/lib/access";
 import { appUrlFrom, escapeHtml, sendTo, taskLink } from "@/lib/telegram";
@@ -11,51 +11,66 @@ import { shortDate } from "@/lib/dates";
 
 const WORK = ["status", "result", "blockReason", "blockUntil", "blockFromStatus", "attachments", "contactIds"] as const;
 
+type Fail = { error: string; status: number };
+type Patched = { prev: Task; task: Task; nextPatch: Partial<Task>; users: User[] };
+
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const user = await sessionUser();
   if (!user) return NextResponse.json({ ok: false, auth: true }, { status: 401 });
   const { id } = await ctx.params;
   const patch = (await req.json()) as Partial<Task>;
-  const { state } = await loadSharedState();
-  const prev = state.tasks.find((t) => t.id === id);
-  if (!prev) return NextResponse.json({ ok: false, error: "Нет задачи" }, { status: 404 });
-  const edit = canEditTask(user, prev);
-  const work = canWorkTask(user, prev);
-  if (!work && !edit) return NextResponse.json({ ok: false, error: "Нет доступа" }, { status: 403 });
-
   if ("contactIds" in patch) {
     const ids = patch.contactIds;
     if (!Array.isArray(ids) || !ids.every((x) => typeof x === "string")) {
       return NextResponse.json({ ok: false, error: "contactIds должен быть списком" }, { status: 400 });
     }
-    // Привязать можно только существующих и видимых этому пользователю контрагентов;
-    // уже привязанные, но скрытые от него — сохраняем как есть.
-    const visible = new Set(state.contacts.filter((c) => canSeeContact(user, c)).map((c) => c.id));
-    const hidden = (prev.contactIds ?? []).filter((id) => !visible.has(id));
-    patch.contactIds = [...new Set([...ids.filter((id) => visible.has(id)), ...hidden])];
   }
 
-  const nextPatch: Partial<Task> = {};
-  for (const [k, v] of Object.entries(patch)) {
-    if (v === undefined) continue;
-    if (edit || (work && (WORK as readonly string[]).includes(k))) {
-      (nextPatch as Record<string, unknown>)[k] = v;
+  // Проверки и изменение — на свежих данных внутри атомарного обновления.
+  const out = await updateSharedState<{ fail?: Fail; ok?: Patched }>((state) => {
+    const prev = state.tasks.find((t) => t.id === id);
+    if (!prev) return { result: { fail: { error: "Нет задачи", status: 404 } } };
+    const edit = canEditTask(user, prev);
+    const work = canWorkTask(user, prev);
+    if (!work && !edit) return { result: { fail: { error: "Нет доступа", status: 403 } } };
+
+    const request: Partial<Task> = { ...patch };
+    if (request.contactIds) {
+      // Привязать можно только существующих и видимых этому пользователю контрагентов;
+      // уже привязанные, но скрытые от него — сохраняем как есть.
+      const visible = new Set(state.contacts.filter((c) => canSeeContact(user, c)).map((c) => c.id));
+      const hidden = (prev.contactIds ?? []).filter((cid) => !visible.has(cid));
+      request.contactIds = [...new Set([...request.contactIds.filter((cid) => visible.has(cid)), ...hidden])];
     }
-  }
-  if (nextPatch.status && nextPatch.status !== prev.status) {
-    const check = canMoveStatus(prev, nextPatch.status, state.tasks, user, {
-      result: nextPatch.result,
-      blockReason: nextPatch.blockReason,
-      blockUntil: nextPatch.blockUntil,
-    });
-    if (!check.ok) return NextResponse.json({ ok: false, error: check.error }, { status: 400 });
-  }
-  const tasks = state.tasks.map((t) => (t.id === id ? { ...t, ...nextPatch } : t));
-  const task = tasks.find((t) => t.id === id)!;
-  await saveSharedState(withActivity({ ...state, tasks }, taskChanges(user, prev, task, state.users)));
+    const nextPatch: Partial<Task> = {};
+    for (const [k, v] of Object.entries(request)) {
+      if (v === undefined) continue;
+      if (edit || (work && (WORK as readonly string[]).includes(k))) {
+        (nextPatch as Record<string, unknown>)[k] = v;
+      }
+    }
+    if (nextPatch.status && nextPatch.status !== prev.status) {
+      const check = canMoveStatus(prev, nextPatch.status, state.tasks, user, {
+        result: nextPatch.result,
+        blockReason: nextPatch.blockReason,
+        blockUntil: nextPatch.blockUntil,
+      });
+      if (!check.ok) return { result: { fail: { error: check.error, status: 400 } } };
+    }
+    const tasks = state.tasks.map((t) => (t.id === id ? { ...t, ...nextPatch } : t));
+    const task = tasks.find((t) => t.id === id)!;
+    return {
+      state: withActivity({ ...state, tasks }, taskChanges(user, prev, task, state.users)),
+      result: { ok: { prev, task, nextPatch, users: state.users } },
+    };
+  });
+  if (out.fail) return NextResponse.json({ ok: false, error: out.fail.error }, { status: out.fail.status });
+  const { prev, task, nextPatch, users } = out.ok!;
+
+  // Уведомления — только после успешной записи.
   const url = appUrlFrom(req);
   const who = escapeHtml(user.name);
-  const person = (uid: string) => (uid !== user.id ? state.users.find((u) => u.id === uid) : undefined);
+  const person = (uid: string) => (uid !== user.id ? users.find((u) => u.id === uid) : undefined);
   if (nextPatch.assigneeId && nextPatch.assigneeId !== prev.assigneeId) {
     await sendTo(person(task.assigneeId), `🆕 ${who} назначил вам задачу: ${taskLink(url, task)}\nСрок: ${shortDate(task.due)}`);
   }
@@ -71,30 +86,31 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
   const user = await sessionUser();
   if (!user) return NextResponse.json({ ok: false, auth: true }, { status: 401 });
   const { id } = await ctx.params;
-  const { state } = await loadSharedState();
-  const task = state.tasks.find((t) => t.id === id);
-  if (!task) return NextResponse.json({ ok: true, gone: true });
-  if (!canDeleteTask(user, task)) {
-    return NextResponse.json({ ok: false, error: "Удалять можно только свои задачи" }, { status: 403 });
-  }
-  const tasks = state.tasks
-    .filter((t) => t.id !== id)
-    .map((t) =>
-      task.code && (t.dependsOn ?? []).includes(task.code)
-        ? { ...t, dependsOn: t.dependsOn.filter((c) => c !== task.code) }
-        : t,
-    );
-  await saveSharedState(
-    withActivity(
-      {
-        ...state,
-        tasks,
-        comments: state.comments.filter((c) => c.taskId !== id),
-        subtasks: state.subtasks.filter((s) => s.taskId !== id),
-        notices: state.notices.filter((n) => n.taskId !== id),
-      },
-      [deleted(user, task)],
-    ),
-  );
-  return NextResponse.json({ ok: true });
+  const out = await updateSharedState<{ gone?: boolean; forbidden?: boolean }>((state) => {
+    const task = state.tasks.find((t) => t.id === id);
+    if (!task) return { result: { gone: true } };
+    if (!canDeleteTask(user, task)) return { result: { forbidden: true } };
+    const tasks = state.tasks
+      .filter((t) => t.id !== id)
+      .map((t) =>
+        task.code && (t.dependsOn ?? []).includes(task.code)
+          ? { ...t, dependsOn: t.dependsOn.filter((c) => c !== task.code) }
+          : t,
+      );
+    return {
+      state: withActivity(
+        {
+          ...state,
+          tasks,
+          comments: state.comments.filter((c) => c.taskId !== id),
+          subtasks: state.subtasks.filter((st) => st.taskId !== id),
+          notices: state.notices.filter((n) => n.taskId !== id),
+        },
+        [deleted(user, task)],
+      ),
+      result: {},
+    };
+  });
+  if (out.forbidden) return NextResponse.json({ ok: false, error: "Удалять можно только свои задачи" }, { status: 403 });
+  return NextResponse.json({ ok: true, ...(out.gone ? { gone: true } : {}) });
 }

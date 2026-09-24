@@ -1,5 +1,5 @@
-import { randomBytes } from "node:crypto";
-import { get as blobGet, put as blobPut } from "@vercel/blob";
+import { createHash, randomBytes } from "node:crypto";
+import { BlobPreconditionFailedError, get as blobGet, put as blobPut } from "@vercel/blob";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { AppState } from "./types";
@@ -15,10 +15,19 @@ const localPath = (key: string) => join(process.cwd(), ".local-store", key);
 type GetOptions = Parameters<typeof blobGet>[1];
 type PutOptions = Parameters<typeof blobPut>[2];
 
-async function get(key: string, options: GetOptions) {
-  if (!LOCAL) return blobGet(key, options);
+type Stored = { stream: ReadableStream<Uint8Array>; etag: string | null } | null;
+
+const hashOf = (body: string | Buffer) => `"${createHash("sha1").update(body).digest("hex")}"`;
+
+async function get(key: string, options: GetOptions): Promise<Stored> {
+  if (!LOCAL) {
+    const file = await blobGet(key, options);
+    if (!file || file.statusCode !== 200) return null;
+    return { stream: file.stream, etag: file.blob.etag ?? null };
+  }
   try {
-    return { stream: new Blob([readFileSync(localPath(key))]).stream() };
+    const body = readFileSync(localPath(key));
+    return { stream: new Blob([body]).stream(), etag: hashOf(body) };
   } catch {
     return null;
   }
@@ -27,14 +36,14 @@ async function get(key: string, options: GetOptions) {
 async function put(key: string, body: string, options: PutOptions) {
   if (!LOCAL) return blobPut(key, body, options);
   const file = localPath(key);
-  if (options?.allowOverwrite === false) {
-    try {
-      readFileSync(file);
-      throw new Error("exists");
-    } catch (e) {
-      if (e instanceof Error && e.message === "exists") throw e;
-    }
+  let current: Buffer | null = null;
+  try {
+    current = readFileSync(file);
+  } catch {
+    current = null;
   }
+  if (options?.allowOverwrite === false && current) throw new Error("exists");
+  if (options?.ifMatch && (!current || hashOf(current) !== options.ifMatch)) throw new BlobPreconditionFailedError();
   mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, body);
 }
@@ -87,23 +96,33 @@ export async function loadSessionSecret(): Promise<string> {
   return secret;
 }
 
+/** Состояние из Blob вместе с ETag версии (null — файла ещё нет). */
+async function loadBlobVersioned(): Promise<{ state: AppState; etag: string | null } | null> {
+  const file = await get(KEY, { access: "private", useCache: false });
+  if (!file?.stream) return null;
+  const text = await new Response(file.stream).text();
+  if (!text) return null;
+  return { state: normalizeState(JSON.parse(text)), etag: file.etag };
+}
+
 export async function loadBlobState(): Promise<AppState | null> {
   try {
-    const file = await get(KEY, { access: "private", useCache: false });
-    if (!file?.stream) return null;
-    const text = await new Response(file.stream).text();
-    if (!text) return null;
-    return normalizeState(JSON.parse(text));
+    return (await loadBlobVersioned())?.state ?? null;
   } catch {
     return null;
   }
 }
 
-export async function saveBlobState(state: AppState) {
+/**
+ * Запись с защитой от гонок: ifMatch — только если файл не менялся с момента чтения;
+ * без etag (файла ещё нет) — только создание, не перезапись.
+ */
+async function writeBlobState(state: AppState, etag: string | null) {
   await put(KEY, JSON.stringify(state), {
     access: "private",
     addRandomSuffix: false,
-    allowOverwrite: true,
+    allowOverwrite: etag !== null,
+    ...(etag ? { ifMatch: etag } : {}),
     contentType: "application/json",
     cacheControlMaxAge: 0,
   });
@@ -153,9 +172,9 @@ export function resetTeamCredentials(state: AppState): AppState {
   return { ...state, users, authVersion: AUTH_VERSION };
 }
 
-export async function loadSharedState(): Promise<{ state: AppState; via: "db" | "blob" | "seed" }> {
-  const loaded = await loadStoredState();
-  let state = loaded.state;
+/** Разовые миграции данных; чистые функции, применяются при каждом чтении до записи. */
+function applyMigrations(input: AppState): { state: AppState; changed: boolean } {
+  let state = input;
   let changed = false;
   if (isLegacyState(state)) {
     state = migrateLegacyState(state);
@@ -170,50 +189,107 @@ export async function loadSharedState(): Promise<{ state: AppState; via: "db" | 
     state = { ...state, users: state.users.map((u) => (u.id === "u-vladimir" && u.streams === undefined ? { ...u, streams: ["BRAND"] } : u)) };
     changed = true;
   }
-  if (changed) await saveSharedState(state);
-  return { ...loaded, state };
+  return { state, changed };
 }
 
-async function loadStoredState(): Promise<{ state: AppState; via: "db" | "blob" | "seed" }> {
-  const blob = await loadBlobState();
-  if (blob) return { state: blob, via: "blob" };
+type Via = "db" | "blob" | "seed";
+
+/** Текущая версия: из Blob, иначе из Postgres (если доступен), иначе seed. etag null — Blob ещё пуст. */
+async function loadVersioned(): Promise<{ state: AppState; etag: string | null; via: Via; changed: boolean }> {
+  const blob = await loadBlobVersioned();
+  if (blob) return { ...applyMigrations(blob.state), etag: blob.etag, via: "blob" };
   const { getPrisma } = await import("./prisma");
-  const { loadDbState, saveDbState } = await import("./persist");
+  const { loadDbState } = await import("./persist");
   const prisma = getPrisma();
   if (prisma) {
     try {
       await prisma.$queryRaw`SELECT 1`;
-      const count = await prisma.user.count();
-      if (count === 0) {
-        await saveDbState(prisma, seed);
-        await saveBlobState(seed);
-        return { state: seed, via: "db" };
+      if ((await prisma.user.count()) > 0) {
+        return { ...applyMigrations(await loadDbState(prisma)), etag: null, via: "db", changed: true };
       }
-      const state = await loadDbState(prisma);
-      await saveBlobState(state);
-      return { state, via: "db" };
     } catch {
-      /* Aiven unreachable from Vercel */
+      /* Postgres недоступен — работаем от Blob */
     }
   }
-  await saveBlobState(seed);
-  return { state: seed, via: "seed" };
+  return { state: seed, etag: null, via: "seed", changed: true };
 }
 
-export async function saveSharedState(state: AppState) {
-  let via: "db" | "blob" = "blob";
-  await saveBlobState(state);
+/**
+ * Копия в Postgres. Записи могут финишировать в другом порядке, чем попали в Blob, поэтому после
+ * сохранения сверяемся с Blob: если там уже более новая версия (rev больше), кладём в базу её.
+ * Кто сохраняет последним, тот и видит последнюю версию, так что база не откатывается на старую.
+ */
+async function mirrorToDb(state: AppState) {
   const { getPrisma } = await import("./prisma");
   const { saveDbState } = await import("./persist");
   const prisma = getPrisma();
-  if (prisma) {
+  if (!prisma) return false;
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    let current = state;
+    for (let i = 0; i < 4; i++) {
+      await saveDbState(prisma, current);
+      const latest = await loadBlobVersioned().catch(() => null);
+      if (!latest || (latest.state.rev ?? 0) <= (current.rev ?? 0)) break;
+      current = latest.state;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const isConflict = (e: unknown) =>
+  e instanceof BlobPreconditionFailedError ||
+  (e instanceof Error && (e.name === "BlobPreconditionFailedError" || /exists|precondition/i.test(e.message)));
+
+export class StateConflictError extends Error {
+  constructor() {
+    super("Данные одновременно меняют несколько человек — повторите действие");
+    this.name = "StateConflictError";
+  }
+}
+
+/**
+ * Единственный способ изменить общее состояние. `change` получает свежие данные и возвращает
+ * новое состояние (или undefined — ничего не менять) и результат. Если между чтением и записью
+ * кто-то успел сохранить своё, чтение и `change` повторяются на новых данных — правки не теряются.
+ * Побочные эффекты (Telegram и т.п.) делайте после вызова, по результату: `change` может выполниться несколько раз.
+ */
+export async function updateSharedState<T>(
+  change: (state: AppState) => { state?: AppState; result: T } | Promise<{ state?: AppState; result: T }>,
+): Promise<T & { via?: Via }> {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const cur = await loadVersioned();
+    const out = await change(cur.state);
+    const changed = out.state ?? (cur.changed ? cur.state : undefined);
+    if (!changed) return out.result as T & { via?: Via };
+    const next = { ...changed, rev: (cur.state.rev ?? 0) + 1 };
     try {
-      await prisma.$queryRaw`SELECT 1`;
-      await saveDbState(prisma, state);
-      via = "db";
-    } catch {
-      /* Vercel often cannot reach Aiven; blob is source of truth */
+      await writeBlobState(next, cur.etag);
+    } catch (e) {
+      if (!isConflict(e)) throw e;
+      await new Promise((r) => setTimeout(r, 30 + Math.random() * 120 * (attempt + 1)));
+      continue;
+    }
+    const db = await mirrorToDb(next);
+    return Object.assign(out.result as object, { via: db ? "db" : "blob" }) as T & { via?: Via };
+  }
+  throw new StateConflictError();
+}
+
+/** Только чтение (миграции при необходимости сохраняются той же безопасной записью). */
+export async function loadSharedState(): Promise<{ state: AppState; via: Via }> {
+  const cur = await loadVersioned();
+  if (cur.changed) {
+    const next = { ...cur.state, rev: (cur.state.rev ?? 0) + 1 };
+    try {
+      await writeBlobState(next, cur.etag);
+      await mirrorToDb(next);
+    } catch (e) {
+      if (!isConflict(e)) throw e;
+      return loadSharedState(); // кто-то записал раньше — читаем его версию
     }
   }
-  return via;
+  return { state: cur.state, via: cur.via };
 }

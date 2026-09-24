@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { sessionUser } from "@/lib/session";
-import { loadSharedState, saveSharedState } from "@/lib/blobState";
+import { updateSharedState } from "@/lib/blobState";
 import type { Task } from "@/lib/types";
 import { created, withActivity } from "@/lib/activity";
 import { appUrlFrom, escapeHtml, sendTo, taskLink } from "@/lib/telegram";
@@ -21,11 +21,16 @@ export async function POST(req: Request) {
     participantIds: body.participantIds ?? [],
     zones: body.zones?.length ? body.zones : body.zone ? [body.zone] : [],
   };
-  const { state } = await loadSharedState();
-  await saveSharedState(withActivity({ ...state, tasks: [task, ...state.tasks] }, [created(user, task)]));
+  const { assignee } = await updateSharedState((state) => {
+    if (state.tasks.some((t) => t.id === task.id)) return { result: { assignee: undefined } }; // повтор запроса
+    return {
+      state: withActivity({ ...state, tasks: [task, ...state.tasks] }, [created(user, task)]),
+      result: { assignee: state.users.find((u) => u.id === task.assigneeId) },
+    };
+  });
   if (task.assigneeId !== user.id) {
     await sendTo(
-      state.users.find((u) => u.id === task.assigneeId),
+      assignee,
       `🆕 Новая задача от ${escapeHtml(user.name)}: ${taskLink(appUrlFrom(req), task)}\nСрок: ${shortDate(task.due)}`,
     );
   }
