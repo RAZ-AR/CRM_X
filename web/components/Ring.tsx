@@ -36,7 +36,7 @@ export function Ring({
         {Math.round(p)}%
       </text>
       {label && (
-        <text x="60" y="74" textAnchor="middle" fontSize="10" fill="#757575">
+        <text x="60" y="74" textAnchor="middle" fontSize="10" fill="#6F6E69">
           {label}
         </text>
       )}

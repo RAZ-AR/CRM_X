@@ -105,8 +105,8 @@ export default function MoneyPage() {
 
   return (
     <div className="space-y-3">
-      <div className="card p-4 flex flex-wrap items-center gap-2">
-        <h1 className="text-xl font-semibold mr-auto">Деньги</h1>
+      <div className="flex flex-wrap items-end gap-2 pb-1">
+        <h1 className="page-title m-0 mr-auto">Деньги</h1>
         <select className="text-sm" value={zone} onChange={(e) => setZone(e.target.value)}>
           <option value="all">Все проекты</option>
           {zones.map((z) => (
@@ -115,7 +115,7 @@ export default function MoneyPage() {
         </select>
         <div className="flex gap-1" role="group" aria-label="Валюта итогов">
           {CURRENCIES.map((c) => (
-            <button key={c} type="button" onClick={() => pickCur(c)} className={`pill px-3 py-1 text-sm ${cur === c ? "bg-black text-white" : "bg-[#f4f4f6]"}`}>
+            <button key={c} type="button" onClick={() => pickCur(c)} className={`pill px-3 py-1 text-sm ${cur === c ? "bg-black text-white" : "bg-[#F3F2EE]"}`}>
               {c}
             </button>
           ))}
@@ -136,7 +136,7 @@ export default function MoneyPage() {
           <div className="divide-y divide-black/5">
             {due.map((x) => (
               <div key={x.id} className="flex items-center gap-2 py-1.5 text-sm">
-                <span className={`w-14 ${x.date < today ? "text-red-500 font-medium" : "text-[#757575]"}`}>{shortDate(x.date)}</span>
+                <span className={`w-14 ${x.date < today ? "text-red-500 font-medium" : "text-[#6F6E69]"}`}>{shortDate(x.date)}</span>
                 <span className="flex-1 truncate">{x.title} · {zoneName(x.zone)}</span>
                 <span className="font-medium">{money(x.amount, x.currency)}</span>
               </div>
@@ -148,11 +148,11 @@ export default function MoneyPage() {
       <div className="card p-4 overflow-x-auto">
         <div className="font-medium mb-2">План и факт по статьям · {cur}</div>
         {rows.length === 0 ? (
-          <p className="text-sm text-[#9a9aa0]">Пока пусто: добавьте строки бюджета ниже.</p>
+          <p className="text-sm text-[#6F6E69]">Пока пусто: добавьте строки бюджета ниже.</p>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[#757575]">
+              <tr className="text-left text-[#6F6E69]">
                 <th className="py-1 font-normal">Статья</th>
                 <th className="py-1 font-normal text-right">План</th>
                 <th className="py-1 font-normal text-right">Оплачено</th>
@@ -196,18 +196,18 @@ export default function MoneyPage() {
               </form>
             ) : (
               <div key={x.id} className="flex flex-wrap items-center gap-2 py-2 text-sm">
-                <span className={`w-14 ${x.status !== "paid" && x.date < today ? "text-red-500 font-medium" : "text-[#757575]"}`}>{shortDate(x.date)}</span>
+                <span className={`w-14 ${x.status !== "paid" && x.date < today ? "text-red-500 font-medium" : "text-[#6F6E69]"}`}>{shortDate(x.date)}</span>
                 <span className="flex-1 min-w-[10rem]">
                   <span className="font-medium">{x.title}</span>
-                  <span className="text-[#757575]"> · {zoneName(x.zone)} · {x.category}</span>
-                  {x.contactId && <span className="text-[#757575]"> · {contacts.find((c) => c.id === x.contactId)?.name}</span>}
+                  <span className="text-[#6F6E69]"> · {zoneName(x.zone)} · {x.category}</span>
+                  {x.contactId && <span className="text-[#6F6E69]"> · {contacts.find((c) => c.id === x.contactId)?.name}</span>}
                   {x.taskId && tasks.some((t) => t.id === x.taskId) && (
                     <button type="button" className="ml-1 text-[#2383e2] underline" onClick={() => setPreviewId(x.taskId!)}>задача</button>
                   )}
                 </span>
                 <span className="text-right">
                   <span className="font-medium">{money(x.amount, x.currency)}</span>
-                  {x.currency !== cur && <span className="block text-[11px] text-[#9a9aa0]">≈ {show(convert(x.amount, x.currency, cur, rates))}</span>}
+                  {x.currency !== cur && <span className="block text-[11px] text-[#6F6E69]">≈ {show(convert(x.amount, x.currency, cur, rates))}</span>}
                 </span>
                 <select
                   className="text-xs"
@@ -220,7 +220,7 @@ export default function MoneyPage() {
                     <option key={st} value={st}>{EXPENSE_STATUS[st].label}</option>
                   ))}
                 </select>
-                <button type="button" className="text-xs text-[#757575]" onClick={() => setEditExpense(x.id)}>изменить</button>
+                <button type="button" className="text-xs text-[#6F6E69]" onClick={() => setEditExpense(x.id)}>изменить</button>
                 <button
                   type="button"
                   className="text-xs text-red-500"
@@ -231,7 +231,7 @@ export default function MoneyPage() {
               </div>
             ),
           )}
-          {list.length === 0 && <p className="text-sm text-[#9a9aa0] py-2">Нет расходов с таким статусом.</p>}
+          {list.length === 0 && <p className="text-sm text-[#6F6E69] py-2">Нет расходов с таким статусом.</p>}
         </div>
         <form className="grid sm:grid-cols-3 gap-2 pt-2 border-t border-black/5" onSubmit={(e) => onExpense(e)}>
           <div className="sm:col-span-3 text-sm font-medium">Новый расход или платёж</div>
@@ -255,10 +255,10 @@ export default function MoneyPage() {
             ) : (
               <div key={b.id} className="flex flex-wrap items-center gap-2 py-2 text-sm">
                 <span className="flex-1 min-w-[10rem]">
-                  {b.category} <span className="text-[#757575]">· {zoneName(b.zone)}{b.note ? ` · ${b.note}` : ""}</span>
+                  {b.category} <span className="text-[#6F6E69]">· {zoneName(b.zone)}{b.note ? ` · ${b.note}` : ""}</span>
                 </span>
                 <span className="font-medium">{money(b.amount, b.currency)}</span>
-                <button type="button" className="text-xs text-[#757575]" onClick={() => setEditBudget(b.id)}>изменить</button>
+                <button type="button" className="text-xs text-[#6F6E69]" onClick={() => setEditBudget(b.id)}>изменить</button>
                 <button type="button" className="text-xs text-red-500" onClick={() => confirm("Удалить строку бюджета?") && run(deleteRecord("budget", b.id))}>
                   удалить
                 </button>
@@ -281,9 +281,9 @@ export default function MoneyPage() {
 function Stat({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone?: "ok" | "bad" }) {
   return (
     <div className="card p-4">
-      <div className="text-xs text-[#757575]">{label}</div>
-      <div className={`text-lg font-semibold ${tone === "bad" ? "text-red-500" : ""}`}>{value}</div>
-      {hint && <div className="text-[11px] text-[#9a9aa0]">{hint}</div>}
+      <div className="text-xs text-[#6F6E69]">{label}</div>
+      <div className={`num text-[22px] md:text-[28px] leading-tight font-semibold tracking-[-0.02em] ${tone === "bad" ? "text-[var(--red)]" : ""}`}>{value}</div>
+      {hint && <div className="text-[11px] text-[#6F6E69]">{hint}</div>}
     </div>
   );
 }
@@ -402,8 +402,8 @@ function Rates({ rates, onSave }: { rates: { USD: number; EUR: number; updatedAt
         1 EUR в AMD
         <input name="EUR" inputMode="decimal" required defaultValue={rates.EUR} className="w-28" />
       </label>
-      <button className="pill bg-[#f4f4f6] px-3 py-2">Сохранить</button>
-      <span className="text-[#9a9aa0]">
+      <button className="pill bg-[#F3F2EE] px-3 py-2">Сохранить</button>
+      <span className="text-[#6F6E69]">
         {note || (rates.updatedAt ? `обновлены ${shortDate(rates.updatedAt.slice(0, 10))}` : "стартовые значения, проверьте")}
       </span>
     </form>

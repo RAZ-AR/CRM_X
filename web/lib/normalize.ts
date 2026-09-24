@@ -40,5 +40,6 @@ export function normalizeState(raw: Partial<AppState> | null | undefined): AppSt
     budget: parsed.budget ?? [],
     expenses: parsed.expenses ?? [],
     risks: (parsed.risks ?? []).map((r) => ({ ...r, taskIds: r.taskIds ?? [] })),
+    todos: parsed.todos ?? [],
   };
 }

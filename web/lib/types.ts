@@ -201,6 +201,33 @@ export type AppState = {
   fx?: FxRates;
   /** Реестр рисков — общий для команды. */
   risks?: Risk[];
+  /** Личные дела с напоминаниями: каждый видит только свои. */
+  todos?: Todo[];
+};
+
+export type TodoRepeat = "none" | "daily" | "weekdays" | "weekly";
+
+export const TODO_REPEAT: Record<TodoRepeat, string> = {
+  none: "Без повтора",
+  daily: "Каждый день",
+  weekdays: "По будням",
+  weekly: "Каждую неделю",
+};
+
+export type Todo = {
+  id: string;
+  userId: string;
+  text: string;
+  done: boolean;
+  /** Когда напомнить: ISO-время (UTC). Пусто — без напоминания. */
+  remindAt?: string;
+  repeat?: TodoRepeat;
+  /** Уже напомнили про этот remindAt (сервер отправил в Telegram). */
+  remindedAt?: string;
+  /** Связанная задача, если дело про неё. */
+  taskId?: string;
+  createdAt: string;
+  doneAt?: string;
 };
 
 export const CURRENCIES = ["AMD", "USD", "EUR"] as const;

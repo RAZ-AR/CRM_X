@@ -46,7 +46,7 @@ export default function KanbanPage() {
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2 mb-4 min-w-0">
-        <h1 className="text-xl font-semibold flex-1 min-w-[12rem]">
+        <h1 className="page-title m-0 flex-1 min-w-[12rem]">
           Доска {zobj ? `· ${zobj.emoji} ${zobj.name}` : "· все проекты"}{due ? ` · ${formatDate(due)}` : ""}
         </h1>
         <select className="text-sm" value={assignee} onChange={(e) => setAssignee(e.target.value)}>
@@ -90,8 +90,10 @@ export default function KanbanPage() {
         <div className="flex gap-3 min-w-[72rem]">
           {boardColumns.map((col) => (
             <div key={col} className="card p-3 w-[min(85vw,18rem)] md:w-auto md:flex-1 md:min-w-[13.5rem] shrink-0 snap-center min-w-0">
-              <div className="text-sm font-medium mb-2 px-1">
-                <StatusIcon status={col} size={14} /> {statusMeta[col].label}
+              <div className="text-sm font-medium mb-3 px-1 flex items-center gap-2">
+                <StatusIcon status={col} size={15} />
+                <span className="flex-1 truncate">{statusMeta[col].label}</span>
+                <span className="cap num">{list.filter((t) => t.status === col).length}</span>
               </div>
               <div
                 className="space-y-2 min-h-[200px]"

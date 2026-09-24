@@ -18,7 +18,7 @@ export default function TeamPage() {
         <div key={u.id} className="card p-5">
           <div className="h-12 w-12 rounded-full bg-amber-100 grid place-items-center text-lg font-semibold">{u.avatar}</div>
           <div className="font-semibold mt-3">{u.name}</div>
-          <div className="text-sm text-gray-500">{u.title}</div>
+          <div className="text-sm text-[#6F6E69]">{u.title}</div>
           <div className="text-sm mt-2">
             {tasks.filter((t) => t.assigneeId === u.id && t.status !== "done").length} активных задач
           </div>

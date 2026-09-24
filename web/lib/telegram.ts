@@ -113,6 +113,12 @@ export function digestFor(state: AppState, user: User, today: string, appUrl: st
   text += section("⏭ Пора начать", toStart, (t) => `до ${shortDate(t.due)}`);
   text += section("⛔ Заблокировано", blocked, (t) => (t.blockReason ? escapeHtml(t.blockReason) : `до ${shortDate(t.due)}`));
   if (![overdue, dueToday, active, toStart, blocked].some((l) => l.length)) text += "\n\nНа сегодня задач нет.";
+  const todos = (state.todos ?? []).filter((t) => t.userId === user.id && !t.done);
+  const todayTodos = todos.filter((t) => !t.remindAt || t.remindAt.slice(0, 10) <= today);
+  if (todos.length) {
+    text += `\n\n✅ <b>Мои дела</b> (${todos.length})`;
+    for (const t of todayTodos.slice(0, 8)) text += `\n• ${escapeHtml(t.text)}`;
+  }
 
   if (isCpo(user)) {
     const team = open.filter((t) => t.due < today && t.assigneeId !== user.id && canSeeTask(user, t, state.users));

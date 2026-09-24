@@ -26,14 +26,14 @@ export default function NotificationsPage() {
   return (
     <div className="max-w-2xl space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Уведомления</h1>
-        <button className="text-sm text-[#757575]" onClick={markAllRead}>
+        <h1 className="page-title m-0">Уведомления</h1>
+        <button className="text-sm text-[#6F6E69]" onClick={markAllRead}>
           Прочитать все
         </button>
       </div>
       <section>
         <h2 className="text-sm font-semibold mb-2">Новые</h2>
-        {fresh.length === 0 && <p className="text-sm text-[#9a9aa0]">Нет новых</p>}
+        {fresh.length === 0 && <p className="text-sm text-[#6F6E69]">Нет новых</p>}
         <div className="space-y-2">
           {fresh.map((n) => (
             <button
@@ -43,24 +43,24 @@ export default function NotificationsPage() {
               className="w-full text-left rounded-2xl px-4 py-3 text-sm bg-[#FFF8C5] border border-black/5"
             >
               <span className="pill bg-black text-white text-[10px] px-2 py-0.5 mr-2">новое</span>
-              <span className="text-[10px] text-[#9a9aa0]">{KIND[n.kind || "task_new"]}</span>
+              <span className="text-[10px] text-[#6F6E69]">{KIND[n.kind || "task_new"]}</span>
               <div className="mt-1 font-medium">{n.text}</div>
-              <div className="text-xs mt-1 text-[#9a9aa0]">{new Date(n.createdAt).toLocaleString("ru-RU")}</div>
+              <div className="text-xs mt-1 text-[#6F6E69]">{new Date(n.createdAt).toLocaleString("ru-RU")}</div>
             </button>
           ))}
         </div>
       </section>
       <section>
-        <h2 className="text-sm font-semibold mb-2 text-[#9a9aa0]">Прочитанные</h2>
-        <p className="text-[11px] text-[#9a9aa0] mb-2">Исчезают через 4 дня после открытия</p>
-        {old.length === 0 && <p className="text-sm text-[#9a9aa0]">Пусто</p>}
+        <h2 className="text-sm font-semibold mb-2 text-[#6F6E69]">Прочитанные</h2>
+        <p className="text-[11px] text-[#6F6E69] mb-2">Исчезают через 4 дня после открытия</p>
+        {old.length === 0 && <p className="text-sm text-[#6F6E69]">Пусто</p>}
         <div className="space-y-2">
           {old.map((n) => (
             <button
               key={n.id}
               type="button"
               onClick={() => open(n)}
-              className="w-full text-left rounded-2xl px-4 py-3 text-sm bg-[#f4f4f6] text-[#6b6b70]"
+              className="w-full text-left rounded-2xl px-4 py-3 text-sm bg-[#F3F2EE] text-[#6F6E69]"
             >
               <span className="text-[10px]">{KIND[n.kind || "task_new"]}</span>
               <div className="mt-1">{n.text}</div>

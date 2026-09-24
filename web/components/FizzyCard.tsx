@@ -23,13 +23,13 @@ export function FizzyCard({
         <StatusIcon status={task.status} size={14} />
         <span className="font-medium flex-1">{task.title}</span>
       </div>
-      <div className="text-xs text-gray-400 mt-1">
+      <div className="text-xs text-[#6F6E69] mt-1">
         {zoneName} · {a?.name} · {formatDate(task.due)}
       </div>
     </>
   );
-  if (href) return <Link href={href} className="block rounded-2xl bg-gray-50 px-4 py-3">{body}</Link>;
-  return <div className="rounded-2xl bg-gray-50 px-4 py-3">{body}</div>;
+  if (href) return <Link href={href} className="block rounded-2xl bg-[#F3F2EE] px-4 py-3">{body}</Link>;
+  return <div className="rounded-2xl bg-[#F3F2EE] px-4 py-3">{body}</div>;
 }
 
 export function RailBtn({

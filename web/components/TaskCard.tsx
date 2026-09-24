@@ -35,7 +35,7 @@ export function TaskCard({
   return (
     <div
       className="rounded-2xl p-3 text-sm min-w-0 overflow-hidden"
-      style={{ background: multi ? "#e5e7eb" : "#f4f4f6" }}
+      style={{ background: multi ? "#e5e7eb" : "#F3F2EE" }}
       draggable
       onDragStart={(e) => e.dataTransfer.setData("id", task.id)}
     >
@@ -45,7 +45,7 @@ export function TaskCard({
           <span>{task.title}</span>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          {task.code && <span className="text-[10px] text-[#9a9aa0]">{task.code}</span>}
+          {task.code && <span className="text-[10px] text-[#6F6E69]">{task.code}</span>}
           {task.wave && <span className="pill bg-black text-white px-1.5 py-0.5 text-[10px]">{task.wave}</span>}
           {zs.map((slug) => {
             const z = zones.find((x) => x.slug === slug);
@@ -55,12 +55,12 @@ export function TaskCard({
               </span>
             );
           })}
-          <span className="flex items-center gap-1 text-[11px] text-[#757575]">
+          <span className="flex items-center gap-1 text-[11px] text-[#6F6E69]">
             <span className="h-5 w-5 rounded-full bg-white grid place-items-center text-[10px] font-semibold">{a?.avatar ?? "?"}</span>
             {a?.name}
           </span>
         </div>
-        <div className="text-[11px] text-gray-400 mt-1 flex items-center gap-2">
+        <div className="text-[11px] text-[#6F6E69] mt-1 flex items-center gap-2">
           <span>{formatDate(task.startDate)} → {formatDate(task.due)}</span>
           {(task.attachments?.length ?? 0) > 0 && (
             <span className="inline-flex items-center gap-0.5 text-[#111]">
@@ -71,7 +71,7 @@ export function TaskCard({
       </button>
       {task.status !== "blocked" && pending && pending !== task.status ? (
         <div className="mt-2 flex items-center gap-2 min-w-0">
-          <span className="flex-1 min-w-0 truncate text-xs text-[#757575]">→ {SHORT[pending]}</span>
+          <span className="flex-1 min-w-0 truncate text-xs text-[#6F6E69]">→ {SHORT[pending]}</span>
           <button
             type="button"
             className="h-8 w-8 shrink-0 rounded-full bg-black text-white grid place-items-center"
@@ -107,7 +107,7 @@ export function TaskCard({
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="text-center text-[11px] text-[#757575] truncate px-1">{SHORT[show] ?? statusMeta[show].label}</span>
+          <span className="text-center text-[11px] text-[#6F6E69] truncate px-1">{SHORT[show] ?? statusMeta[show].label}</span>
           <button
             type="button"
             className="h-8 w-8 rounded-full bg-white grid place-items-center disabled:opacity-30"

@@ -61,7 +61,7 @@ export function AddTaskModal({
         className="card w-full max-w-lg p-6 space-y-3 max-h-[90vh] overflow-y-auto"
       >
         <h2 className="text-lg font-semibold">Новая задача → бэклог</h2>
-        <p className="text-xs text-gray-400">Статус: Не начато. {lockZone ? `Проект: ${lockZone}` : "Выбери проект."}</p>
+        <p className="text-xs text-[#6F6E69]">Статус: Не начато. {lockZone ? `Проект: ${lockZone}` : "Выбери проект."}</p>
         <input name="title" required placeholder="Название" className="w-full" />
         {!lockZone && (
           <select name="zone" defaultValue={current.zone ?? "wafl"} className="w-full" required>
@@ -71,10 +71,10 @@ export function AddTaskModal({
           </select>
         )}
         <div className="grid grid-cols-2 gap-2">
-          <label className="text-xs text-gray-500">Начало
+          <label className="text-xs text-[#6F6E69]">Начало
             <input name="startDate" type="date" required className="w-full mt-1" />
           </label>
-          <label className="text-xs text-gray-500">Конец
+          <label className="text-xs text-[#6F6E69]">Конец
             <input name="due" type="date" required className="w-full mt-1" />
           </label>
         </div>
@@ -98,7 +98,7 @@ export function AddTaskModal({
         <textarea name="description" placeholder="Описание" className="w-full" />
         <textarea name="result" placeholder="Готово когда… (критерий закрытия)" className="w-full" />
         <textarea name="comment" placeholder="Комментарий к задаче" className="w-full" />
-        <label className="text-xs text-gray-500 block">
+        <label className="text-xs text-[#6F6E69] block">
           Файл или фото
           <input name="files" type="file" accept="image/*,.pdf,.doc,.docx" multiple className="mt-1 block w-full text-sm" />
         </label>
