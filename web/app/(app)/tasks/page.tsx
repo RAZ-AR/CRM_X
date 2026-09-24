@@ -4,15 +4,15 @@ import Link from "next/link";
 import { useState } from "react";
 import { ChevronLeft, ExternalLink } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { canWorkTask, isCpo, isOverdue } from "@/lib/access";
+import { isCpo, isOverdue } from "@/lib/access";
 import { shortDate, todayYerevan } from "@/lib/dates";
 import { HOME_VIEWS, homeLists, isHomeView, scopeTasks, type HomeView } from "@/lib/homeLists";
-import { StatusPicker } from "@/components/StatusIcon";
+import { TaskRow } from "@/components/TaskRow";
 import type { Task } from "@/lib/types";
 
 /** Полный список задач. С главной сюда ведёт «все N →»: ?view=overdue&who=…&zone=…&date=… */
 export default function TasksPage() {
-  const { current, tasks, users, zones, setPreviewId, updateTask } = useStore();
+  const { current, tasks, users, zones, setPreviewId } = useStore();
   const [params] = useState(() => new URLSearchParams(typeof window === "undefined" ? "" : window.location.search));
   const [view, setView] = useState<HomeView | "all">(() => {
     const v = params.get("view");
@@ -69,39 +69,29 @@ export default function TasksPage() {
         ))}
       </div>
 
-      <div className="card p-2 sm:p-3 space-y-1">
+      <div className="card px-4 md:px-5 py-2">
         {list.length === 0 && <p className="text-sm text-[#6F6E69] p-3">Здесь пусто</p>}
         {list.map((t) => {
           const a = users.find((u) => u.id === t.assigneeId);
           const z = zones.find((x) => x.slug === t.zone);
           return (
-            <div key={t.id} className="rounded-xl bg-[#F3F2EE] pl-1.5 pr-3 py-1.5 text-sm flex items-center gap-1.5">
-              <StatusPicker
-                status={t.status}
-                disabled={!canWorkTask(current, t)}
-                onPick={(st) => {
-                  const r = updateTask(t.id, t.status === "blocked" ? { status: st, blockReason: "", blockUntil: "" } : { status: st });
-                  if (!r.ok) {
-                    alert(r.error);
-                    if (r.error.includes("готово когда")) setPreviewId(t.id);
-                  }
-                }}
-                onBlock={() => setPreviewId(t.id)}
-              />
-              <button type="button" onClick={() => setPreviewId(t.id)} className="flex-1 min-w-0 text-left flex items-center gap-2">
-                <span className="hidden sm:inline text-[11px] text-[#6F6E69] w-14 shrink-0">{t.code}</span>
-                <span className="flex-1 min-w-0 truncate">
-                  {t.title}
-                  {t.criticalPath && <span className="text-[#b91c1c] text-[10px]"> ●</span>}
+            <TaskRow
+              key={t.id}
+              task={t}
+              onOpen={setPreviewId}
+              zoneColor={z?.color}
+              late={isOverdue(t, picked)}
+              meta={`${t.code ? `${t.code} · ` : ""}${z?.name ?? ""}`}
+              badge={
+                <span className="flex items-center gap-1 shrink-0">
+                  <span className={`cap num hidden sm:inline ${isOverdue(t, picked) ? "!text-[var(--red)] font-medium" : ""}`}>{shortDate(t.due)}</span>
+                  <Link href={`/tasks/${t.id}`} className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)]" aria-label="Открыть страницу задачи" title="Открыть страницу задачи">
+                    <ExternalLink size={14} />
+                  </Link>
                 </span>
-                <span className="hidden sm:inline text-[11px] text-[#6F6E69] shrink-0">{z?.emoji} {z?.name}</span>
-                <span className={`text-[11px] shrink-0 ${isOverdue(t, picked) ? "text-red-500 font-medium" : "text-[#6F6E69]"}`}>{shortDate(t.due)}</span>
-                <span className="h-5 w-5 rounded-full bg-white grid place-items-center text-[9px] font-semibold shrink-0" title={a?.name}>{a?.avatar}</span>
-              </button>
-              <Link href={`/tasks/${t.id}`} className="shrink-0 p-1 text-[#6F6E69] hover:text-black" aria-label="Открыть страницу задачи" title="Открыть страницу задачи">
-                <ExternalLink size={14} />
-              </Link>
-            </div>
+              }
+              avatar={a ? { letter: a.avatar, name: a.name } : undefined}
+            />
           );
         })}
       </div>

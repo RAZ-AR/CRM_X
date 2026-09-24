@@ -6,8 +6,8 @@ import { canSeeTask, taskZones } from "@/lib/access";
 import { openDeps } from "@/lib/taskRules";
 import { addDays, shortDate, todayYerevan, weekStart } from "@/lib/dates";
 import type { Task } from "@/lib/types";
-import { ChevronLeft, ChevronRight, Flame } from "lucide-react";
-import { StatusIcon } from "@/components/StatusIcon";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { TaskRow } from "@/components/TaskRow";
 
 /** Что каждому делать на неделе: задачи, которые идут в эти дни, плюс хвосты с прошлых недель. */
 export default function WeekPage() {
@@ -57,48 +57,52 @@ export default function WeekPage() {
 
       {people.length === 0 && <div className="card p-6 text-sm text-[#6F6E69]">На эту неделю открытых задач нет.</div>}
 
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid gap-4 md:gap-5 xl:grid-cols-2">
         {people.map((u) => {
           const mine = sortTasks(week.filter((t) => t.assigneeId === u.id));
           const overdue = mine.filter(late).length;
           const deadlines = mine.filter((t) => !late(t) && t.due <= to).length;
           return (
-            <section key={u.id} className="card p-4">
+            <section key={u.id} className="card px-4 pt-4 pb-2 md:px-5 min-w-0">
               <div className="flex items-center gap-2 mb-3">
-                <span className="h-9 w-9 rounded-full bg-[#F3F2EE] grid place-items-center text-sm font-semibold">{u.avatar}</span>
+                <span className="h-9 w-9 rounded-full bg-[var(--soft)] grid place-items-center text-sm font-semibold">{u.avatar}</span>
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold">{u.name}</div>
                   <div className="text-xs text-[#6F6E69]">{u.title}</div>
                 </div>
                 <div className="text-right text-xs text-[#6F6E69]">
                   <div>{mine.length} задач · {deadlines} сдать</div>
-                  {overdue > 0 && <div className="text-[#b91c1c]">{overdue} просрочено</div>}
+                  {overdue > 0 && <div className="text-[var(--red)]">{overdue} просрочено</div>}
                 </div>
               </div>
-              <div className="space-y-1.5">
+              <div>
                 {mine.map((t) => {
                   const z = zones.find((x) => x.slug === t.zone);
                   const waiting = openDeps(t, tasks);
                   const dueThisWeek = !late(t) && t.due <= to;
                   return (
-                    <button
+                    <TaskRow
                       key={t.id}
-                      type="button"
-                      onClick={() => setPreviewId(t.id)}
-                      className="w-full text-left rounded-2xl px-3 py-2 text-sm flex items-start gap-2"
-                      style={{ background: late(t) ? "#fee2e2" : "#F3F2EE" }}
-                    >
-                      <span className="shrink-0 mt-0.5">{late(t) ? <Flame size={14} className="text-[#e86a4a]" /> : <StatusIcon status={t.status} size={14} />}</span>
-                      <span className="flex-1 min-w-0">
-                        <span className="font-medium">{t.title}</span>
-                        <span className="block text-[11px] text-[#6F6E69] mt-0.5">
-                          {z?.emoji} {t.code} · {shortDate(t.startDate || t.due)}–{shortDate(t.due)}
-                          {t.criticalPath && <span className="text-[#b91c1c]"> · critical</span>}
-                          {waiting.length > 0 && <span> · ждёт {waiting.map((d) => d.code).join(", ")}</span>}
-                        </span>
-                      </span>
-                      {dueThisWeek && <span className="pill bg-black text-white text-[10px] px-2 py-0.5 shrink-0">сдать {shortDate(t.due)}</span>}
-                    </button>
+                      task={t}
+                      onOpen={setPreviewId}
+                      zoneColor={z?.color}
+                      late={late(t)}
+                      meta={
+                        <>
+                          {t.code} · {shortDate(t.startDate || t.due)}–{shortDate(t.due)}
+                          {waiting.length > 0 && <> · ждёт {waiting.map((d) => d.code).join(", ")}</>}
+                        </>
+                      }
+                      badge={
+                        late(t) ? (
+                          <span className="cap num shrink-0 !text-[var(--red)] font-medium">{shortDate(t.due)}</span>
+                        ) : dueThisWeek ? (
+                          <span className="pill bg-[var(--ink)] text-white text-[11px] px-2.5 py-1 shrink-0 num hidden sm:inline">сдать {shortDate(t.due)}</span>
+                        ) : (
+                          <span className="cap num shrink-0 hidden sm:inline">до {shortDate(t.due)}</span>
+                        )
+                      }
+                    />
                   );
                 })}
               </div>

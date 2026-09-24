@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Ban, CheckCircle2, Circle, Eye, PlayCircle } from "lucide-react";
-import { statusMeta } from "@/lib/access";
-import type { TaskStatus } from "@/lib/types";
+import { canWorkTask, statusMeta } from "@/lib/access";
+import { useStore } from "@/lib/store";
+import type { Task, TaskStatus } from "@/lib/types";
 
 /** Иконка и цвет каждого статуса — одинаковые во всём приложении. */
 export const STATUS_ICON: Record<TaskStatus, { Icon: typeof Circle; color: string; short: string }> = {
@@ -93,6 +94,72 @@ export function StatusPicker({
           ))}
         </span>
       )}
+    </span>
+  );
+}
+
+const FLOW: TaskStatus[] = ["todo", "in_progress", "review", "done"];
+
+/** Текущий статус и два соседних шага пути: следующие, а в конце пути — предыдущие. */
+export function statusSteps(task: Pick<Task, "status" | "blockFromStatus">): TaskStatus[] {
+  if (task.status === "blocked") {
+    const back = task.blockFromStatus && task.blockFromStatus !== "blocked" ? task.blockFromStatus : "todo";
+    const i = FLOW.indexOf(back);
+    return (["blocked", back, FLOW[Math.min(i + 1, FLOW.length - 1)]] as TaskStatus[]).filter((s, k, a) => a.indexOf(s) === k);
+  }
+  const i = FLOW.indexOf(task.status);
+  const from = Math.max(0, Math.min(i, FLOW.length - 3));
+  return FLOW.slice(from, from + 3);
+}
+
+/**
+ * Переключатель статуса справа в строке задачи: текущий статус подсвечен и подписан,
+ * рядом — иконки соседних шагов. Нажатие меняет статус; если нужен «готово когда» — открывает карточку.
+ */
+export function StatusSwitch({ task, onOpen, compact = false }: { task: Task; onOpen: (id: string) => void; compact?: boolean }) {
+  const { current, updateTask } = useStore();
+  const can = Boolean(current && canWorkTask(current, task));
+  const steps = statusSteps(task);
+  return (
+    <span className="flex items-center gap-1 shrink-0" role="group" aria-label="Статус задачи">
+      {steps.map((s) => {
+        const on = s === task.status;
+        const meta = STATUS_ICON[s];
+        if (on) {
+          return (
+            <span
+              key={s}
+              className="inline-flex items-center gap-1.5 h-8 rounded-full pl-2 pr-2.5 text-xs font-medium"
+              style={{ background: `${meta.color}14`, color: meta.color }}
+              title={statusMeta[s].label}
+            >
+              <StatusIcon status={s} size={16} />
+              <span className={compact ? "hidden" : "hidden sm:inline"}>{meta.short}</span>
+            </span>
+          );
+        }
+        return (
+          <button
+            key={s}
+            type="button"
+            disabled={!can}
+            title={`Перевести: ${statusMeta[s].label}`}
+            aria-label={`Перевести в «${meta.short}»`}
+            className="h-8 w-8 rounded-full grid place-items-center opacity-45 hover:opacity-100 hover:bg-[var(--soft)] disabled:opacity-20 disabled:hover:bg-transparent transition-opacity"
+            onClick={(e) => {
+              e.stopPropagation();
+              const patch: Partial<Task> = task.status === "blocked" ? { status: s, blockReason: "", blockUntil: "" } : { status: s };
+              const r = updateTask(task.id, patch);
+              if (!r.ok) {
+                alert(r.error);
+                if (r.error.includes("готово когда")) onOpen(task.id);
+              }
+            }}
+          >
+            <StatusIcon status={s} size={17} />
+          </button>
+        );
+      })}
     </span>
   );
 }

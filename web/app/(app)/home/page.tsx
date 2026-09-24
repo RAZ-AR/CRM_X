@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRight, CalendarDays, CheckCircle2, Eye, TriangleAlert, Pencil } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { canManagePeople, canWorkTask, isCpo, statusMeta } from "@/lib/access";
-import { StatusPicker } from "@/components/StatusIcon";
+import { canManagePeople, isCpo, statusMeta } from "@/lib/access";
+import { TaskRow } from "@/components/TaskRow";
 import { HOME_VIEWS, homeLists, scopeTasks, type HomeView } from "@/lib/homeLists";
 import { streamProgress, weightedDone, zoneTasks } from "@/lib/readiness";
 import { addDays, diffDays, formatDate, shortDate, todayYerevan, weekStart } from "@/lib/dates";
@@ -386,7 +386,7 @@ export default function HomePage() {
             ))}
           </div>
           {L[activeTab].length ? (
-            <TaskRows list={L[activeTab]} red={activeTab === "overdue" || activeTab === "blocked"} open={setPreviewId} users={users} />
+            <TaskRows list={L[activeTab]} red={activeTab === "overdue" || activeTab === "blocked"} open={setPreviewId} users={users} zones={zones} />
           ) : (
             <p className="cap py-8 text-center m-0">Задач нет</p>
           )}
@@ -516,36 +516,21 @@ function RiskRow({ p, risks }: { p: number; risks: import("@/lib/types").Risk[] 
   );
 }
 
-function TaskRows({ list, red, open, users }: { list: Task[]; red: boolean; open: (id: string) => void; users: { id: string; avatar: string; name: string }[] }) {
-  const { current, updateTask } = useStore();
-  const setStatus = (t: Task, status: Task["status"]) =>
-    updateTask(t.id, t.status === "blocked" ? { status, blockReason: "", blockUntil: "" } : { status });
+function TaskRows({ list, red, open, users, zones }: { list: Task[]; red: boolean; open: (id: string) => void; users: { id: string; avatar: string; name: string }[]; zones: { slug: string; color: string }[] }) {
   return (
     <div>
       {list.slice(0, 5).map((t) => {
         const a = users.find((u) => u.id === t.assigneeId);
         return (
-          <div key={t.id} className="flex items-center gap-2 border-t border-[var(--line)] py-1.5">
-            <StatusPicker
-              status={t.status}
-              disabled={!current || !canWorkTask(current, t)}
-              onPick={(st) => {
-                const r = setStatus(t, st);
-                if (!r.ok) {
-                  alert(r.error);
-                  if (r.error.includes("готово когда")) open(t.id);
-                }
-              }}
-              onBlock={() => open(t.id)}
-            />
-            <button type="button" onClick={() => open(t.id)} className="flex-1 min-w-0 text-left flex items-center gap-3 py-1.5">
-              <span className="hidden sm:inline cap num w-14 shrink-0">{t.code}</span>
-              <span className="flex-1 min-w-0 truncate text-sm">{t.title}</span>
-              {t.criticalPath && <span className="h-1.5 w-1.5 rounded-full bg-[var(--red)] shrink-0" title="critical path" />}
-              <span className={`cap num shrink-0 ${red ? "!text-[var(--red)]" : ""}`}>{shortDate(t.due)}</span>
-              <span className="h-6 w-6 rounded-full bg-[var(--soft)] grid place-items-center text-[10px] font-semibold shrink-0" title={a?.name}>{a?.avatar}</span>
-            </button>
-          </div>
+          <TaskRow
+            key={t.id}
+            task={t}
+            onOpen={open}
+            late={red}
+            zoneColor={zones.find((z) => z.slug === t.zone)?.color}
+            meta={t.code || undefined}
+            avatar={a ? { letter: a.avatar, name: a.name } : undefined}
+          />
         );
       })}
     </div>
