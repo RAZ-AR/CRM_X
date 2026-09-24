@@ -1,6 +1,7 @@
 import type { AppState, User } from "./types";
 import { ensureHashed } from "./auth";
 import {
+  hasPerm,
   canManagePeople,
   canSeeContact,
   canSeeTask,
@@ -64,8 +65,18 @@ export function mergeState(existing: AppState, incoming: AppState, user: User): 
     }
   }
 
+  // Контрагентов добавляют и правят все, у кого есть доступ к контактам; удаляет только Owner.
+  const contacts = new Map(existing.contacts.map((c) => [c.id, c]));
+  if (hasPerm(user, "contacts")) {
+    for (const c of incoming.contacts ?? []) {
+      const prev = contacts.get(c.id);
+      if (!prev || canSeeContact(user, prev)) contacts.set(c.id, { ...prev, ...c });
+    }
+  }
+
   const base: AppState = {
     ...existing,
+    contacts: [...contacts.values()],
     comments: [...comments.values()].filter((c) => tasksById.has(c.taskId)),
     subtasks: [...subtasks.values()].filter((s) => tasksById.has(s.taskId)),
     notices: [...notices.values()],

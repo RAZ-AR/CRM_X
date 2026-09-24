@@ -105,6 +105,8 @@ export type Task = {
   wave: "A" | "B" | "C" | "";
   workstream: string;
   dependsOn: string[];
+  /** Контрагенты и контакты, привязанные к задаче. */
+  contactIds?: string[];
   blockReason?: string;
   /** ISO date or "forever" */
   blockUntil?: string;
@@ -129,7 +131,31 @@ export type Contact = {
   telegram: string;
   whatsapp: string;
   zone: ZoneSlug | "all";
-  kind: "staff" | "vendor" | "partner";
+  /** vendor — старое название поставщика. */
+  kind: "staff" | "vendor" | "partner" | "contractor" | "supplier" | "authority";
+  /** Контрагенты: чем занимаются (электрика, окна, упаковка…). */
+  specialty?: string;
+  status?: ContractorStatus;
+  notes?: string;
+};
+
+export type ContractorStatus = "lead" | "negotiation" | "contract" | "working" | "done" | "rejected";
+
+export const CONTACT_KINDS: { id: Contact["kind"]; label: string }[] = [
+  { id: "contractor", label: "Подрядчик" },
+  { id: "supplier", label: "Поставщик" },
+  { id: "partner", label: "Партнёр" },
+  { id: "authority", label: "Госорган / арендодатель" },
+  { id: "staff", label: "Сотрудник" },
+];
+
+export const CONTRACTOR_STATUS: Record<ContractorStatus, { label: string; color: string }> = {
+  lead: { label: "Кандидат", color: "#E5E7EB" },
+  negotiation: { label: "Переговоры", color: "#FDE68A" },
+  contract: { label: "Договор", color: "#BFDBFE" },
+  working: { label: "В работе", color: "#BBF7D0" },
+  done: { label: "Завершено", color: "#D1D5DB" },
+  rejected: { label: "Отказ", color: "#FECACA" },
 };
 
 export type NoticeKind = "task_new" | "deadline" | "status" | "comment" | "broadcast";

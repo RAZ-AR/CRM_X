@@ -9,7 +9,7 @@ import { statusMeta } from "@/lib/access";
 import { appUrlFrom, escapeHtml, sendTo, taskLink } from "@/lib/telegram";
 import { shortDate } from "@/lib/dates";
 
-const WORK = ["status", "result", "blockReason", "blockUntil", "blockFromStatus", "attachments"] as const;
+const WORK = ["status", "result", "blockReason", "blockUntil", "blockFromStatus", "attachments", "contactIds"] as const;
 
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const user = await sessionUser();

@@ -29,6 +29,7 @@ export function normalizeState(raw: Partial<AppState> | null | undefined): AppSt
       ...c,
       telegram: c.telegram || "",
       whatsapp: c.whatsapp || "",
+      kind: c.kind === "vendor" ? "supplier" : c.kind,
     })),
     notices: parsed.notices ?? EMPTY_STATE.notices,
     broadcast: parsed.broadcast ?? EMPTY_STATE.broadcast,

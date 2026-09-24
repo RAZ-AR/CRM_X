@@ -95,7 +95,7 @@ export function employeeNav(user: User) {
     items.push({ href: `/kanban?zone=${z}`, label: z.toUpperCase(), icon: "zone" });
   }
   if (hasPerm(user, "wiki")) items.push({ href: "/wiki", label: "Wiki", icon: "wiki" });
-  if (hasPerm(user, "contacts")) items.push({ href: "/contacts", label: "Контакты", icon: "contacts" });
+  if (hasPerm(user, "contacts")) items.push({ href: "/contacts", label: "Контрагенты", icon: "contacts" });
   if (canManagePeople(user)) items.push({ href: "/settings", label: "Команда", icon: "team" });
   return items;
 }
@@ -110,7 +110,7 @@ export function cpoNav() {
     { href: "/meeting", label: "Планёрка", icon: "meeting" },
     { href: "/settings", label: "Команда", icon: "team" },
     { href: "/wiki", label: "Wiki", icon: "wiki" },
-    { href: "/contacts", label: "Контакты", icon: "contacts" },
+    { href: "/contacts", label: "Контрагенты", icon: "contacts" },
   ];
 }
 
