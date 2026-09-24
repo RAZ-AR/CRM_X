@@ -18,6 +18,7 @@ import {
   Users,
   X,
   KeyRound,
+  CalendarDays,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { cpoNav, employeeNav, isCpo } from "@/lib/access";
@@ -27,6 +28,7 @@ import { TaskModal } from "@/components/TaskSheet";
 
 const icons: Record<string, React.ReactNode> = {
   home: <Home size={18} />,
+  week: <CalendarDays size={18} />,
   check: <CheckSquare size={18} />,
   kanban: <Kanban size={18} />,
   zone: <LayoutGrid size={18} />,
@@ -219,9 +221,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-black/5 grid grid-cols-4 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] z-30">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-black/5 grid grid-cols-5 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] z-30">
         <Link href="/home" className={clsx("flex flex-col items-center gap-0.5 text-[11px]", path === "/home" ? "text-black font-semibold" : "text-[#9a9aa0]")}>
           <Home size={20} /> Главная
+        </Link>
+        <Link href="/week" className={clsx("flex flex-col items-center gap-0.5 text-[11px]", path === "/week" ? "text-black font-semibold" : "text-[#9a9aa0]")}>
+          <CalendarDays size={20} /> Неделя
         </Link>
         <Link href="/kanban" className={clsx("flex flex-col items-center gap-0.5 text-[11px]", path === "/kanban" ? "text-black font-semibold" : "text-[#9a9aa0]")}>
           <Kanban size={20} /> Доска
