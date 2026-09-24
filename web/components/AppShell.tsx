@@ -19,6 +19,7 @@ import {
   X,
   KeyRound,
   CalendarDays,
+  GanttChart,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { cpoNav, employeeNav, isCpo } from "@/lib/access";
@@ -29,6 +30,7 @@ import { TaskModal } from "@/components/TaskSheet";
 const icons: Record<string, React.ReactNode> = {
   home: <Home size={18} />,
   week: <CalendarDays size={18} />,
+  timeline: <GanttChart size={18} />,
   check: <CheckSquare size={18} />,
   kanban: <Kanban size={18} />,
   zone: <LayoutGrid size={18} />,
