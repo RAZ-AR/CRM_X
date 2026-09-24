@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ExternalLink } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { canWorkTask, isCpo, isOverdue } from "@/lib/access";
 import { shortDate, todayYerevan } from "@/lib/dates";
@@ -98,6 +98,9 @@ export default function TasksPage() {
                 <span className={`text-[11px] shrink-0 ${isOverdue(t, picked) ? "text-red-500 font-medium" : "text-[#6b6b70]"}`}>{shortDate(t.due)}</span>
                 <span className="h-5 w-5 rounded-full bg-white grid place-items-center text-[9px] font-semibold shrink-0" title={a?.name}>{a?.avatar}</span>
               </button>
+              <Link href={`/tasks/${t.id}`} className="shrink-0 p-1 text-[#9a9aa0] hover:text-black" aria-label="Открыть страницу задачи" title="Открыть страницу задачи">
+                <ExternalLink size={14} />
+              </Link>
             </div>
           );
         })}
