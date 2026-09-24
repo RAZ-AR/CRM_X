@@ -13,11 +13,12 @@ const DAY_W = 16;
 const ROW_H = 30;
 const LABEL_W = 220;
 
-/** Timeline по 7 потокам с вехами запусков и предпросмотром переноса сроков. */
+/** Roadmap по 7 потокам с вехами запусков и предпросмотром переноса сроков. */
 export default function TimelinePage() {
   const { current, tasks, users, zones, saveTaskDates, setPreviewId } = useStore();
   const today = todayYerevan();
   const [zone, setZone] = useState("all");
+  const [who, setWho] = useState("all");
   const [selected, setSelected] = useState<string | null>(null);
   const [draft, setDraft] = useState<{ start: string; due: string } | null>(null);
   const [applying, setApplying] = useState(false);
@@ -26,9 +27,14 @@ export default function TimelinePage() {
   const visible = useMemo(
     () =>
       current
-        ? tasks.filter((t) => canSeeTask(current, t, users) && (zone === "all" || taskZones(t).includes(zone)))
+        ? tasks.filter(
+            (t) =>
+              canSeeTask(current, t, users) &&
+              (zone === "all" || taskZones(t).includes(zone)) &&
+              (who === "all" || t.assigneeId === who),
+          )
         : [],
-    [current, tasks, users, zone],
+    [current, tasks, users, zone, who],
   );
   const task = selected ? tasks.find((t) => t.id === selected) ?? null : null;
   const shifts = useMemo(
@@ -147,13 +153,21 @@ export default function TimelinePage() {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-end gap-2 pb-1">
-        <h1 className="page-title m-0 mr-auto">Timeline</h1>
+        <h1 className="page-title m-0 mr-auto">Roadmap</h1>
         <div className="flex flex-wrap gap-1.5 text-[11px] text-[#6F6E69]">
           <span className="pill bg-[#F3F2EE] px-2 py-1"><span className="inline-block h-2 w-3 rounded-full align-middle mr-1" style={{ boxShadow: "inset 0 0 0 2px #b91c1c" }} />critical path</span>
           <span className="pill bg-[#F3F2EE] px-2 py-1">◆ запуск</span>
           <span className="pill bg-[#F3F2EE] px-2 py-1"><span className="text-[#e86a4a]">|</span> сегодня</span>
         </div>
-        <select className="text-sm" value={zone} onChange={(e) => setZone(e.target.value)}>
+        <select className="text-sm" aria-label="Сотрудник" value={who} onChange={(e) => setWho(e.target.value)}>
+          <option value="all">Все сотрудники</option>
+          {users
+            .filter((u) => tasks.some((t) => t.assigneeId === u.id && canSeeTask(current, t, users)))
+            .map((u) => (
+              <option key={u.id} value={u.id}>{u.id === current.id ? `${u.name} (я)` : u.name}</option>
+            ))}
+        </select>
+        <select className="text-sm" aria-label="Проект" value={zone} onChange={(e) => setZone(e.target.value)}>
           <option value="all">Все проекты</option>
           {zones.map((z) => (
             <option key={z.slug} value={z.slug}>{z.emoji} {z.name}</option>

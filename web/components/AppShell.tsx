@@ -22,6 +22,8 @@ import {
   GanttChart,
   ClipboardList,
   ListChecks,
+  PanelLeftClose,
+  PanelLeftOpen,
   Wallet,
   ShieldAlert,
 } from "lucide-react";
@@ -56,6 +58,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [bell, setBell] = useState(false);
   const [menu, setMenu] = useState(false);
   const [cmdk, setCmdk] = useState(false);
+  // Свёрнутое меню запоминаем в браузере.
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return typeof window !== "undefined" && localStorage.getItem("crmx-nav-collapsed") === "1";
+    } catch {
+      return false;
+    }
+  });
+  const toggleCollapsed = () =>
+    setCollapsed((v) => {
+      try {
+        localStorage.setItem("crmx-nav-collapsed", v ? "0" : "1");
+      } catch {
+        /* ignore */
+      }
+      return !v;
+    });
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -81,60 +100,86 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const unread = mine.filter((n) => !n.read).length;
   const team = users.filter((u) => u.id !== current.id).slice(0, 5);
 
-  const navList = (
+  const navItems = (mini: boolean) => (
     <nav className="flex flex-col gap-1 flex-1">
       {nav.map((n) => {
-        const on = path === n.href || (n.href.startsWith("/kanban") && path === "/kanban");
+        const on = path === n.href || (n.href === "/roadmap" && path === "/timeline") || (n.href.startsWith("/kanban") && path === "/kanban");
         return (
           <Link
             key={n.href}
             href={n.href}
+            title={mini ? n.label : undefined}
+            aria-label={mini ? n.label : undefined}
             className={clsx(
-              "flex items-center gap-3 px-3 py-2 rounded-xl text-sm",
+              "flex items-center gap-3 py-2 rounded-xl text-sm",
+              mini ? "justify-center px-0 h-10" : "px-3",
               on ? "bg-[var(--card)] text-[var(--ink)] font-medium border border-[var(--line)]" : "text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--card)]/60 border border-transparent",
             )}
           >
             {icons[n.icon]}
-            {n.label}
+            {!mini && n.label}
           </Link>
         );
       })}
     </nav>
   );
+  const navList = navItems(false);
 
   return (
     <div className="min-h-dvh bg-[var(--bg)]">
-      <div className="min-h-dvh md:grid md:grid-cols-[232px_1fr]">
-        <aside className="hidden md:flex flex-col px-4 py-6 sticky top-0 h-dvh overflow-y-auto">
-          <Link href="/home" className="flex items-center gap-2 mb-8 px-3">
-            <span className="h-8 w-8 rounded-[10px] bg-[var(--ink)] grid place-items-center text-white text-xs font-bold">X</span>
-            <span className="font-semibold text-[17px] tracking-tight">CRM X</span>
-          </Link>
-          {navList}
-          <div className="flex -space-x-2 mb-4 mt-4 px-3">
-            {team.map((u) => (
-              <span key={u.id} className="h-8 w-8 rounded-full bg-[var(--card)] border-2 border-[var(--bg)] grid place-items-center text-xs font-semibold">
-                {u.avatar}
-              </span>
-            ))}
-          </div>
-          <Link href="/profile" className="flex items-center gap-2 text-sm text-[#6F6E69] py-1 px-3">
-            <KeyRound size={16} /> Мой профиль
-          </Link>
-          {isCpo(current) && (
-            <Link href="/settings" className="flex items-center gap-2 text-sm text-[#6F6E69] py-1 px-3">
-              <Settings size={16} /> Настройки
-            </Link>
+      <div className="min-h-dvh">
+        {/* Боковое меню закреплено и не скроллится со страницей; сворачивается до иконок. */}
+        <aside
+          className={clsx(
+            "hidden md:flex flex-col fixed inset-y-0 left-0 z-20 py-5 overflow-y-auto bg-[var(--bg)] border-r border-[var(--line)] transition-[width] duration-200",
+            collapsed ? "w-[72px] px-3" : "w-[232px] px-4",
           )}
-          <button
-            className="flex items-center gap-2 text-sm text-[#6F6E69] py-1 px-3"
-            onClick={() => {
-              logout();
-              router.push("/login");
-            }}
-          >
-            <LogOut size={16} /> Выйти
-          </button>
+        >
+          <div className={clsx("flex items-center mb-7", collapsed ? "flex-col gap-3" : "gap-2 px-3")}>
+            <Link href="/home" className="flex items-center gap-2 min-w-0" aria-label="CRM X — главная">
+              <span className="h-8 w-8 rounded-[10px] bg-[var(--ink)] grid place-items-center text-white text-xs font-bold shrink-0">X</span>
+              {!collapsed && <span className="font-semibold text-[17px] tracking-tight">CRM X</span>}
+            </Link>
+            <button
+              type="button"
+              onClick={toggleCollapsed}
+              className={clsx("h-8 w-8 rounded-lg grid place-items-center text-[var(--muted)] hover:text-[var(--ink)] hover:bg-[var(--card)]", !collapsed && "ml-auto")}
+              aria-label={collapsed ? "Развернуть меню" : "Свернуть меню"}
+              title={collapsed ? "Развернуть меню" : "Свернуть меню"}
+            >
+              {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+            </button>
+          </div>
+          {navItems(collapsed)}
+          {!collapsed && (
+            <div className="flex -space-x-2 mb-4 mt-4 px-3">
+              {team.map((u) => (
+                <span key={u.id} className="h-8 w-8 rounded-full bg-[var(--card)] border-2 border-[var(--bg)] grid place-items-center text-xs font-semibold">
+                  {u.avatar}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className={clsx("flex flex-col gap-1 mt-3", collapsed && "items-center")}>
+            <Link href="/profile" title="Мой профиль" className={clsx("flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--ink)] py-1.5", collapsed ? "justify-center w-10" : "px-3")}>
+              <KeyRound size={16} /> {!collapsed && "Мой профиль"}
+            </Link>
+            {isCpo(current) && (
+              <Link href="/settings" title="Настройки" className={clsx("flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--ink)] py-1.5", collapsed ? "justify-center w-10" : "px-3")}>
+                <Settings size={16} /> {!collapsed && "Настройки"}
+              </Link>
+            )}
+            <button
+              title="Выйти"
+              className={clsx("flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--ink)] py-1.5", collapsed ? "justify-center w-10" : "px-3")}
+              onClick={() => {
+                logout();
+                router.push("/login");
+              }}
+            >
+              <LogOut size={16} /> {!collapsed && "Выйти"}
+            </button>
+          </div>
         </aside>
 
         {menu && (
@@ -162,7 +207,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        <div className="min-w-0 flex flex-col pb-16 md:pb-0">
+        <div className={clsx("min-w-0 flex flex-col pb-16 md:pb-0 transition-[padding] duration-200", collapsed ? "md:pl-[72px]" : "md:pl-[232px]")}>
           <header className="relative flex items-center gap-2 px-4 py-3 md:px-8 md:pt-6 md:pb-2">
             <button className="md:hidden h-10 w-10 rounded-full bg-[var(--card)] border border-[var(--line)] grid place-items-center shrink-0" aria-label="Меню" onClick={() => setMenu(true)}>
               <Menu size={18} />

@@ -88,7 +88,7 @@ export function employeeNav(user: User) {
     { href: "/home", label: "Главная", icon: "home" },
     { href: "/todo", label: "Дела", icon: "todo" },
     { href: "/week", label: "Неделя", icon: "week" },
-    { href: "/timeline", label: "Timeline", icon: "timeline" },
+    { href: "/roadmap", label: "Roadmap", icon: "timeline" },
     { href: "/kanban", label: "Доска", icon: "kanban" },
   ];
   const boards = user.boardZones?.length ? user.boardZones : user.zone ? [user.zone] : [];
@@ -108,7 +108,7 @@ export function cpoNav() {
     { href: "/home", label: "Главная", icon: "home" },
     { href: "/todo", label: "Дела", icon: "todo" },
     { href: "/week", label: "Неделя", icon: "week" },
-    { href: "/timeline", label: "Timeline", icon: "timeline" },
+    { href: "/roadmap", label: "Roadmap", icon: "timeline" },
     { href: "/kanban", label: "Доска", icon: "kanban" },
     { href: "/zones", label: "Проекты", icon: "zone" },
     { href: "/meeting", label: "Планёрка", icon: "meeting" },
