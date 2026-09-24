@@ -31,7 +31,36 @@ export async function saveBlobState(state: AppState) {
   });
 }
 
+/**
+ * Старая демо-база: Owner = u-cpo, 90 задач бэклога. Заменяем людей и чистим задачи,
+ * зоны / wiki / контакты оставляем. Идемпотентно: после миграции u-cpo нет.
+ */
+export function isLegacyState(state: AppState) {
+  return state.users.some((u) => u.id === "u-cpo");
+}
+
+export function migrateLegacyState(state: AppState): AppState {
+  return {
+    ...state,
+    users: seed.users,
+    tasks: [],
+    comments: [],
+    subtasks: [],
+    notices: [],
+    contacts: [...seed.contacts.filter((c) => c.kind === "staff"), ...state.contacts.filter((c) => c.kind !== "staff")],
+    broadcast: state.broadcast ? { ...state.broadcast, authorId: seed.users[0].id } : seed.broadcast,
+  };
+}
+
 export async function loadSharedState(): Promise<{ state: AppState; via: "db" | "blob" | "seed" }> {
+  const loaded = await loadStoredState();
+  if (!isLegacyState(loaded.state)) return loaded;
+  const state = migrateLegacyState(loaded.state);
+  await saveSharedState(state);
+  return { ...loaded, state };
+}
+
+async function loadStoredState(): Promise<{ state: AppState; via: "db" | "blob" | "seed" }> {
   const blob = await loadBlobState();
   if (blob) return { state: blob, via: "blob" };
   const { getPrisma } = await import("./prisma");

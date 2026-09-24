@@ -24,11 +24,11 @@ export default function SettingsPage() {
   const [copied, setCopied] = useState(false);
 
   if (!current) return null;
-  if (!canManagePeople(current)) return <div className="card p-6">Только Owner и Armen.</div>;
+  if (!canManagePeople(current)) return <div className="card p-6">Только Owner.</div>;
 
-  function suggestLogin() {
-    const n = unusedFourDigit(taken, [pin]);
-    setLogin(n);
+  function suggestLogin(form: HTMLFormElement | null) {
+    const name = String(new FormData(form ?? undefined).get("name") || "").trim().split(/\s+/)[0] || "";
+    setLogin(name);
   }
 
   function suggestPin() {
@@ -61,7 +61,7 @@ export default function SettingsPage() {
   }
 
   async function copyCreds(name: string, l: string, p: string) {
-    const text = `${name}\nлогин ${l}\nPIN ${p}`;
+    const text = `${name}\nлогин ${l}\nпароль ${p}`;
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -74,7 +74,7 @@ export default function SettingsPage() {
     <div className="space-y-3 max-w-3xl">
       <h1 className="text-xl font-semibold">Команда и доступы к доскам</h1>
       <p className="text-sm text-[#757575]">
-        Owner и Armen создают человека с логином и PIN из 4 цифр — сразу можно отдать на объекте.
+        Owner создаёт человека с логином (обычно имя) и паролем от 4 символов. Потом человек сам меняет пароль в «Мой профиль».
       </p>
       <form onSubmit={onAdd} className="card p-5 grid sm:grid-cols-2 gap-2">
         <div className="sm:col-span-2 font-medium">Добавить сотрудника</div>
@@ -92,35 +92,29 @@ export default function SettingsPage() {
         </select>
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="text-xs text-[#757575]">Логин · 4 цифры</label>
-            <button type="button" className="text-xs underline" onClick={suggestLogin}>подобрать</button>
+            <label className="text-xs text-[#757575]">Логин · обычно имя</label>
+            <button type="button" className="text-xs underline" onClick={(e) => suggestLogin(e.currentTarget.form)}>как имя</button>
           </div>
           <input
-            inputMode="numeric"
-            pattern="\d{4}"
-            maxLength={4}
+            maxLength={32}
             required
-            placeholder="например 5050"
+            placeholder="например Karina"
             value={login}
-            onChange={(e) => setLogin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+            onChange={(e) => setLogin(e.target.value.replace(/\s/g, ""))}
           />
         </div>
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="text-xs text-[#757575]">PIN · 4 цифры</label>
-            <span className="flex gap-2">
-              <button type="button" className="text-xs underline" onClick={() => setPin(login)}>как логин</button>
-              <button type="button" className="text-xs underline" onClick={suggestPin}>подобрать</button>
-            </span>
+            <label className="text-xs text-[#757575]">Пароль · от 4 символов</label>
+            <button type="button" className="text-xs underline" onClick={suggestPin}>подобрать</button>
           </div>
           <input
-            inputMode="numeric"
-            pattern="\d{4}"
-            maxLength={4}
+            minLength={4}
+            maxLength={64}
             required
-            placeholder="пин для входа"
+            placeholder="пароль для входа"
             value={pin}
-            onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+            onChange={(e) => setPin(e.target.value)}
           />
         </div>
         {err && <p className="text-red-500 text-sm sm:col-span-2">{err}</p>}
@@ -131,7 +125,7 @@ export default function SettingsPage() {
         <div className="card p-5 bg-black text-white">
           <div className="text-sm opacity-70 mb-1">Отдайте сотруднику</div>
           <div className="text-lg font-medium">{created.name}</div>
-          <div className="mt-2 font-mono text-xl tracking-widest">логин {created.login} · PIN {created.pin}</div>
+          <div className="mt-2 font-mono text-xl tracking-widest">логин {created.login} · пароль {created.pin}</div>
           <button
             type="button"
             className="mt-3 pill bg-white text-black px-4 py-2 text-sm"
@@ -151,10 +145,9 @@ export default function SettingsPage() {
               <input
                 className="mt-1"
                 defaultValue={u.email}
-                inputMode="numeric"
-                maxLength={4}
+                maxLength={32}
                 onBlur={(e) => {
-                  const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+                  const v = e.target.value.trim();
                   if (v && v !== u.email) {
                     const r = setUserLogin(u.id, v);
                     if (!r.ok) alert(r.error);
@@ -164,14 +157,13 @@ export default function SettingsPage() {
               />
             </label>
             <label className="text-xs text-[#757575]">
-              Новый PIN
+              Новый пароль
               <input
                 className="mt-1"
                 placeholder="••••"
-                inputMode="numeric"
-                maxLength={4}
+                maxLength={64}
                 onBlur={(e) => {
-                  const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+                  const v = e.target.value.trim();
                   if (!v) return;
                   const r = setUserPin(u.id, v);
                   if (!r.ok) alert(r.error);

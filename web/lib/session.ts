@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { loadSharedState } from "./blobState";
 import { seed } from "./seed";
+import { sameLogin } from "./pin";
 import type { User } from "./types";
 
 export const UID_COOKIE = "crmx_uid";
@@ -24,7 +25,7 @@ export async function findUserById(id: string): Promise<User | null> {
 }
 
 export async function findUserByLogin(email: string, password: string): Promise<User | null> {
-  return (await allUsers()).find((u) => u.email === email && u.password === password) ?? null;
+  return (await allUsers()).find((u) => sameLogin(u.email, email) && u.password === password) ?? null;
 }
 
 export async function sessionUser(): Promise<User | null> {

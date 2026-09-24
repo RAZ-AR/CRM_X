@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import { seed } from "./seed";
-import { isFourDigit, loginTaken } from "./pin";
+import { isValidLogin, isValidPassword, loginTaken, sameLogin } from "./pin";
 import { canMoveStatus } from "./taskRules";
 import { normalizeState } from "./normalize";
 import type {
@@ -59,10 +59,11 @@ type Store = AppState & {
   setBroadcast: (text: string, emoji: string) => void;
   toggleReaction: (commentId: string, emoji: string) => void;
   setManager: (userId: string, managerId: string | null) => void;
+  changeOwnPassword: (current: string, next: string) => Promise<{ ok: true } | { ok: false; error: string }>;
 };
 
 const Ctx = createContext<Store | null>(null);
-const KEY = "crmx-v8";
+const KEY = "crmx-v9";
 const USER_KEY = "crmx-user";
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -179,7 +180,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       });
       const data = await res.json();
       if (!res.ok || !data?.ok) {
-        const u = state.users.find((x) => x.email === email && x.password === password);
+        const u = state.users.find((x) => sameLogin(x.email, email) && x.password === password);
         if (!u) return false;
         setCurrent(u);
         localStorage.setItem(USER_KEY, u.id);
@@ -200,7 +201,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(USER_KEY, data.user.id);
       return true;
     } catch {
-      const u = state.users.find((x) => x.email === email && x.password === password);
+      const u = state.users.find((x) => sameLogin(x.email, email) && x.password === password);
       if (!u) return false;
       setCurrent(u);
       localStorage.setItem(USER_KEY, u.id);
@@ -536,8 +537,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }): { ok: true } | { ok: false; error: string } => {
       const email = u.email.trim();
       const password = u.password.trim();
-      if (!isFourDigit(email)) return { ok: false, error: "Логин — ровно 4 цифры" };
-      if (!isFourDigit(password)) return { ok: false, error: "PIN — ровно 4 цифры" };
+      if (!isValidLogin(email)) return { ok: false, error: "Логин — 2–32 символа, без пробелов" };
+      if (!isValidPassword(password)) return { ok: false, error: "Пароль — минимум 4 символа" };
       if (loginTaken(state.users, email)) return { ok: false, error: "Такой логин уже есть" };
       const user: User = {
         id: `u-${crypto.randomUUID().slice(0, 8)}`,
@@ -560,7 +561,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const setUserPin = useCallback((userId: string, pin: string): { ok: true } | { ok: false; error: string } => {
     const password = pin.trim();
-    if (!isFourDigit(password)) return { ok: false, error: "PIN — ровно 4 цифры" };
+    if (!isValidPassword(password)) return { ok: false, error: "Пароль — минимум 4 символа" };
     setState((s) => ({
       ...s,
       users: s.users.map((u) => (u.id === userId ? { ...u, password } : u)),
@@ -570,7 +571,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const setUserLogin = useCallback((userId: string, login: string): { ok: true } | { ok: false; error: string } => {
     const email = login.trim();
-    if (!isFourDigit(email)) return { ok: false, error: "Логин — ровно 4 цифры" };
+    if (!isValidLogin(email)) return { ok: false, error: "Логин — 2–32 символа, без пробелов" };
     if (loginTaken(state.users, email, userId)) return { ok: false, error: "Такой логин уже есть" };
     setState((s) => ({
       ...s,
@@ -578,6 +579,26 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }));
     return { ok: true };
   }, [state.users]);
+
+  const changeOwnPassword = useCallback(
+    async (currentPassword: string, next: string): Promise<{ ok: true } | { ok: false; error: string }> => {
+      if (!isValidPassword(next)) return { ok: false, error: "Пароль — минимум 4 символа" };
+      try {
+        const res = await fetch("/api/password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ current: currentPassword, next: next.trim() }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data?.ok) return { ok: false, error: data?.error || "Не получилось сменить пароль" };
+        return { ok: true };
+      } catch {
+        return { ok: false, error: "Нет связи с сервером" };
+      }
+    },
+    [],
+  );
 
   const value = useMemo(
     () => ({
@@ -608,6 +629,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setBroadcast,
       toggleReaction,
       setManager,
+      changeOwnPassword,
     }),
     [
       state,
@@ -637,6 +659,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setBroadcast,
       toggleReaction,
       setManager,
+      changeOwnPassword,
     ],
   );
 

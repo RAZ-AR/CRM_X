@@ -5,7 +5,7 @@ export function isCpo(user: User) {
 }
 
 export function canManagePeople(user: User) {
-  return isCpo(user) || user.permissions.includes("manage_users") || user.id === "u-armen";
+  return isCpo(user) || user.permissions.includes("manage_users");
 }
 
 export function hasPerm(user: User, p: Permission) {

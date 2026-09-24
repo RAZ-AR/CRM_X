@@ -32,7 +32,7 @@ curl -X POST https://ТВОЙ-ДОМЕН/api/state -H 'content-type: application
 Если на Vercel красная плашка «только этот браузер»: Aiven режет чужие IP.
 Aiven Console → PostgreSQL → **Allowed IP addresses** → Add `0.0.0.0/0` (или Public Access). Сохрани. Подожди 1–2 мин, обнови CRM, выйди и зайди.
 
-Логины как на экране входа: **1111 / 1111** Owner, **2222 / 2222** Armen, …
+Логины: **Armen** (Owner), **Vladimir**, **Karina**. Пароли выдаёт Owner, сменить свой: «Мой профиль».
 
 С `DATABASE_URL` приложение само читает `GET /api/state` и пишет `PUT /api/state` (~0.6с после правки). Два браузера видят одну доску.
 

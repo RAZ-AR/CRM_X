@@ -8,7 +8,7 @@ export function normalizeState(raw: Partial<AppState> | null | undefined): AppSt
     ...parsed,
     users: (parsed.users ?? seed.users).map((u) => ({
       ...u,
-      managerId: u.managerId === undefined ? (u.id === "u-cpo" ? null : "u-armen") : u.managerId,
+      managerId: u.managerId === undefined ? (u.role === "cpo" ? null : seed.users[0]?.id ?? null) : u.managerId,
       permissions: u.permissions ?? [],
       boardZones: u.boardZones ?? [],
     })),
