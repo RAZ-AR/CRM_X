@@ -42,6 +42,10 @@ export type User = {
   permissions: Permission[];
   boardZones: ZoneSlug[];
   managerId: string | null;
+  /** Только на сервере: чат Telegram для уведомлений. */
+  telegramChatId?: string;
+  /** В браузер приходит только признак «Telegram подключён». */
+  telegramLinked?: boolean;
 };
 
 export type Zone = {

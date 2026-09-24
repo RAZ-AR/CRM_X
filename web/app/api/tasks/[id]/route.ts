@@ -4,6 +4,9 @@ import { canDeleteTask, canEditTask, canWorkTask } from "@/lib/access";
 import { canMoveStatus } from "@/lib/taskRules";
 import { loadSharedState, saveSharedState } from "@/lib/blobState";
 import type { Task } from "@/lib/types";
+import { statusMeta } from "@/lib/access";
+import { appUrlFrom, escapeHtml, sendTo, taskLink } from "@/lib/telegram";
+import { shortDate } from "@/lib/dates";
 
 const WORK = ["status", "result", "blockReason", "blockUntil", "blockFromStatus", "attachments"] as const;
 
@@ -36,7 +39,19 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   }
   const tasks = state.tasks.map((t) => (t.id === id ? { ...t, ...nextPatch } : t));
   await saveSharedState({ ...state, tasks });
-  return NextResponse.json({ ok: true, task: tasks.find((t) => t.id === id) });
+  const task = tasks.find((t) => t.id === id)!;
+  const url = appUrlFrom(req);
+  const who = escapeHtml(user.name);
+  const person = (uid: string) => (uid !== user.id ? state.users.find((u) => u.id === uid) : undefined);
+  if (nextPatch.assigneeId && nextPatch.assigneeId !== prev.assigneeId) {
+    await sendTo(person(task.assigneeId), `🆕 ${who} назначил вам задачу: ${taskLink(url, task)}\nСрок: ${shortDate(task.due)}`);
+  }
+  if (nextPatch.status && nextPatch.status !== prev.status && ["review", "done", "blocked"].includes(task.status)) {
+    const m = statusMeta[task.status];
+    const why = task.status === "blocked" && task.blockReason ? `\nПричина: ${escapeHtml(task.blockReason)}` : "";
+    await sendTo(person(task.authorId), `${m.emoji} ${m.label}: ${taskLink(url, task)} — ${who}${why}`);
+  }
+  return NextResponse.json({ ok: true, task });
 }
 
 export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string }> }) {

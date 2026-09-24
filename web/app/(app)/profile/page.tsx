@@ -45,6 +45,81 @@ export default function ProfilePage() {
           {busy ? "Сохраняю…" : "Сохранить"}
         </button>
       </form>
+      <TelegramCard linked={Boolean(current.telegramLinked)} owner={current.role === "cpo"} />
+    </div>
+  );
+}
+
+function TelegramCard({ linked, owner }: { linked: boolean; owner: boolean }) {
+  const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function call(url: string, method: "GET" | "POST") {
+    setBusy(true);
+    setNote(null);
+    try {
+      const res = await fetch(url, { method, credentials: "same-origin" });
+      return (await res.json()) as { ok: boolean; url?: string; error?: string; sent?: number; failed?: number };
+    } catch {
+      return { ok: false, error: "Нет связи с сервером" };
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="card p-5 flex flex-col gap-2">
+      <div className="font-medium">Telegram</div>
+      <p className="text-sm text-[#757575]">
+        Бот пишет, когда вам назначают задачу, когда ваша задача ушла на проверку, готова или заблокирована,
+        и каждое утро в 9:00 присылает список дел.
+      </p>
+      <div className="text-sm">{linked ? "✅ Подключён" : "Не подключён"}</div>
+      <button
+        type="button"
+        disabled={busy}
+        className="pill bg-black text-white py-2 font-medium disabled:opacity-50"
+        onClick={async () => {
+          const r = await call("/api/telegram/link", "GET");
+          if (r.ok && r.url) {
+            window.open(r.url, "_blank");
+            setNote({ ok: true, text: "В Telegram нажмите «Старт». Ссылка действует 30 минут." });
+          } else setNote({ ok: false, text: r.error || "Не получилось" });
+        }}
+      >
+        {linked ? "Подключить заново" : "Подключить Telegram"}
+      </button>
+      {linked && (
+        <button
+          type="button"
+          disabled={busy}
+          className="pill bg-[#f4f4f6] py-2 text-sm"
+          onClick={async () => {
+            const r = await call("/api/telegram/unlink", "POST");
+            setNote(r.ok ? { ok: true, text: "Отключено. Обновите страницу." } : { ok: false, text: r.error || "Не получилось" });
+          }}
+        >
+          Отключить
+        </button>
+      )}
+      {owner && (
+        <button
+          type="button"
+          disabled={busy}
+          className="pill bg-[#f4f4f6] py-2 text-sm"
+          onClick={async () => {
+            const r = await call("/api/telegram/digest", "POST");
+            setNote(
+              r.ok
+                ? { ok: true, text: `Утренний список отправлен: ${r.sent ?? 0} чел.` }
+                : { ok: false, text: `${r.error || "Не получилось"}${r.sent ? ` (доставлено ${r.sent})` : ""}` },
+            );
+          }}
+        >
+          Разослать утренний список сейчас
+        </button>
+      )}
+      {note && <p className={note.ok ? "text-green-600 text-sm" : "text-red-500 text-sm"}>{note.text}</p>}
     </div>
   );
 }
