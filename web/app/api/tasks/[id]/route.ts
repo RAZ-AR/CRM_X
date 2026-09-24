@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { sessionUser } from "@/lib/session";
-import { canEditTask, canWorkTask } from "@/lib/access";
+import { canDeleteTask, canEditTask, canWorkTask } from "@/lib/access";
 import { canMoveStatus } from "@/lib/taskRules";
 import { loadSharedState, saveSharedState } from "@/lib/blobState";
 import type { Task } from "@/lib/types";
@@ -37,4 +37,31 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   const tasks = state.tasks.map((t) => (t.id === id ? { ...t, ...nextPatch } : t));
   await saveSharedState({ ...state, tasks });
   return NextResponse.json({ ok: true, task: tasks.find((t) => t.id === id) });
+}
+
+export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+  const user = await sessionUser();
+  if (!user) return NextResponse.json({ ok: false, auth: true }, { status: 401 });
+  const { id } = await ctx.params;
+  const { state } = await loadSharedState();
+  const task = state.tasks.find((t) => t.id === id);
+  if (!task) return NextResponse.json({ ok: true, gone: true });
+  if (!canDeleteTask(user, task)) {
+    return NextResponse.json({ ok: false, error: "Удалять можно только свои задачи" }, { status: 403 });
+  }
+  const tasks = state.tasks
+    .filter((t) => t.id !== id)
+    .map((t) =>
+      task.code && (t.dependsOn ?? []).includes(task.code)
+        ? { ...t, dependsOn: t.dependsOn.filter((c) => c !== task.code) }
+        : t,
+    );
+  await saveSharedState({
+    ...state,
+    tasks,
+    comments: state.comments.filter((c) => c.taskId !== id),
+    subtasks: state.subtasks.filter((s) => s.taskId !== id),
+    notices: state.notices.filter((n) => n.taskId !== id),
+  });
+  return NextResponse.json({ ok: true });
 }

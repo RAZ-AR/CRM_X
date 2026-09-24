@@ -1,7 +1,7 @@
 "use client";
 
-import { BLOCK_COLORS } from "@/lib/readiness";
-import { READINESS_BLOCKS, type Zone } from "@/lib/types";
+import { streamProgress } from "@/lib/readiness";
+import type { Task } from "@/lib/types";
 
 export function Donut({
   percent,
@@ -112,10 +112,8 @@ function arc(cx: number, cy: number, r: number, start: number, end: number) {
   return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
 }
 
-export function zoneSlices(zone: Zone) {
-  return READINESS_BLOCKS.map((b) => ({
-    key: b,
-    value: Math.max(zone.readiness[b], 1),
-    color: BLOCK_COLORS[b],
-  }));
+export function zoneSlices(tasks: Task[]) {
+  return streamProgress(tasks)
+    .filter((s) => s.total > 0)
+    .map((s) => ({ key: s.stream, value: Math.max(s.pct, 1), color: s.color }));
 }

@@ -1,18 +1,18 @@
 import type { AppState, Task } from "./types";
-import { seed } from "./seed";
+import { EMPTY_STATE } from "./emptyState";
 
 export function normalizeState(raw: Partial<AppState> | null | undefined): AppState {
   const parsed = raw ?? {};
   return {
-    ...seed,
+    ...EMPTY_STATE,
     ...parsed,
-    users: (parsed.users ?? seed.users).map((u) => ({
+    users: (parsed.users ?? EMPTY_STATE.users).map((u) => ({
       ...u,
-      managerId: u.managerId === undefined ? (u.id === "u-cpo" ? null : "u-armen") : u.managerId,
+      managerId: u.managerId ?? null,
       permissions: u.permissions ?? [],
       boardZones: u.boardZones ?? [],
     })),
-    tasks: (parsed.tasks ?? seed.tasks).map((task) => ({
+    tasks: (parsed.tasks ?? EMPTY_STATE.tasks).map((task) => ({
       ...task,
       status: ((task.status as string) === "waiting" ? "blocked" : task.status) as Task["status"],
       blockReason: task.blockReason ?? "",
@@ -21,19 +21,19 @@ export function normalizeState(raw: Partial<AppState> | null | undefined): AppSt
       participantIds: task.participantIds ?? [],
       attachments: task.attachments ?? [],
     })),
-    comments: (parsed.comments ?? seed.comments).map((c) => ({
+    comments: (parsed.comments ?? EMPTY_STATE.comments).map((c) => ({
       ...c,
       reactions: c.reactions ?? [],
     })),
-    contacts: (parsed.contacts ?? seed.contacts).map((c) => ({
+    contacts: (parsed.contacts ?? EMPTY_STATE.contacts).map((c) => ({
       ...c,
       telegram: c.telegram || "",
       whatsapp: c.whatsapp || "",
     })),
-    notices: parsed.notices ?? seed.notices ?? [],
-    broadcast: parsed.broadcast ?? seed.broadcast ?? null,
-    wiki: parsed.wiki ?? seed.wiki,
-    subtasks: parsed.subtasks ?? seed.subtasks,
-    zones: parsed.zones ?? seed.zones,
+    notices: parsed.notices ?? EMPTY_STATE.notices,
+    broadcast: parsed.broadcast ?? EMPTY_STATE.broadcast,
+    wiki: parsed.wiki ?? EMPTY_STATE.wiki,
+    subtasks: parsed.subtasks ?? EMPTY_STATE.subtasks,
+    zones: parsed.zones ?? EMPTY_STATE.zones,
   };
 }

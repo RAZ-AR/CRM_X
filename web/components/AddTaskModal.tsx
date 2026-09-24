@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { useStore } from "@/lib/store";
 import { isCpo } from "@/lib/access";
 import { filesToAttachments } from "@/lib/files";
-import type { Priority, ZoneSlug } from "@/lib/types";
+import { STREAMS, type Priority, type ZoneSlug } from "@/lib/types";
 
 export function AddTaskModal({
   lockZone,
@@ -42,7 +42,7 @@ export function AddTaskModal({
       attachments,
       code: "",
       wave: "",
-      workstream: "",
+      workstream: String(fd.get("workstream") || ""),
       dependsOn: [],
       blockReason: "",
       zones: [zone],
@@ -78,6 +78,12 @@ export function AddTaskModal({
             <input name="due" type="date" required className="w-full mt-1" />
           </label>
         </div>
+        <select name="workstream" className="w-full" defaultValue="">
+          <option value="">Поток: —</option>
+          {STREAMS.map((st) => (
+            <option key={st} value={st}>Поток: {st}</option>
+          ))}
+        </select>
         <select name="priority" className="w-full" defaultValue="medium">
           <option value="low">Срочность: низкая</option>
           <option value="medium">Срочность: средняя</option>

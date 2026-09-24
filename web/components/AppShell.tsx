@@ -17,6 +17,7 @@ import {
   Settings,
   Users,
   X,
+  KeyRound,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { cpoNav, employeeNav, isCpo } from "@/lib/access";
@@ -102,6 +103,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             ))}
           </div>
+          <Link href="/profile" className="flex items-center gap-2 text-sm text-[#6b6b70] py-1">
+            <KeyRound size={16} /> Мой профиль
+          </Link>
           {isCpo(current) && (
             <Link href="/settings" className="flex items-center gap-2 text-sm text-[#6b6b70] py-1">
               <Settings size={16} /> Настройки
@@ -127,8 +131,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[#ddd]" />
               <div className="font-semibold mb-3">Навигация</div>
               {navList}
+              <Link href="/profile" className="mt-4 block text-sm text-[#6b6b70] py-2" onClick={() => setMenu(false)}>
+                Мой профиль · пароль
+              </Link>
               <button
-                className="mt-4 w-full text-left text-sm text-[#6b6b70] py-2"
+                className="w-full text-left text-sm text-[#6b6b70] py-2"
                 onClick={() => {
                   logout();
                   router.push("/login");

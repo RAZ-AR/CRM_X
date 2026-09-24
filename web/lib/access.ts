@@ -5,7 +5,7 @@ export function isCpo(user: User) {
 }
 
 export function canManagePeople(user: User) {
-  return isCpo(user) || user.permissions.includes("manage_users") || user.id === "u-armen";
+  return isCpo(user) || user.permissions.includes("manage_users");
 }
 
 export function hasPerm(user: User, p: Permission) {
@@ -44,6 +44,11 @@ export function canSeeTask(user: User, task: Task, users: User[] = []) {
 /** Срок, вес, critical path, название — автор / CPO / Armen. */
 export function canEditTask(user: User, task: Task) {
   return isCpo(user) || canManagePeople(user) || task.authorId === user.id;
+}
+
+/** Удалить: Owner — любую, остальные — только созданные ими. */
+export function canDeleteTask(user: User, task: Task) {
+  return isCpo(user) || task.authorId === user.id;
 }
 
 /** Статус, чеклист, комментарий, вложение — исполнитель и участники тоже. */

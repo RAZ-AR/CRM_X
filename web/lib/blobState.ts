@@ -31,7 +31,43 @@ export async function saveBlobState(state: AppState) {
   });
 }
 
+/**
+ * Всё, что было до master-плана от 24.09.2026 (нет проекта «ОБЩИЕ»): заменяем задачи и проекты
+ * на новый план. Пароли людей с теми же id сохраняем, внешние контакты и свои wiki-страницы — тоже.
+ * Идемпотентно: после миграции «common» есть, повторно не срабатывает.
+ */
+export function isLegacyState(state: AppState) {
+  return !state.zones.some((z) => z.slug === "common");
+}
+
+export function migrateLegacyState(state: AppState): AppState {
+  const seedIds = new Set(seed.wiki.map((w) => w.id));
+  return {
+    ...state,
+    zones: seed.zones,
+    users: seed.users.map((u) => {
+      const prev = state.users.find((x) => x.id === u.id);
+      return { ...u, password: prev?.password || u.password };
+    }),
+    tasks: seed.tasks,
+    subtasks: seed.subtasks,
+    comments: [],
+    notices: [],
+    wiki: [...seed.wiki, ...state.wiki.filter((w) => !seedIds.has(w.id) && w.id !== "w1")],
+    contacts: [...seed.contacts.filter((c) => c.kind === "staff"), ...state.contacts.filter((c) => c.kind !== "staff")],
+    broadcast: seed.broadcast,
+  };
+}
+
 export async function loadSharedState(): Promise<{ state: AppState; via: "db" | "blob" | "seed" }> {
+  const loaded = await loadStoredState();
+  if (!isLegacyState(loaded.state)) return loaded;
+  const state = migrateLegacyState(loaded.state);
+  await saveSharedState(state);
+  return { ...loaded, state };
+}
+
+async function loadStoredState(): Promise<{ state: AppState; via: "db" | "blob" | "seed" }> {
   const blob = await loadBlobState();
   if (blob) return { state: blob, via: "blob" };
   const { getPrisma } = await import("./prisma");

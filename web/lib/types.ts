@@ -17,18 +17,18 @@ export type Permission =
 
 export type ZoneSlug = string;
 
-export const READINESS_BLOCKS = [
+/** 7 потоков запуска. Готовность проекта считается по задачам каждого потока. */
+export const STREAMS = [
+  "LEGAL",
   "SPACE",
-  "EQUIPMENT",
-  "TEAM",
+  "BRAND",
   "PRODUCT",
-  "IT",
-  "MARKETING",
-  "OPERATIONS",
-  "READY",
+  "EQUIPMENT & SUPPLY",
+  "PEOPLE",
+  "LAUNCH",
 ] as const;
 
-export type ReadinessBlock = (typeof READINESS_BLOCKS)[number];
+export type Stream = (typeof STREAMS)[number];
 
 export type User = {
   id: string;
@@ -50,7 +50,8 @@ export type Zone = {
   emoji: string;
   color: string;
   deadline: string;
-  readiness: Record<ReadinessBlock, number>;
+  /** Устарело: готовность считается из задач (см. lib/readiness.ts). */
+  readiness: Record<string, number>;
 };
 
 export type Comment = {

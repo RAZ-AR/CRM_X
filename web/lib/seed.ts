@@ -7,124 +7,71 @@ export const seed: AppState = {
       "name": "WAFL",
       "emoji": "🧇",
       "color": "#F5D76E",
-      "deadline": "2026-10-15",
-      "readiness": {
-        "SPACE": 50,
-        "EQUIPMENT": 25,
-        "TEAM": 30,
-        "PRODUCT": 35,
-        "IT": 15,
-        "MARKETING": 20,
-        "OPERATIONS": 15,
-        "READY": 12
-      }
+      "deadline": "2026-10-28",
+      "readiness": {}
     },
     {
       "slug": "kitchen",
       "name": "Dark Kitchen",
       "emoji": "🍳",
       "color": "#F5A9A9",
-      "deadline": "2026-10-30",
-      "readiness": {
-        "SPACE": 25,
-        "EQUIPMENT": 15,
-        "TEAM": 10,
-        "PRODUCT": 20,
-        "IT": 15,
-        "MARKETING": 20,
-        "OPERATIONS": 15,
-        "READY": 8
-      }
+      "deadline": "2026-11-10",
+      "readiness": {}
     },
     {
       "slug": "cafe",
       "name": "CAFE",
       "emoji": "☕",
       "color": "#A9F5A9",
-      "deadline": "2026-12-15",
-      "readiness": {
-        "SPACE": 15,
-        "EQUIPMENT": 20,
-        "TEAM": 25,
-        "PRODUCT": 20,
-        "IT": 15,
-        "MARKETING": 20,
-        "OPERATIONS": 15,
-        "READY": 8
-      }
+      "deadline": "2027-01-15",
+      "readiness": {}
     },
     {
       "slug": "comx",
       "name": "COMX",
       "emoji": "📚",
       "color": "#A9D0F5",
-      "deadline": "2026-10-30",
-      "readiness": {
-        "SPACE": 10,
-        "EQUIPMENT": 20,
-        "TEAM": 25,
-        "PRODUCT": 20,
-        "IT": 15,
-        "MARKETING": 18,
-        "OPERATIONS": 15,
-        "READY": 8
-      }
+      "deadline": "2026-12-15",
+      "readiness": {}
+    },
+    {
+      "slug": "common",
+      "name": "ОБЩИЕ",
+      "emoji": "🏛️",
+      "color": "#E5E7EB",
+      "deadline": "2026-11-10",
+      "readiness": {}
     }
   ],
   "users": [
     {
-      "id": "u-cpo",
-      "name": "Owner",
-      "email": "1111",
+      "id": "u-armen",
+      "name": "Armen",
+      "email": "Armen",
       "password": "1111",
       "role": "cpo",
       "zone": null,
-      "title": "Owner / CPO",
-      "avatar": "O",
+      "title": "Owner проекта",
+      "avatar": "A",
       "permissions": [],
       "boardZones": [
         "wafl",
         "kitchen",
         "cafe",
-        "comx"
+        "comx",
+        "common"
       ],
       "managerId": null
     },
     {
-      "id": "u-armen",
-      "name": "Armen",
-      "email": "2222",
+      "id": "u-vladimir",
+      "name": "Vladimir",
+      "email": "Vladimir",
       "password": "2222",
       "role": "employee",
-      "zone": "wafl",
-      "title": "Product Owner",
-      "avatar": "A",
-      "permissions": [
-        "manage_users",
-        "zone_page",
-        "zone_team_tasks",
-        "zone_team",
-        "wiki",
-        "contacts",
-        "zone_readiness"
-      ],
-      "boardZones": [
-        "wafl",
-        "kitchen",
-        "cafe",
-        "comx"
-      ],
-      "managerId": "u-cpo"
-    },
-    {
-      "id": "u-market",
-      "name": "Маркетолог",
-      "email": "3333",
-      "password": "3333",
-      "role": "employee",
-      "zone": "wafl",
-      "title": "Marketer",
-      "avatar": "М",
+      "zone": null,
+      "title": "Креативный директор",
+      "avatar": "V",
       "permissions": [
         "wiki",
         "contacts",
@@ -132,2636 +79,5366 @@ export const seed: AppState = {
       ],
       "boardZones": [
         "wafl",
+        "kitchen",
+        "cafe",
         "comx",
-        "cafe"
+        "common"
       ],
       "managerId": "u-armen"
     },
     {
-      "id": "u-tech",
-      "name": "Технолог",
-      "email": "4444",
-      "password": "4444",
+      "id": "u-karina",
+      "name": "Karina",
+      "email": "Karina",
+      "password": "3333",
       "role": "employee",
-      "zone": "wafl",
-      "title": "Waffle technologist · ищем до 17 сен",
-      "avatar": "Т",
-      "permissions": [],
-      "boardZones": [
-        "wafl"
+      "zone": null,
+      "title": "Маркетинг",
+      "avatar": "K",
+      "permissions": [
+        "wiki",
+        "contacts",
+        "marketing_all_zones"
       ],
-      "managerId": "u-armen"
-    },
-    {
-      "id": "u-pastry",
-      "name": "Кондитер",
-      "email": "5555",
-      "password": "5555",
-      "role": "employee",
-      "zone": "wafl",
-      "title": "Pastry · выход 3 окт",
-      "avatar": "К",
-      "permissions": [],
       "boardZones": [
-        "wafl"
+        "wafl",
+        "kitchen",
+        "cafe",
+        "comx",
+        "common"
       ],
-      "managerId": "u-armen"
-    },
-    {
-      "id": "u-sous",
-      "name": "Су-шеф",
-      "email": "6666",
-      "password": "6666",
-      "role": "employee",
-      "zone": "kitchen",
-      "title": "Sous-chef · нужен окт",
-      "avatar": "С",
-      "permissions": [],
-      "boardZones": [
-        "kitchen"
-      ],
-      "managerId": "u-armen"
-    },
-    {
-      "id": "u-cook",
-      "name": "Повар",
-      "email": "7777",
-      "password": "7777",
-      "role": "employee",
-      "zone": "kitchen",
-      "title": "Cook ×3 · нужен окт",
-      "avatar": "П",
-      "permissions": [],
-      "boardZones": [
-        "kitchen"
-      ],
-      "managerId": "u-armen"
-    },
-    {
-      "id": "u-bar",
-      "name": "Бармен",
-      "email": "8888",
-      "password": "8888",
-      "role": "employee",
-      "zone": "cafe",
-      "title": "Bartender · выход дек",
-      "avatar": "Б",
-      "permissions": [],
-      "boardZones": [
-        "cafe"
-      ],
-      "managerId": "u-armen"
-    },
-    {
-      "id": "u-wait",
-      "name": "Официант",
-      "email": "9999",
-      "password": "9999",
-      "role": "employee",
-      "zone": "cafe",
-      "title": "Waiter ×2 · выход дек/янв",
-      "avatar": "Ф",
-      "permissions": [],
-      "boardZones": [
-        "cafe"
-      ],
-      "managerId": "u-armen"
+      "managerId": "u-vladimir"
     }
   ],
   "tasks": [
     {
-      "id": "t1",
-      "title": "Обмер 2 окон Corner: улица + внутрь",
-      "description": "Размеры проёмов, высота выдачи, дождь/солнце. Внутреннее окно до зала закрыто",
-      "zone": "wafl",
+      "id": "t-gen-01",
+      "title": "Проверка договорных ограничений по помещениям",
+      "description": "",
+      "zone": "common",
       "zones": [
-        "wafl"
+        "common"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-09-15",
-      "due": "2026-09-18",
-      "priority": "critical",
+      "startDate": "2026-09-24",
+      "due": "2026-09-28",
+      "priority": "medium",
       "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-15",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Понятно, что можно делать в каждом помещении",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-001",
-      "wave": "A",
-      "workstream": "Архитектура",
-      "dependsOn": []
+      "code": "GEN-01",
+      "wave": "",
+      "workstream": "LEGAL",
+      "dependsOn": [],
+      "blockReason": ""
     },
     {
-      "id": "t2",
-      "title": "Согласовать уличное окно и очередь с кинотеатром Москва",
-      "description": "Письменно: окно на улицу можно, где очередь, вход в Москву не перекрыт",
-      "zone": "wafl",
+      "id": "t-gen-02",
+      "title": "Подписание договоров по объектам",
+      "description": "",
+      "zone": "common",
       "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-15",
-      "due": "2026-09-20",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-15",
-      "attachments": [],
-      "code": "NOR-002",
-      "wave": "A",
-      "workstream": "Зонирование",
-      "dependsOn": []
-    },
-    {
-      "id": "t3",
-      "title": "Чертёж поста лицом на улицу: выпечка / сборка / окно",
-      "description": "3 поста, мелтер не на ветру, касса у стекла, без гостевого WC и посадки",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
+        "common"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-09-16",
-      "due": "2026-09-22",
+      "startDate": "2026-09-28",
+      "due": "2026-09-28",
       "priority": "critical",
       "status": "todo",
       "weight": 3,
       "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-16",
+      "result": "Договоры подписаны",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-003",
-      "wave": "A",
-      "workstream": "Зонирование",
+      "code": "GEN-02",
+      "wave": "",
+      "workstream": "LEGAL",
       "dependsOn": [
-        "NOR-001"
-      ]
+        "GEN-01"
+      ],
+      "blockReason": ""
     },
     {
-      "id": "t4",
-      "title": "Найти технолога: тесто + карамель + шоколад",
-      "description": "Оффер принят, человек в работе",
-      "zone": "wafl",
+      "id": "t-gen-03",
+      "title": "Нотариус / оформление документов",
+      "description": "",
+      "zone": "common",
       "zones": [
-        "wafl"
+        "common"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-09-15",
-      "due": "2026-09-22",
-      "priority": "critical",
+      "startDate": "2026-09-28",
+      "due": "2026-09-28",
+      "priority": "medium",
       "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-15",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Документы оформлены",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-004",
-      "wave": "A",
-      "workstream": "HR",
-      "dependsOn": []
+      "code": "GEN-03",
+      "wave": "",
+      "workstream": "LEGAL",
+      "dependsOn": [],
+      "blockReason": ""
     },
     {
-      "id": "t5",
-      "title": "Заказ 2 вафельниц + мелтер шоколада",
-      "description": "Счёт оплачен, прибытие в Ереван до 8 окт",
-      "zone": "wafl",
+      "id": "t-gen-04",
+      "title": "Регистрация / запуск юрлиц",
+      "description": "",
+      "zone": "common",
       "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-17",
-      "due": "2026-09-23",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-17",
-      "attachments": [],
-      "code": "NOR-005",
-      "wave": "A",
-      "workstream": "Оборудование",
-      "dependsOn": [
-        "NOR-003"
-      ]
-    },
-    {
-      "id": "t6",
-      "title": "Разрешение окна на вынос без зала и без гостевого WC",
-      "description": "Пакет под окно, не под кафе на 40 мест",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-15",
-      "due": "2026-09-26",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-15",
-      "attachments": [],
-      "code": "NOR-006",
-      "wave": "A",
-      "workstream": "Концепция",
-      "dependsOn": [
-        "NOR-002"
-      ]
-    },
-    {
-      "id": "t7",
-      "title": "4 лица меню + техкарты под выдачу в окно",
-      "description": "Classic / Berry / Party / Soft. Эталон 10 мин в коробке без течи",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
+        "common"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-10-04",
+      "startDate": "2026-09-28",
+      "due": "2026-10-05",
       "priority": "critical",
       "status": "todo",
       "weight": 3,
       "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-22",
+      "result": "Юрструктура готова",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-007",
-      "wave": "A",
-      "workstream": "Меню / продукт",
+      "code": "GEN-04",
+      "wave": "",
+      "workstream": "LEGAL",
       "dependsOn": [
-        "NOR-004"
-      ]
-    },
-    {
-      "id": "t8",
-      "title": "Ремонт только объёма Corner, зал не вскрывать",
-      "description": "Окно на улицу готово, внутреннее зашито, зал закрыт",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
+        "GEN-03"
       ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-10-08",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-22",
-      "attachments": [],
-      "code": "NOR-008",
-      "wave": "A",
-      "workstream": "Строительство",
-      "dependsOn": [
-        "NOR-001",
-        "NOR-003",
-        "NOR-006"
-      ]
+      "blockReason": ""
     },
     {
-      "id": "t9",
-      "title": "Упаковка взял и пошёл под шоколад",
-      "description": "Макет до 25 сен, печать 27 сен, на объекте 8 окт. 10 мин в руке на Абовяне без течи",
-      "zone": "wafl",
+      "id": "t-gen-05",
+      "title": "Бухгалтерия: бухгалтер / аутсорс, налоговый режим",
+      "description": "",
+      "zone": "common",
       "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-17",
-      "due": "2026-10-08",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-17",
-      "attachments": [],
-      "code": "NOR-009",
-      "wave": "A",
-      "workstream": "POSM",
-      "dependsOn": [
-        "NOR-007"
-      ]
-    },
-    {
-      "id": "t10",
-      "title": "POS в уличном окне + 4 лица в номенклатуре",
-      "description": "Чек, карта, отмена в проёме окна",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-10-10",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-22",
-      "attachments": [],
-      "code": "NOR-010",
-      "wave": "A",
-      "workstream": "IT",
-      "dependsOn": [
-        "NOR-007",
-        "NOR-008"
-      ]
-    },
-    {
-      "id": "t11",
-      "title": "Найти кондитеров Corner и обучить окно",
-      "description": "Выход 8 окт. Два поста: сборка и окно. Бариста нет",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
+        "common"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-09-29",
-      "due": "2026-10-12",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-29",
-      "attachments": [],
-      "code": "NOR-011",
-      "wave": "A",
-      "workstream": "HR",
-      "dependsOn": [
-        "NOR-004",
-        "NOR-007"
-      ]
-    },
-    {
-      "id": "t12",
-      "title": "Вывеска только у окна, не по барельефам фасада Москвы",
-      "description": "Макет с кино до 23 сен, монтаж у окна до 12 окт, читается с площади Азнавура",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-16",
-      "due": "2026-10-12",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-16",
-      "attachments": [],
-      "code": "NOR-012",
-      "wave": "A",
-      "workstream": "POSM",
-      "dependsOn": [
-        "NOR-002"
-      ]
-    },
-    {
-      "id": "t13",
-      "title": "Пре-опенинг: окно у Москвы, не уютное пространство",
-      "description": "Гео у Москвы, фото разреза, карты ведут к фасаду, не в зал",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-29",
-      "due": "2026-10-14",
-      "priority": "high",
+      "due": "2026-10-07",
+      "priority": "medium",
       "status": "todo",
       "weight": 1,
       "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-09-29",
+      "result": "Бухгалтер есть, налоговый режим выбран",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-013",
-      "wave": "A",
-      "workstream": "Маркетинг",
-      "dependsOn": [
-        "NOR-002",
-        "NOR-012"
-      ]
+      "code": "GEN-05",
+      "wave": "",
+      "workstream": "LEGAL",
+      "dependsOn": [],
+      "blockReason": ""
     },
     {
-      "id": "t14",
-      "title": "Soft уличного окна + audit WAFL",
-      "description": "50 штук в окно. Без WC, без зала, без внутреннего окна. Очередь не бьёт в кино",
-      "zone": "wafl",
+      "id": "t-gen-06",
+      "title": "Банковские счета и платёжные инструменты",
+      "description": "",
+      "zone": "common",
       "zones": [
-        "wafl"
+        "common"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-10-11",
-      "due": "2026-10-14",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-11",
-      "attachments": [],
-      "code": "NOR-014",
-      "wave": "A",
-      "workstream": "Тестирование",
-      "dependsOn": [
-        "NOR-005",
-        "NOR-007",
-        "NOR-008",
-        "NOR-009",
-        "NOR-010",
-        "NOR-011",
-        "NOR-012",
-        "NOR-038",
-        "NOR-039",
-        "NOR-043",
-        "NOR-045",
-        "NOR-047",
-        "NOR-049"
-      ]
-    },
-    {
-      "id": "t15",
-      "title": "Открытие уличного окна WAFL у Москвы",
-      "description": "Только окно на улицу. Внутрь не пускаем. Пик после сеансов — 4 лица",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-15",
-      "due": "2026-10-15",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-15",
-      "attachments": [],
-      "code": "NOR-015",
-      "wave": "A",
-      "workstream": "Открытие",
-      "dependsOn": [
-        "NOR-006",
-        "NOR-013",
-        "NOR-014"
-      ]
-    },
-    {
-      "id": "t16",
-      "title": "Чертёж хаба: гриль + лепка пельменя + сборка доставки",
-      "description": "Лепка отдельно от гриля. Зал не участвует",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-15",
-      "due": "2026-09-24",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-15",
-      "attachments": [],
-      "code": "NOR-016",
-      "wave": "B",
-      "workstream": "Архитектура",
-      "dependsOn": []
-    },
-    {
-      "id": "t17",
-      "title": "Вытяжка и линия кухни — заказ",
-      "description": "Вытяжка, гриль, плита, морозилка под лепку заказаны, дата поставки до 20 окт",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-20",
-      "due": "2026-10-08",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-20",
-      "attachments": [],
-      "code": "NOR-017",
-      "wave": "B",
-      "workstream": "Оборудование",
-      "dependsOn": [
-        "NOR-016",
-        "NOR-054"
-      ]
-    },
-    {
-      "id": "t18",
-      "title": "Служебный ход курьера мимо входа Москвы и окна WAFL",
-      "description": "Курьер не через фасадное окно и не в очередь вафель. Выдача с хаба / служебки",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen",
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-17",
-      "due": "2026-10-16",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-17",
-      "attachments": [],
-      "code": "NOR-018",
-      "wave": "B",
-      "workstream": "Зонирование",
-      "dependsOn": [
-        "NOR-002",
-        "NOR-016"
-      ]
-    },
-    {
-      "id": "t19",
-      "title": "Найти су-шефа и 3 поваров-универсалов",
-      "description": "Су-шеф выход 8–15 окт, повара 15–20 окт",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-29",
-      "due": "2026-10-20",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-29",
-      "attachments": [],
-      "code": "NOR-019",
-      "wave": "B",
-      "workstream": "HR",
-      "dependsOn": []
-    },
-    {
-      "id": "t20",
-      "title": "Своя лепка: цикл и 2–3 начинки на старт",
-      "description": "Замес → лепка → заморозка → варка → 25 мин в коробке. Не live под заказ",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-08",
-      "due": "2026-10-22",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-08",
-      "attachments": [],
-      "code": "NOR-020",
-      "wave": "B",
-      "workstream": "Меню / продукт",
-      "dependsOn": [
-        "NOR-016",
-        "NOR-019"
-      ]
-    },
-    {
-      "id": "t21",
-      "title": "3 юр.витрины + 2 агрегатора: бургер / пельмень / обед",
-      "description": "3 карточки в 2 службах, фото, юр.связка. Адрес выдачи — служебка, не окно WAFL",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-10-26",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-22",
-      "attachments": [],
-      "code": "NOR-021",
-      "wave": "B",
-      "workstream": "Маркетинг",
-      "dependsOn": [
-        "NOR-018",
-        "NOR-060",
-        "NOR-059"
-      ]
-    },
-    {
-      "id": "t22",
-      "title": "Soft доставки 3 витрин и запуск Dark Kitchen",
-      "description": "Зал закрыт. Курьер только служебка. 20 тестовых заказов на бренд",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-26",
-      "due": "2026-10-30",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-26",
-      "attachments": [],
-      "code": "NOR-022",
-      "wave": "B",
-      "workstream": "Открытие",
-      "dependsOn": [
-        "NOR-017",
-        "NOR-018",
-        "NOR-019",
-        "NOR-020",
-        "NOR-021",
-        "NOR-057",
-        "NOR-063",
-        "NOR-064",
-        "NOR-065",
-        "NOR-066"
-      ]
-    },
-    {
-      "id": "t23",
-      "title": "COMX: список SKU и условия консигнации",
-      "description": "40-80 позиций и 1 поставщик на консигнации. Зал не нужен",
-      "zone": "comx",
-      "zones": [
-        "comx"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-15",
-      "due": "2026-10-10",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-15",
-      "attachments": [],
-      "code": "NOR-023",
-      "wave": "B",
-      "workstream": "Закупки",
-      "dependsOn": []
-    },
-    {
-      "id": "t24",
-      "title": "COMX: место стеллажа не на очереди WAFL",
-      "description": "Место размечено. Очередь окна и вход кино свободны. Зал закрыт",
-      "zone": "comx",
-      "zones": [
-        "comx",
-        "wafl"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-10-20",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-22",
-      "attachments": [],
-      "code": "NOR-024",
-      "wave": "B",
-      "workstream": "Зонирование",
-      "dependsOn": [
-        "NOR-002",
-        "NOR-023",
-        "NOR-071"
-      ]
-    },
-    {
-      "id": "t25",
-      "title": "COMX: мерч 3-4 SKU на витрине у книг",
-      "description": "Кружка / тоут / пин стоят у стеллажа. Бьются в кассе окна отдельной группой",
-      "zone": "comx",
-      "zones": [
-        "comx"
-      ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-10-24",
-      "priority": "high",
+      "startDate": "2026-10-05",
+      "due": "2026-10-09",
+      "priority": "medium",
       "status": "todo",
       "weight": 1,
       "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-09-22",
+      "result": "Счета открыты, можно платить поставщикам",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-025",
-      "wave": "B",
-      "workstream": "Брендинг",
-      "dependsOn": []
-    },
-    {
-      "id": "t26",
-      "title": "COMX: книга и мерч в кассе окна WAFL",
-      "description": "Смена окна пробивает книгу и мерч. POS зала нет",
-      "zone": "comx",
-      "zones": [
-        "comx",
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-10",
-      "due": "2026-10-26",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-10",
-      "attachments": [],
-      "code": "NOR-026",
-      "wave": "B",
-      "workstream": "IT",
+      "code": "GEN-06",
+      "wave": "",
+      "workstream": "LEGAL",
       "dependsOn": [
-        "NOR-010",
-        "NOR-025"
-      ]
+        "GEN-04"
+      ],
+      "blockReason": ""
     },
     {
-      "id": "t27",
-      "title": "COMX: полка открыта, продаёт смена WAFL",
-      "description": "Полка работает 30 окт. Отдельного продавца нет. Не стоим на очереди вафель",
-      "zone": "comx",
+      "id": "t-gen-07",
+      "title": "Финансовая модель и бюджет запуска",
+      "description": "",
+      "zone": "common",
       "zones": [
-        "comx"
+        "common"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-10-28",
-      "due": "2026-10-30",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-28",
-      "attachments": [],
-      "code": "NOR-027",
-      "wave": "B",
-      "workstream": "Открытие",
-      "dependsOn": [
-        "NOR-024",
-        "NOR-025",
-        "NOR-026",
-        "NOR-070",
-        "NOR-075"
-      ]
-    },
-    {
-      "id": "t28",
-      "title": "Посадки ~40: Casual + Time Café, без покерной",
-      "description": "Раскладка 40 мест. Game Room не в объёме. Очередь WAFL не перекрыта",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-15",
-      "due": "2026-11-05",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-15",
-      "attachments": [],
-      "code": "NOR-028",
-      "wave": "C",
-      "workstream": "Зонирование",
-      "dependsOn": [
-        "NOR-015"
-      ]
-    },
-    {
-      "id": "t29",
-      "title": "Меню зала 12–16 + завтрак из заготовок хаба",
-      "description": "Европейское короткое. 4–5 завтраков. Не ломает 3 витрины в обед",
-      "zone": "cafe",
-      "zones": [
-        "cafe",
-        "kitchen"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-31",
-      "due": "2026-11-25",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-31",
-      "attachments": [],
-      "code": "NOR-029",
-      "wave": "C",
-      "workstream": "Меню / продукт",
-      "dependsOn": [
-        "NOR-022"
-      ]
-    },
-    {
-      "id": "t30",
-      "title": "Ремонт зала после стабильной доставки",
-      "description": "Пыль отсечена от окна WAFL. Кухня отдаёт доставку во время ремонта",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-11-02",
-      "due": "2026-12-01",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-11-02",
-      "attachments": [],
-      "code": "NOR-030",
-      "wave": "C",
-      "workstream": "Строительство",
-      "dependsOn": [
-        "NOR-022",
-        "NOR-028"
-      ]
-    },
-    {
-      "id": "t31",
-      "title": "Бар: стойка, кофемашина, лёд, стекло",
-      "description": "Бар у WC работает. Кофе. Запах туалета не в зал",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-11-05",
-      "due": "2026-12-05",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-11-05",
-      "attachments": [],
-      "code": "NOR-031",
-      "wave": "C",
-      "workstream": "Оборудование",
-      "dependsOn": [
-        "NOR-030"
-      ]
-    },
-    {
-      "id": "t32",
-      "title": "Алкоголь: разрешение, бар-карта, учёт",
-      "description": "Можно легально наливать. 8–12 позиций. Замок и учёт",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-15",
-      "due": "2026-12-05",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-15",
-      "attachments": [],
-      "code": "NOR-032",
-      "wave": "C",
-      "workstream": "Концепция",
-      "dependsOn": []
-    },
-    {
-      "id": "t33",
-      "title": "Найти бармена и 2 официантов",
-      "description": "Бармен с 20–25 ноя. Официанты с 1–8 дек. Утро бармен на завтраке",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-11-10",
-      "due": "2026-12-08",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-11-10",
-      "attachments": [],
-      "code": "NOR-033",
-      "wave": "C",
-      "workstream": "HR",
-      "dependsOn": []
-    },
-    {
-      "id": "t34",
-      "title": "Time Café: розетки, шкафчики, Wi-Fi, правило стола",
-      "description": "Шкафчики как на плане. Нет безлимита на 1 американо. Учёт у бармена",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-11-10",
-      "due": "2026-12-08",
-      "priority": "high",
-      "status": "todo",
-      "weight": 1,
-      "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-11-10",
-      "attachments": [],
-      "code": "NOR-034",
-      "wave": "C",
-      "workstream": "SOP / процессы",
-      "dependsOn": [
-        "NOR-028",
-        "NOR-033"
-      ]
-    },
-    {
-      "id": "t35",
-      "title": "POS зала связан с лентой кухни + гостевые WC",
-      "description": "Тикет зала и агрегатора на одной ленте. WC гостей работают",
-      "zone": "cafe",
-      "zones": [
-        "cafe",
-        "kitchen"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-11-15",
-      "due": "2026-12-10",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-11-15",
-      "attachments": [],
-      "code": "NOR-035",
-      "wave": "C",
-      "workstream": "IT",
-      "dependsOn": [
-        "NOR-010",
-        "NOR-022",
-        "NOR-030"
-      ]
-    },
-    {
-      "id": "t36",
-      "title": "Открыть внутреннее окно WAFL в зал",
-      "description": "Уличное окно не закрываем. Внутреннее для гостей зала. На смене хватает рук",
-      "zone": "cafe",
-      "zones": [
-        "cafe",
-        "wafl"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-12-08",
-      "due": "2026-12-14",
-      "priority": "high",
-      "status": "todo",
-      "weight": 1,
-      "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-12-08",
-      "attachments": [],
-      "code": "NOR-036",
-      "wave": "C",
-      "workstream": "Открытие",
-      "dependsOn": [
-        "NOR-015",
-        "NOR-030"
-      ]
-    },
-    {
-      "id": "t37",
-      "title": "Soft зала + завтрак + открытие CAFE",
-      "description": "3 тестовых слоя. Доставка не выключена. Покерной нет. Time Café живой",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-12-12",
-      "due": "2026-12-15",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-12-12",
-      "attachments": [],
-      "code": "NOR-037",
-      "wave": "C",
-      "workstream": "Открытие",
-      "dependsOn": [
-        "NOR-029",
-        "NOR-031",
-        "NOR-032",
-        "NOR-033",
-        "NOR-035",
-        "NOR-084",
-        "NOR-089",
-        "NOR-090"
-      ]
-    },
-    {
-      "id": "t38",
-      "title": "WAFL: точка питания 2 вафельниц + мелтер",
-      "description": "Розетки/автоматы по мощности. Не делить с кухней до запуска кухни",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-16",
-      "due": "2026-09-25",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-16",
-      "attachments": [],
-      "code": "NOR-038",
-      "wave": "A",
-      "workstream": "Инженерия",
-      "dependsOn": [
-        "NOR-001",
-        "NOR-003"
-      ]
-    },
-    {
-      "id": "t39",
-      "title": "WAFL: мойка персонала и слив без гостевого WC",
-      "description": "Руки мыть можно. Гостевой туалет не обещаем",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-16",
-      "due": "2026-09-26",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-16",
-      "attachments": [],
-      "code": "NOR-039",
-      "wave": "A",
-      "workstream": "Инженерия",
-      "dependsOn": [
-        "NOR-003"
-      ]
-    },
-    {
-      "id": "t40",
-      "title": "WAFL: выбрать шоколад и карамель, пробная партия",
-      "description": "Марка шоколада и карамели зафиксированы, есть 5 кг на тесты",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-09-30",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-22",
-      "attachments": [],
-      "code": "NOR-040",
-      "wave": "A",
-      "workstream": "Поставщики",
-      "dependsOn": [
-        "NOR-004"
-      ]
-    },
-    {
-      "id": "t41",
-      "title": "WAFL: тесто — 3 прогона до желез на объекте",
-      "description": "Тесто держит резку, не рвётся, не течёт после карамели",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-23",
+      "startDate": "2026-09-24",
       "due": "2026-10-03",
       "priority": "critical",
       "status": "todo",
       "weight": 3,
       "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-23",
+      "result": "Бюджет по статьям утверждён Owner, резерв 10–15% заложен",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-041",
-      "wave": "A",
-      "workstream": "Меню / продукт",
-      "dependsOn": [
-        "NOR-004",
-        "NOR-040"
-      ]
+      "code": "GEN-07",
+      "wave": "",
+      "workstream": "LEGAL",
+      "dependsOn": [],
+      "blockReason": ""
     },
     {
-      "id": "t42",
-      "title": "WAFL: эталон Classic / Berry / Party / Soft на фото",
-      "description": "4 фото разреза для окна, карт и сторис. Не интерьер зала",
-      "zone": "wafl",
+      "id": "t-gen-08",
+      "title": "Требования и разрешения для food-проекта",
+      "description": "",
+      "zone": "common",
       "zones": [
-        "wafl"
+        "common"
       ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-09-30",
-      "due": "2026-10-07",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-30",
-      "attachments": [],
-      "code": "NOR-042",
-      "wave": "A",
-      "workstream": "Брендинг",
-      "dependsOn": [
-        "NOR-007",
-        "NOR-041"
-      ]
-    },
-    {
-      "id": "t43",
-      "title": "WAFL: первая закупка сырья на 7 дней окна",
-      "description": "Склад на 7 пиковых дней после сеансов. Есть запас шоколада",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-01",
-      "due": "2026-10-10",
+      "startDate": "2026-09-24",
+      "due": "2026-10-02",
       "priority": "critical",
       "status": "todo",
       "weight": 3,
       "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-01",
+      "result": "Список требований и документов по Waffle и кухне",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-043",
-      "wave": "A",
-      "workstream": "Закупки",
-      "dependsOn": [
-        "NOR-007",
-        "NOR-040"
-      ]
+      "code": "GEN-08",
+      "wave": "",
+      "workstream": "LEGAL",
+      "dependsOn": [],
+      "blockReason": ""
     },
     {
-      "id": "t44",
-      "title": "WAFL: цены, аллергены, табличка в окне",
-      "description": "4 цены + аллергены видны с улицы. На армянском и русском",
-      "zone": "wafl",
+      "id": "t-gen-09",
+      "title": "Требования к вывеске / фасаду / окну",
+      "description": "",
+      "zone": "common",
       "zones": [
-        "wafl"
+        "common"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-09-29",
-      "due": "2026-10-10",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-29",
-      "attachments": [],
-      "code": "NOR-044",
-      "wave": "A",
-      "workstream": "SOP / процессы",
-      "dependsOn": [
-        "NOR-007"
-      ]
-    },
-    {
-      "id": "t45",
-      "title": "WAFL: санитарный пакет под окно на вынос",
-      "description": "Документы под окно, не под кафе. Можно печь и продавать",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-15",
-      "due": "2026-10-06",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-15",
-      "attachments": [],
-      "code": "NOR-045",
-      "wave": "A",
-      "workstream": "Концепция",
-      "dependsOn": [
-        "NOR-006"
-      ]
-    },
-    {
-      "id": "t46",
-      "title": "WAFL: график смен 2 кондитера + подмена Owner/Armen",
-      "description": "Закрыты сеансы пт–вс. Нет дыр в пике",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-03",
-      "due": "2026-10-12",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-03",
-      "attachments": [],
-      "code": "NOR-046",
-      "wave": "A",
-      "workstream": "HR",
-      "dependsOn": [
-        "NOR-011"
-      ]
-    },
-    {
-      "id": "t47",
-      "title": "WAFL: SOP окна 1 страница: печь / резать / начинять / глазировать / окно",
-      "description": "Смена читает SOP за 10 мин. Время на 1 штуку известно",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-04",
-      "due": "2026-10-11",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-04",
-      "attachments": [],
-      "code": "NOR-047",
-      "wave": "A",
-      "workstream": "SOP / процессы",
-      "dependsOn": [
-        "NOR-007",
-        "NOR-011"
-      ]
-    },
-    {
-      "id": "t48",
-      "title": "WAFL: размен, отмена, инкассация в окне",
-      "description": "Наличные и карта. Отмена без зала. Сейф на ночь",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-05",
-      "due": "2026-10-11",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-05",
-      "attachments": [],
-      "code": "NOR-048",
-      "wave": "A",
-      "workstream": "IT",
-      "dependsOn": [
-        "NOR-010"
-      ]
-    },
-    {
-      "id": "t49",
-      "title": "WAFL: ограждение очереди, не на вход кино",
-      "description": "Стойки/разметка. Очередь не режет вход в Москву",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-10-10",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-22",
-      "attachments": [],
-      "code": "NOR-049",
-      "wave": "A",
-      "workstream": "POSM",
-      "dependsOn": [
-        "NOR-002"
-      ]
-    },
-    {
-      "id": "t50",
-      "title": "WAFL: козырёк/защита от дождя на выдаче",
-      "description": "В дождь можно отдать коробку без каши на шоколаде",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-10-10",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-22",
-      "attachments": [],
-      "code": "NOR-050",
-      "wave": "A",
-      "workstream": "Строительство",
-      "dependsOn": [
-        "NOR-003",
-        "NOR-008"
-      ]
-    },
-    {
-      "id": "t51",
-      "title": "WAFL: гео и карточки Google / Yandex — точка у фасада",
-      "description": "Пин у окна, не внутри зала. Фото разреза",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-29",
-      "due": "2026-10-13",
-      "priority": "high",
-      "status": "todo",
-      "weight": 1,
-      "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-09-29",
-      "attachments": [],
-      "code": "NOR-051",
-      "wave": "A",
-      "workstream": "Маркетинг",
-      "dependsOn": [
-        "NOR-013"
-      ]
-    },
-    {
-      "id": "t52",
-      "title": "WAFL: закрытие смены и хранение шоколада на ночь",
-      "description": "Мелтер выключен по правилам. Остатки не горкнут",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-08",
-      "due": "2026-10-13",
-      "priority": "high",
-      "status": "todo",
-      "weight": 1,
-      "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-10-08",
-      "attachments": [],
-      "code": "NOR-052",
-      "wave": "A",
-      "workstream": "SOP / процессы",
-      "dependsOn": [
-        "NOR-047"
-      ]
-    },
-    {
-      "id": "t53",
-      "title": "WAFL: мусор шоколада и масла, вывоз",
-      "description": "Договор вывоза. Запах не на фасад Москвы",
-      "zone": "wafl",
-      "zones": [
-        "wafl"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-29",
-      "due": "2026-10-12",
+      "startDate": "2026-09-24",
+      "due": "2026-10-02",
       "priority": "medium",
       "status": "todo",
       "weight": 1,
       "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-09-29",
+      "result": "Понятны ограничения по вывеске и окну",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-053",
-      "wave": "A",
-      "workstream": "Операции",
-      "dependsOn": []
+      "code": "GEN-09",
+      "wave": "",
+      "workstream": "LEGAL",
+      "dependsOn": [],
+      "blockReason": ""
     },
     {
-      "id": "t54",
-      "title": "Кухня: мощность, вытяжка, жироуловитель — ТЗ",
-      "description": "ТЗ подписано. Можно заказывать вытяжку",
-      "zone": "kitchen",
+      "id": "t-gen-10",
+      "title": "Получение разрешений и документов для food",
+      "description": "",
+      "zone": "common",
       "zones": [
-        "kitchen"
+        "common"
       ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-09-15",
+      "startDate": "2026-10-05",
+      "due": "2026-10-20",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Все документы на руках до soft launch Waffle",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-10",
+      "wave": "",
+      "workstream": "LEGAL",
+      "dependsOn": [
+        "GEN-08",
+        "GEN-04"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-11",
+      "title": "Договоры на вывоз отходов, дезинсекцию, клининг",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-12",
+      "due": "2026-10-22",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Договоры подписаны, график есть",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-11",
+      "wave": "",
+      "workstream": "LEGAL",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-12",
+      "title": "Страхование помещений и оборудования",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-25",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Полис действует с открытия Waffle",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-12",
+      "wave": "",
+      "workstream": "LEGAL",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-20",
+      "title": "Первичный осмотр объектов",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-09-25",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Фото + видео + состояние всех помещений",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-20",
+      "wave": "",
+      "workstream": "SPACE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-21",
+      "title": "Первичный обмер всех помещений",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-09-27",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Точные размеры всех помещений",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-21",
+      "wave": "",
+      "workstream": "SPACE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-22",
+      "title": "Что можно и что нельзя демонтировать",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
       "due": "2026-09-26",
       "priority": "critical",
       "status": "todo",
       "weight": 3,
       "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-15",
+      "result": "Список ограничений по демонтажу",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-054",
-      "wave": "B",
-      "workstream": "Инженерия",
-      "dependsOn": [
-        "NOR-016"
-      ]
+      "code": "GEN-22",
+      "wave": "",
+      "workstream": "SPACE",
+      "dependsOn": [],
+      "blockReason": ""
     },
     {
-      "id": "t55",
-      "title": "Кухня: холод — морозилка лепки + холодильник линии",
-      "description": "Объём под 3–5 дней лепки. Не общий с WAFL",
-      "zone": "kitchen",
+      "id": "t-gen-23",
+      "title": "Техническое обследование инженерии",
+      "description": "",
+      "zone": "common",
       "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-20",
-      "due": "2026-10-10",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-20",
-      "attachments": [],
-      "code": "NOR-055",
-      "wave": "B",
-      "workstream": "Оборудование",
-      "dependsOn": [
-        "NOR-016"
-      ]
-    },
-    {
-      "id": "t56",
-      "title": "Кухня: посудомойка и зона мойки",
-      "description": "Мойка не в зале. Хватает на 3 витрины",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-10-12",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-22",
-      "attachments": [],
-      "code": "NOR-056",
-      "wave": "B",
-      "workstream": "Оборудование",
-      "dependsOn": [
-        "NOR-016"
-      ]
-    },
-    {
-      "id": "t57",
-      "title": "Кухня: санитарка и разрешение на производство",
-      "description": "Можно готовить и отдавать курьеру. Зал не требуется",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-15",
-      "due": "2026-10-16",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-15",
-      "attachments": [],
-      "code": "NOR-057",
-      "wave": "B",
-      "workstream": "Концепция",
-      "dependsOn": []
-    },
-    {
-      "id": "t58",
-      "title": "Кухня: меню-черновик 8–10 позиций на бренд",
-      "description": "Бургер / пельмень / обед. Себес черновой. Без живого зала",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
+        "common"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-09-15",
+      "startDate": "2026-09-24",
+      "due": "2026-09-30",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Мощности и точки подключения по каждому объекту",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-23",
+      "wave": "",
+      "workstream": "SPACE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-24",
+      "title": "Пожарные и санитарные требования к объектам",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-10-02",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Требования к каждому объекту записаны",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-24",
+      "wave": "",
+      "workstream": "SPACE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-25",
+      "title": "Технический паспорт объектов",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-30",
+      "due": "2026-10-03",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Единая таблица ограничений по всем помещениям",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-25",
+      "wave": "",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "GEN-21",
+        "GEN-23"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-26",
+      "title": "Подрядчики: электрик, сантехник, вентиляция",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-09-30",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Подрядчики выбраны, есть сметы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-26",
+      "wave": "",
+      "workstream": "SPACE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-27",
+      "title": "Общий график ремонта: Waffle → Dark Kitchen → COMX → CAFE",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-29",
+      "due": "2026-10-02",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Очерёдность и окна работ по объектам утверждены",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-27",
+      "wave": "",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "GEN-22"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-28",
+      "title": "Предварительный расчёт инженерных работ",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-30",
+      "due": "2026-10-05",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Бюджет инженерии по объектам",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-28",
+      "wave": "",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "GEN-26"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-29",
+      "title": "Интернет, Wi-Fi, видеонаблюдение, сигнализация",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-12",
+      "due": "2026-10-22",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Всё подключено в Waffle и на кухне",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-29",
+      "wave": "",
+      "workstream": "SPACE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-30",
+      "title": "Пожарная безопасность: огнетушители, датчики, план эвакуации",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-24",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Объекты готовы к проверке",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-30",
+      "wave": "",
+      "workstream": "SPACE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-40",
+      "title": "Сбор референсов, moodboard",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-09-26",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Moodboard",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-40",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-41",
+      "title": "Исследование конкурентов и визуального поля",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-09-28",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Понимание рынка и свободных ниш",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-41",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-42",
+      "title": "Brand concept",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-26",
+      "due": "2026-09-30",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Концепция бренда",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-42",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-40"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-43",
+      "title": "Название и позиционирование",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-28",
+      "due": "2026-10-01",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Название и позиционирование зафиксированы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-43",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-44",
+      "title": "Варианты логотипа",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-01",
+      "due": "2026-10-05",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "3–5 вариантов",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-44",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-42",
+        "GEN-43"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-45",
+      "title": "Выбор направления логотипа",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-05",
+      "due": "2026-10-06",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Owner выбрал одно направление",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-45",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-44"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-46",
+      "title": "Айдентика",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-06",
+      "due": "2026-10-15",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Готовая визуальная система",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-46",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-45"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-47",
+      "title": "Tone of Voice",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-06",
+      "due": "2026-10-08",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Правила коммуникации",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-47",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-45"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-48",
+      "title": "Бренд-гайд / базовые правила",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-19",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Базовый brand book",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-48",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-46"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-49",
+      "title": "Униформа персонала",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-22",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Униформа заказана к обучению персонала",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-49",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-46"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-50",
+      "title": "Проверка доменов",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-09-26",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Доступные варианты",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-50",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-51",
+      "title": "Покупка доменов",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-26",
+      "due": "2026-09-30",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Домены зарегистрированы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-51",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-50"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-52",
+      "title": "Регистрация соцсетей",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-01",
+      "due": "2026-10-05",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Аккаунты созданы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-52",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-43"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-53",
+      "title": "Оформление соцсетей",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-18",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Готовые профили в айдентике",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-53",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-46",
+        "GEN-52"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-54",
+      "title": "Контент-план запуска",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-10",
+      "due": "2026-10-17",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "План публикаций до и после открытия",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-54",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-47"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-55",
+      "title": "Фото и визуальный контент",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-18",
+      "due": "2026-10-25",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Контент для запуска",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-55",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-46"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-56",
+      "title": "Сайт / лендинг",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-25",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Лендинг на домене, ссылка на приложение",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-56",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "GEN-46",
+        "GEN-51"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-57",
+      "title": "Карточки в Google Maps, Yandex Maps, 2GIS",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-20",
+      "due": "2026-10-25",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Точка находится на картах",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-57",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-58",
+      "title": "PR открытия: блогеры, городские медиа, событие",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-28",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Список блогеров и медиа, план события",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-58",
+      "wave": "",
+      "workstream": "BRAND",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-60",
+      "title": "Трудовые договоры, зарплатная схема, мотивация",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-08",
+      "due": "2026-10-15",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Шаблоны договоров и схема оплаты",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-60",
+      "wave": "",
+      "workstream": "PEOPLE",
+      "dependsOn": [
+        "GEN-04"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-61",
+      "title": "Медкнижки / санминимум персонала",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-24",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "У всех сотрудников документы до смен",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-61",
+      "wave": "",
+      "workstream": "PEOPLE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-70",
+      "title": "Касса, POS, эквайринг, учёт",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-01",
+      "due": "2026-10-15",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "POS куплен и настроен, эквайринг работает",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-70",
+      "wave": "",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-71",
+      "title": "Логистика закупок: кто, где, как часто",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-10",
+      "due": "2026-10-20",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Таблица закупок с резервными поставщиками",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-71",
+      "wave": "",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-80",
+      "title": "Food safety: процедуры и контроль",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-12",
+      "due": "2026-10-22",
+      "priority": "high",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Процедуры записаны и распечатаны на объектах",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-80",
+      "wave": "",
+      "workstream": "LAUNCH",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-81",
+      "title": "Стандарты работы: открытие и закрытие смены, сервис",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-22",
+      "priority": "high",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Чек-листы смены и стандарты сервиса",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-81",
+      "wave": "",
+      "workstream": "LAUNCH",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-gen-82",
+      "title": "Ежедневный отчёт после запуска",
+      "description": "",
+      "zone": "common",
+      "zones": [
+        "common"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-20",
+      "due": "2026-10-27",
+      "priority": "high",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Шаблон: продажи, food cost, отзывы, проблемы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "GEN-82",
+      "wave": "",
+      "workstream": "LAUNCH",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-01",
+      "title": "Демонтаж Waffle",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-29",
+      "due": "2026-10-01",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Помещение освобождено",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-01",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "GEN-02",
+        "GEN-22"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-02",
+      "title": "Замер Waffle после демонтажа",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-02",
+      "due": "2026-10-03",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Чистовые размеры",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-02",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-01"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-03",
+      "title": "Планировка Waffle",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-03",
+      "due": "2026-10-06",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Утверждённая схема",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-03",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-02"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-04",
+      "title": "Проверка планировки с оборудованием",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-06",
+      "due": "2026-10-08",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Всё помещается",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-04",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-03",
+        "WAF-22"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-05",
+      "title": "Финальный инженерный план Waffle",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-06",
+      "due": "2026-10-09",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Можно начинать монтаж",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-05",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-03",
+        "GEN-25"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-06",
+      "title": "Дизайн точки Waffle",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-08",
+      "due": "2026-10-13",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Дизайн-проект",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-06",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-04",
+        "GEN-45"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-07",
+      "title": "Согласование дизайна и работ: арендодатель, фасад, пожарные",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-13",
+      "due": "2026-10-15",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Письменное согласие на работы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-07",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-06",
+        "GEN-09"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-08",
+      "title": "Ремонт и инженерные работы Waffle",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-21",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Точка готова к монтажу оборудования",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-08",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-07",
+        "WAF-05"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-09",
+      "title": "Заказ материалов и мебели",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-13",
+      "due": "2026-10-17",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Всё заказано",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-09",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-06"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-10",
+      "title": "Подрядчик на окно выдачи",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-09-30",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Подрядчик выбран",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-10",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-11",
+      "title": "Замер окна",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-02",
+      "due": "2026-10-03",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Точные размеры проёма",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-11",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-10",
+        "WAF-01"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-12",
+      "title": "Производство окна",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-03",
+      "due": "2026-10-15",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Окно готово",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-12",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-11",
+        "GEN-09"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-13",
+      "title": "Монтаж окна",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-20",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Окно установлено",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-13",
+      "wave": "A",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-12"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-20",
+      "title": "Можно ли привезти оборудование",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-09-25",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Ответ: везём или покупаем локально",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-20",
+      "wave": "A",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-21",
+      "title": "Поиск локального оборудования (если привезти нельзя)",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-25",
+      "due": "2026-10-02",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Альтернативы с ценами",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-21",
+      "wave": "A",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [
+        "WAF-20"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-22",
+      "title": "Сравнение оборудования и цен, выбор",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-29",
+      "due": "2026-10-05",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Выбранный вариант",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-22",
+      "wave": "A",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [
+        "WAF-20"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-23",
+      "title": "Производственная мощность: сколько вафель в час в пик",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-01",
+      "due": "2026-10-05",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Мощность ≥ пиковой нагрузки",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-23",
+      "wave": "A",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-24",
+      "title": "Заказ оборудования",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-05",
       "due": "2026-10-08",
       "priority": "critical",
       "status": "todo",
       "weight": 3,
       "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-15",
+      "result": "Оплачено, есть дата доставки",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-058",
-      "wave": "B",
-      "workstream": "Меню / продукт",
-      "dependsOn": []
-    },
-    {
-      "id": "t59",
-      "title": "Кухня: фото 3 витрин для агрегаторов",
-      "description": "Фото не с улицы WAFL. Каждое блюдо подписано",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-08",
-      "due": "2026-10-22",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-08",
-      "attachments": [],
-      "code": "NOR-059",
-      "wave": "B",
-      "workstream": "Маркетинг",
+      "code": "WAF-24",
+      "wave": "A",
+      "workstream": "EQUIPMENT & SUPPLY",
       "dependsOn": [
-        "NOR-058",
-        "NOR-020"
-      ]
-    },
-    {
-      "id": "t60",
-      "title": "Кухня: юрлица / договоры 2 агрегаторов",
-      "description": "2 службы подключены. Комиссия понятна",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
+        "WAF-22",
+        "GEN-07"
       ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-10-20",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-22",
-      "attachments": [],
-      "code": "NOR-060",
-      "wave": "B",
-      "workstream": "Концепция",
-      "dependsOn": []
+      "blockReason": ""
     },
     {
-      "id": "t61",
-      "title": "Кухня: упаковка доставки 3 брендов",
-      "description": "Коробка 25 мин без размокания. Пельмень отдельно от бургера",
-      "zone": "kitchen",
+      "id": "t-waf-25",
+      "title": "Доставка оборудования",
+      "description": "",
+      "zone": "wafl",
       "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-22",
-      "due": "2026-10-20",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-22",
-      "attachments": [],
-      "code": "NOR-061",
-      "wave": "B",
-      "workstream": "POSM",
-      "dependsOn": [
-        "NOR-058"
-      ]
-    },
-    {
-      "id": "t62",
-      "title": "Кухня: принтер тикетов и связь окно-не-мешает",
-      "description": "Тикет на хабе. Не печатает в окне WAFL",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-01",
-      "due": "2026-10-22",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-01",
-      "attachments": [],
-      "code": "NOR-062",
-      "wave": "B",
-      "workstream": "IT",
-      "dependsOn": []
-    },
-    {
-      "id": "t63",
-      "title": "Кухня: первая закупка сырья 3 брендов на 5 дней",
-      "description": "Сухой + заморозка лепки. Не пересекается с шоколадом WAFL",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-15",
-      "due": "2026-10-26",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-15",
-      "attachments": [],
-      "code": "NOR-063",
-      "wave": "B",
-      "workstream": "Закупки",
-      "dependsOn": [
-        "NOR-058",
-        "NOR-020"
-      ]
-    },
-    {
-      "id": "t64",
-      "title": "Кухня: прогон бургера 15 заказов",
-      "description": "15 сборок в слот. Время сборки записано",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-22",
-      "due": "2026-10-27",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-22",
-      "attachments": [],
-      "code": "NOR-064",
-      "wave": "B",
-      "workstream": "Тестирование",
-      "dependsOn": [
-        "NOR-019",
-        "NOR-058",
-        "NOR-017"
-      ]
-    },
-    {
-      "id": "t65",
-      "title": "Кухня: прогон пельменя 15 заказов",
-      "description": "15 коробок. Лепка не live. 25 мин в коробке",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-22",
-      "due": "2026-10-27",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-22",
-      "attachments": [],
-      "code": "NOR-065",
-      "wave": "B",
-      "workstream": "Тестирование",
-      "dependsOn": [
-        "NOR-019",
-        "NOR-020",
-        "NOR-017"
-      ]
-    },
-    {
-      "id": "t66",
-      "title": "Кухня: прогон обеда 15 заказов",
-      "description": "Обед не валит бургерную линию",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-23",
-      "due": "2026-10-28",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-23",
-      "attachments": [],
-      "code": "NOR-066",
-      "wave": "B",
-      "workstream": "Тестирование",
-      "dependsOn": [
-        "NOR-019",
-        "NOR-058",
-        "NOR-017"
-      ]
-    },
-    {
-      "id": "t67",
-      "title": "Кухня: инструктаж курьера — только служебка",
-      "description": "Листовка + точка на карте агрегатора. Не фасад Москвы",
-      "zone": "kitchen",
-      "zones": [
-        "kitchen",
         "wafl"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-10-20",
-      "due": "2026-10-28",
+      "startDate": "2026-10-08",
+      "due": "2026-10-19",
       "priority": "critical",
       "status": "todo",
       "weight": 3,
       "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-20",
+      "result": "Оборудование на объекте",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-067",
-      "wave": "B",
-      "workstream": "SOP / процессы",
+      "code": "WAF-25",
+      "wave": "A",
+      "workstream": "EQUIPMENT & SUPPLY",
       "dependsOn": [
-        "NOR-018"
-      ]
+        "WAF-24"
+      ],
+      "blockReason": ""
     },
     {
-      "id": "t68",
-      "title": "Кухня: график 3 поваров под пик агрегаторов",
-      "description": "Обед и вечер закрыты. Нет дыр пт–вс",
-      "zone": "kitchen",
+      "id": "t-waf-26",
+      "title": "Хранение: холодильник, морозилка, сухой склад, упаковка",
+      "description": "",
+      "zone": "wafl",
       "zones": [
-        "kitchen"
+        "wafl"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-10-15",
-      "due": "2026-10-26",
-      "priority": "high",
+      "startDate": "2026-10-10",
+      "due": "2026-10-20",
+      "priority": "medium",
       "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-15",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Всё заказано и помещается",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-068",
-      "wave": "B",
-      "workstream": "HR",
+      "code": "WAF-26",
+      "wave": "A",
+      "workstream": "EQUIPMENT & SUPPLY",
       "dependsOn": [
-        "NOR-019"
-      ]
+        "WAF-04"
+      ],
+      "blockReason": ""
     },
     {
-      "id": "t69",
-      "title": "COMX: договор консигнации с поставщиком",
-      "description": "Подписан. Возврат непроданного прописан",
-      "zone": "comx",
+      "id": "t-waf-27",
+      "title": "Поставщики продуктов + резервные",
+      "description": "",
+      "zone": "wafl",
       "zones": [
-        "comx"
+        "wafl"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-09-15",
-      "due": "2026-10-05",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-15",
-      "attachments": [],
-      "code": "NOR-069",
-      "wave": "B",
-      "workstream": "Закупки",
-      "dependsOn": []
-    },
-    {
-      "id": "t70",
-      "title": "COMX: первая поставка 40–80 SKU",
-      "description": "Коробки на объекте. Не в проходе очереди WAFL",
-      "zone": "comx",
-      "zones": [
-        "comx"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-29",
+      "startDate": "2026-10-10",
       "due": "2026-10-18",
-      "priority": "critical",
+      "priority": "medium",
       "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-29",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Договорённости с основными и резервными",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-070",
-      "wave": "B",
-      "workstream": "Закупки",
-      "dependsOn": [
-        "NOR-023",
-        "NOR-069"
-      ]
+      "code": "WAF-27",
+      "wave": "A",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [],
+      "blockReason": ""
     },
     {
-      "id": "t71",
-      "title": "COMX: закупка стеллажа / острова и света",
-      "description": "Стеллаж влезает, не перекрывает окно и вход кино",
-      "zone": "comx",
+      "id": "t-waf-28",
+      "title": "Упаковка Waffle: дизайн и поставщик",
+      "description": "",
+      "zone": "wafl",
       "zones": [
-        "comx"
+        "wafl"
       ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-17",
-      "due": "2026-10-12",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-09-17",
-      "attachments": [],
-      "code": "NOR-071",
-      "wave": "B",
-      "workstream": "Мебель",
-      "dependsOn": [
-        "NOR-002"
-      ]
-    },
-    {
-      "id": "t72",
-      "title": "COMX: ценники, антивор, учёт остатков",
-      "description": "Таблица остатков. Кто из смены окна может продать",
-      "zone": "comx",
-      "zones": [
-        "comx"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-08",
-      "due": "2026-10-24",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-08",
-      "attachments": [],
-      "code": "NOR-072",
-      "wave": "B",
-      "workstream": "SOP / процессы",
-      "dependsOn": [
-        "NOR-023"
-      ]
-    },
-    {
-      "id": "t73",
-      "title": "COMX: мерч — макет кружки / тоут / пин",
-      "description": "3 макета. Печать не блокирует открытие книг",
-      "zone": "comx",
-      "zones": [
-        "comx",
-        "wafl"
-      ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-17",
-      "due": "2026-10-05",
-      "priority": "high",
+      "due": "2026-10-18",
+      "priority": "medium",
       "status": "todo",
       "weight": 1,
       "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-09-17",
+      "result": "Дизайн утверждён, поставщик выбран",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-073",
-      "wave": "B",
-      "workstream": "Брендинг",
-      "dependsOn": []
-    },
-    {
-      "id": "t74",
-      "title": "COMX: тираж мерча на объект",
-      "description": "Минимум 3 SKU физически на витрине",
-      "zone": "comx",
-      "zones": [
-        "comx"
-      ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-09-29",
-      "due": "2026-10-22",
-      "priority": "high",
-      "status": "todo",
-      "weight": 1,
-      "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-09-29",
-      "attachments": [],
-      "code": "NOR-074",
-      "wave": "B",
-      "workstream": "Закупки",
+      "code": "WAF-28",
+      "wave": "A",
+      "workstream": "EQUIPMENT & SUPPLY",
       "dependsOn": [
-        "NOR-073"
-      ]
+        "GEN-45"
+      ],
+      "blockReason": ""
     },
     {
-      "id": "t75",
-      "title": "COMX: кто продаёт до найма зала — SOP смены окна",
-      "description": "Продавец книг отдельно не нужен. Смена окна умеет пробить",
-      "zone": "comx",
+      "id": "t-waf-29",
+      "title": "Заказ упаковки",
+      "description": "",
+      "zone": "wafl",
       "zones": [
-        "comx",
         "wafl"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-18",
+      "due": "2026-10-23",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Упаковка на руках",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-29",
+      "wave": "A",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [
+        "WAF-28"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-30",
+      "title": "Монтаж оборудования",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-21",
+      "due": "2026-10-24",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Оборудование работает",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-30",
+      "wave": "A",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [
+        "WAF-08",
+        "WAF-25",
+        "WAF-13"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-40",
+      "title": "Поиск шеф-кондитера",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-10-05",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Кандидаты",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-40",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-41",
+      "title": "Выбор шеф-кондитера",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-05",
+      "due": "2026-10-07",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Человек найден",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-41",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "WAF-40"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-42",
+      "title": "Концепция продукта и ассортимент",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-29",
+      "due": "2026-10-05",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Ассортимент",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-42",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-43",
+      "title": "Разработка рецептур",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-07",
+      "due": "2026-10-15",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Рецептуры",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-43",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "WAF-41",
+        "WAF-42"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-44",
+      "title": "Тестирование рецептур",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-19",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Финальные продукты",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-44",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "WAF-43"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-45",
+      "title": "Техкарты Waffle",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-19",
+      "due": "2026-10-22",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Техкарты",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-45",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "WAF-44"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-46",
+      "title": "Себестоимость и цены",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-19",
+      "due": "2026-10-22",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Food cost и цены утверждены",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-46",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "WAF-44"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-47",
+      "title": "Меню-борд и POSM для окна",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-22",
+      "due": "2026-10-25",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Меню и POSM напечатаны",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-47",
+      "wave": "A",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "WAF-46",
+        "GEN-46"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-48",
+      "title": "Юнит-экономика точки Waffle",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-29",
+      "due": "2026-10-05",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Средний чек, food cost, точка безубыточности",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-48",
+      "wave": "A",
+      "workstream": "LEGAL",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-50",
+      "title": "Штатная структура Waffle",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-06",
+      "due": "2026-10-08",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Штат и график смен",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-50",
+      "wave": "A",
+      "workstream": "PEOPLE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-51",
+      "title": "Поиск кондитеров и бариста",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-08",
+      "due": "2026-10-15",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Кандидаты",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-51",
+      "wave": "A",
+      "workstream": "PEOPLE",
+      "dependsOn": [
+        "WAF-50"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-52",
+      "title": "Собеседования",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-12",
-      "due": "2026-10-26",
-      "priority": "high",
+      "due": "2026-10-18",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Выбор",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-52",
+      "wave": "A",
+      "workstream": "PEOPLE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-53",
+      "title": "Найм и договоры",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-18",
+      "due": "2026-10-20",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Команда подписана",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-53",
+      "wave": "A",
+      "workstream": "PEOPLE",
+      "dependsOn": [
+        "WAF-52",
+        "GEN-60"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-54",
+      "title": "Обучение персонала",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-21",
+      "due": "2026-10-24",
+      "priority": "critical",
       "status": "todo",
       "weight": 3,
       "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-12",
+      "result": "Персонал готов",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-075",
-      "wave": "B",
-      "workstream": "HR",
+      "code": "WAF-54",
+      "wave": "A",
+      "workstream": "PEOPLE",
       "dependsOn": [
-        "NOR-011",
-        "NOR-072"
-      ]
+        "WAF-53"
+      ],
+      "blockReason": ""
     },
     {
-      "id": "t76",
-      "title": "CAFE: спецификация мебели ~40 мест Casual + Time Café",
-      "description": "Список столов/стульев/диванов. Game Room нет",
-      "zone": "cafe",
+      "id": "t-waf-55",
+      "title": "Тестовые смены",
+      "description": "",
+      "zone": "wafl",
       "zones": [
-        "cafe"
+        "wafl"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-24",
+      "due": "2026-10-26",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Смена отработана без сбоев",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-55",
+      "wave": "A",
+      "workstream": "PEOPLE",
+      "dependsOn": [
+        "WAF-54",
+        "WAF-30"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-60",
+      "title": "Тест производства Waffle",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-24",
+      "due": "2026-10-25",
+      "priority": "high",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Скорость и качество в норме",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-60",
+      "wave": "A",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "WAF-30"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-61",
+      "title": "Soft launch: ограниченные продажи",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-26",
+      "due": "2026-10-27",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Первые продажи",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-61",
+      "wave": "A",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "WAF-55",
+        "WAF-60",
+        "GEN-10",
+        "GEN-70"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-62",
+      "title": "Анализ и корректировки",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-27",
+      "due": "2026-10-28",
+      "priority": "high",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Исправления внесены",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-62",
+      "wave": "A",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "WAF-61"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-waf-63",
+      "title": "🚀 WAFFLE LAUNCH",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-28",
+      "due": "2026-10-28",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Работающая точка",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "WAF-63",
+      "wave": "A",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "WAF-62",
+        "APP-16"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-01",
+      "title": "App: цели и механика лояльности",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-09-29",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Выбрана механика: баллы / штампы / уровни",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-01",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-02",
+      "title": "App: механики геймификации",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-26",
+      "due": "2026-10-01",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Список механик и наград",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-02",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-03",
+      "title": "App: команда разработки Telegram Mini App",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-10-01",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Разработчик выбран, есть опыт Mini Apps",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-03",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-04",
+      "title": "App: техническое задание Mini App",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-01",
+      "due": "2026-10-05",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "ТЗ согласовано Owner",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-04",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "APP-01",
+        "APP-02",
+        "APP-03"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-05",
+      "title": "App: договор с разработчиком, смета, этапы приёмки",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-05",
+      "due": "2026-10-07",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Договор подписан",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-05",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "APP-04"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-06",
+      "title": "App: UX-прототип",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-07",
+      "due": "2026-10-10",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Кликабельный прототип",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-06",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "APP-05"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-07",
+      "title": "App: UI-дизайн в айдентике",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-15",
+      "due": "2026-10-18",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Макеты всех экранов",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-07",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "APP-06",
+        "GEN-46"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-08",
+      "title": "App: backend — пользователи, баллы, акции, админка",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-10",
+      "due": "2026-10-20",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "API и админка работают",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-08",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "APP-06"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-09",
+      "title": "App: интеграция с POS — начисление и списание баллов",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-21",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Баллы начисляются с чека",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-09",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "APP-06",
+        "GEN-70"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-10",
+      "title": "App: Mini App — клиентская часть (UI после APP-07)",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-12",
+      "due": "2026-10-22",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Все экраны работают в Telegram на iOS и Android",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-10",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "APP-06"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-11",
+      "title": "App: правила программы, оферта, политика ПДн",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-08",
+      "due": "2026-10-16",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Документы опубликованы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-11",
+      "wave": "A",
+      "workstream": "LEGAL",
+      "dependsOn": [
+        "GEN-04"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-12",
+      "title": "App: тестирование (QA)",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-22",
+      "due": "2026-10-24",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Критичных багов нет",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-12",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "APP-08",
+        "APP-09",
+        "APP-10"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-13",
+      "title": "App: бета на тестовых сменах",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-24",
+      "due": "2026-10-26",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Команда прошла все сценарии",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-13",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "APP-12"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-14",
+      "title": "App: бот и публикация Mini App в Telegram",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-24",
+      "due": "2026-10-27",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Бот с кнопкой Mini App доступен гостям",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-14",
+      "wave": "A",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "APP-12"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-15",
+      "title": "App: промо — QR на окне и упаковке ведёт в бот, стартовая акция",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-20",
+      "due": "2026-10-27",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "QR и акция готовы к открытию",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-15",
+      "wave": "A",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "APP-06"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-app-16",
+      "title": "App: запуск вместе с открытием Waffle",
+      "description": "",
+      "zone": "wafl",
+      "zones": [
+        "wafl"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-27",
+      "due": "2026-10-28",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Первые гости в программе",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "APP-16",
+      "wave": "A",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "APP-13",
+        "APP-14"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-01",
+      "title": "Исследование рынка доставки: конкуренты, цены, агрегаторы",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-09-30",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Карта конкурентов",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-01",
+      "wave": "B",
+      "workstream": "PRODUCT",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-02",
+      "title": "Общая концепция Dark Kitchen",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-24",
+      "due": "2026-10-03",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Концепция",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-02",
+      "wave": "B",
+      "workstream": "PRODUCT",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-03",
+      "title": "Long list виртуальных брендов",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-09-26",
+      "due": "2026-10-03",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Long list",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-03",
+      "wave": "B",
+      "workstream": "PRODUCT",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-04",
+      "title": "Концепции брендов: кухня, меню, цена, ЦА, позиционирование",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-03",
+      "due": "2026-10-07",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Концепция по каждому кандидату",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-04",
+      "wave": "B",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "DK-03"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-05",
+      "title": "Выбор 2–4 брендов для MVP",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-07",
+      "due": "2026-10-08",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Owner утвердил бренды",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-05",
+      "wave": "B",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "DK-04",
+        "DK-01",
+        "DK-02"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-06",
+      "title": "Юнит-экономика каждого бренда",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-08",
+      "due": "2026-10-14",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Экономика по каждому бренду",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-06",
+      "wave": "B",
+      "workstream": "LEGAL",
+      "dependsOn": [
+        "DK-05"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-07",
+      "title": "Нейминг и айдентика виртуальных брендов",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-08",
+      "due": "2026-10-18",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Логотипы и визуал брендов",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-07",
+      "wave": "B",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "DK-05"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-08",
+      "title": "MVP-меню",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-08",
+      "due": "2026-10-15",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "MVP menu",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-08",
+      "wave": "B",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "DK-05"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-09",
+      "title": "Рецептуры Dark Kitchen",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-24",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Рецептуры",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-09",
+      "wave": "B",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "DK-08"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-10",
+      "title": "Тест-дегустация / фокус-группа",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-24",
+      "due": "2026-10-27",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Рабочие блюда",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-10",
+      "wave": "B",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "DK-09"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-11",
+      "title": "Техкарты Dark Kitchen",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-27",
+      "due": "2026-10-30",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Техкарты",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-11",
+      "wave": "B",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "DK-10"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-12",
+      "title": "Себестоимость и цены",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-27",
+      "due": "2026-10-30",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Food cost и цены",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-12",
+      "wave": "B",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "DK-10"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-13",
+      "title": "Поставщики продуктов + резервные",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-12",
+      "due": "2026-10-25",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Поставщики",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-13",
+      "wave": "B",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-14",
+      "title": "Упаковка для доставки: дизайн, тест, заказ",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-18",
+      "due": "2026-10-31",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Упаковка на руках",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-14",
+      "wave": "B",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [
+        "DK-07"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-15",
+      "title": "Фото блюд для агрегаторов",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-karina",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-28",
+      "due": "2026-10-31",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Фото всех позиций",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-15",
+      "wave": "B",
+      "workstream": "BRAND",
+      "dependsOn": [
+        "DK-10"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-16",
+      "title": "Подключение к агрегаторам: договоры, меню, модерация",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-20",
+      "due": "2026-11-03",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Бренды опубликованы на агрегаторах",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-16",
+      "wave": "B",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "DK-07",
+        "GEN-04"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-17",
+      "title": "Модель доставки: агрегаторы / свои курьеры / служба",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-08",
+      "due": "2026-10-15",
+      "priority": "high",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Стоимость, SLA, зона, время доставки",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-17",
+      "wave": "B",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "DK-05"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-20",
+      "title": "Демонтаж кухни",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-02",
+      "due": "2026-10-06",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Помещение освобождено",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-20",
+      "wave": "B",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "WAF-01",
+        "GEN-22"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-21",
+      "title": "Замер кухни после демонтажа",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-07",
+      "due": "2026-10-07",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Чистовые размеры",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-21",
+      "wave": "B",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "DK-20"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-22",
+      "title": "Планировка кухни",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-07",
+      "due": "2026-10-10",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Утверждённая схема",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-22",
+      "wave": "B",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "DK-21"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-23",
+      "title": "Проверка планировки с оборудованием",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-13",
+      "due": "2026-10-14",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Всё помещается",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-23",
+      "wave": "B",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "DK-22",
+        "DK-30"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-24",
+      "title": "Инженерный проект: вытяжка, вентиляция, электричество, вода",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-10",
+      "due": "2026-10-14",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Коммуникации спроектированы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-24",
+      "wave": "B",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "DK-22",
+        "GEN-25"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-25",
+      "title": "Дизайн кухни",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-14",
+      "due": "2026-10-18",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Дизайн-проект",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-25",
+      "wave": "B",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "DK-23"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-26",
+      "title": "Согласование: арендодатель, пожарные, санитария",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-18",
+      "due": "2026-10-21",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Письменное согласие на работы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-26",
+      "wave": "B",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "DK-25",
+        "DK-24"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-27",
+      "title": "Ремонт и инженерные работы кухни",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-21",
       "due": "2026-10-31",
       "priority": "critical",
       "status": "todo",
       "weight": 3,
       "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-15",
+      "result": "Кухня готова к монтажу оборудования",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-076",
-      "wave": "C",
-      "workstream": "Мебель",
+      "code": "DK-27",
+      "wave": "B",
+      "workstream": "SPACE",
       "dependsOn": [
-        "NOR-028"
-      ]
+        "DK-26"
+      ],
+      "blockReason": ""
     },
     {
-      "id": "t77",
-      "title": "CAFE: заказ мебели и срок поставки до 5 дек",
-      "description": "Поставка не ломает доставку. Склад/занос через служебку",
-      "zone": "cafe",
+      "id": "t-dk-30",
+      "title": "Список и выбор оборудования под меню",
+      "description": "",
+      "zone": "kitchen",
       "zones": [
-        "cafe"
+        "kitchen"
       ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-10-25",
+      "startDate": "2026-10-08",
+      "due": "2026-10-13",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Список оборудования",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-30",
+      "wave": "B",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [
+        "DK-05"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-31",
+      "title": "Производственная мощность: заказов в час в пик",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-10",
+      "due": "2026-10-14",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Мощность ≥ пиковой нагрузки",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-31",
+      "wave": "B",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-32",
+      "title": "Заказ оборудования кухни",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-13",
+      "due": "2026-10-15",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Оплачено, есть дата доставки",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-32",
+      "wave": "B",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [
+        "DK-30",
+        "GEN-07"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-33",
+      "title": "Доставка оборудования кухни",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-28",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Оборудование на объекте",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-33",
+      "wave": "B",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [
+        "DK-32"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-34",
+      "title": "Хранение: холод, заморозка, сухой склад, маркировка",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-28",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Хранение готово",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-34",
+      "wave": "B",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-35",
+      "title": "Монтаж оборудования кухни",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-31",
+      "due": "2026-11-02",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Оборудование работает",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-35",
+      "wave": "B",
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [
+        "DK-27",
+        "DK-33"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-40",
+      "title": "Штатная структура кухни",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-15",
+      "due": "2026-10-18",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Штат",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-40",
+      "wave": "B",
+      "workstream": "PEOPLE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-41",
+      "title": "Поиск персонала: су-шеф, повара, упаковщик",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-18",
+      "due": "2026-10-27",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Кандидаты",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-41",
+      "wave": "B",
+      "workstream": "PEOPLE",
+      "dependsOn": [
+        "DK-40"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-42",
+      "title": "Найм кухни",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-10-27",
+      "due": "2026-10-31",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Команда",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-42",
+      "wave": "B",
+      "workstream": "PEOPLE",
+      "dependsOn": [
+        "DK-41",
+        "GEN-60"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-43",
+      "title": "Обучение по техкартам",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-01",
+      "due": "2026-11-04",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Команда готова",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-43",
+      "wave": "B",
+      "workstream": "PEOPLE",
+      "dependsOn": [
+        "DK-42",
+        "DK-11"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-44",
+      "title": "Тестовые смены кухни",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-04",
+      "due": "2026-11-05",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Проверка",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-44",
+      "wave": "B",
+      "workstream": "PEOPLE",
+      "dependsOn": [
+        "DK-43",
+        "DK-35"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-50",
+      "title": "Production test: время готовки и сборки заказа",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-03",
+      "due": "2026-11-04",
+      "priority": "high",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Проверка производства",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-50",
+      "wave": "B",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "DK-35"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-51",
+      "title": "Тестовый запуск: закрытые заказы (команда, друзья)",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-05",
+      "due": "2026-11-06",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Первые заказы без сбоев",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-51",
+      "wave": "B",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "DK-44",
+        "DK-50",
+        "DK-16"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-52",
+      "title": "Soft launch на агрегаторах, ограниченные часы",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-06",
+      "due": "2026-11-08",
+      "priority": "critical",
+      "status": "todo",
+      "weight": 3,
+      "criticalPath": true,
+      "result": "Первые реальные заказы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-52",
+      "wave": "B",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "DK-51"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-53",
+      "title": "Анализ и корректировки: время, отзывы, food cost",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-08",
+      "due": "2026-11-10",
+      "priority": "high",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Исправления",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "DK-53",
+      "wave": "B",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "DK-52"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-dk-54",
+      "title": "🚀 DARK KITCHEN LAUNCH",
+      "description": "",
+      "zone": "kitchen",
+      "zones": [
+        "kitchen"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-10",
       "due": "2026-11-10",
       "priority": "critical",
       "status": "todo",
       "weight": 3,
       "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-25",
+      "result": "Первый полноценный запуск",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-077",
-      "wave": "C",
-      "workstream": "Закупки",
+      "code": "DK-54",
+      "wave": "B",
+      "workstream": "LAUNCH",
       "dependsOn": [
-        "NOR-076"
-      ]
-    },
-    {
-      "id": "t78",
-      "title": "CAFE: свет, розетки Time Café, отдельный Wi-Fi",
-      "description": "На каждом месте Time Café розетка. Wi-Fi не общий с кухней",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
+        "DK-53"
       ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-11-02",
-      "due": "2026-12-01",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-11-02",
-      "attachments": [],
-      "code": "NOR-078",
-      "wave": "C",
-      "workstream": "Инженерия",
-      "dependsOn": [
-        "NOR-028",
-        "NOR-030"
-      ]
+      "blockReason": ""
     },
     {
-      "id": "t79",
-      "title": "CAFE: ремонт гостевых WC",
-      "description": "2 WC работают. Запах не в зал и не в бар",
-      "zone": "cafe",
+      "id": "t-bk-01",
+      "title": "Концепция COMX: ассортимент, формат, события",
+      "description": "",
+      "zone": "comx",
       "zones": [
-        "cafe"
+        "comx"
       ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-11-02",
-      "due": "2026-12-05",
-      "priority": "critical",
+      "startDate": "2026-10-20",
+      "due": "2026-10-31",
+      "priority": "medium",
       "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-11-02",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Концепция утверждена",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-079",
+      "code": "BK-01",
       "wave": "C",
-      "workstream": "Строительство",
-      "dependsOn": [
-        "NOR-030"
-      ]
+      "workstream": "PRODUCT",
+      "dependsOn": [],
+      "blockReason": ""
     },
     {
-      "id": "t80",
-      "title": "CAFE: кофемашина, фильтр воды, помол",
-      "description": "Машина на бар. Бариста как отдельная штатка не нужна — бармен",
-      "zone": "cafe",
+      "id": "t-bk-02",
+      "title": "Демонтаж COMX",
+      "description": "",
+      "zone": "comx",
       "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-11-01",
-      "due": "2026-12-01",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-11-01",
-      "attachments": [],
-      "code": "NOR-080",
-      "wave": "C",
-      "workstream": "Оборудование",
-      "dependsOn": []
-    },
-    {
-      "id": "t81",
-      "title": "CAFE: посуда зала и завтрака на 40",
-      "description": "Хватает на оборот обеда + завтрак. Не одноразовость окна WAFL",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-11-05",
-      "due": "2026-12-05",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-11-05",
-      "attachments": [],
-      "code": "NOR-081",
-      "wave": "C",
-      "workstream": "Закупки",
-      "dependsOn": [
-        "NOR-029"
-      ]
-    },
-    {
-      "id": "t82",
-      "title": "CAFE: 4–5 завтраков из заготовок хаба — техкарты",
-      "description": "Завтрак не открывает новую линию. Те же 3 повара",
-      "zone": "cafe",
-      "zones": [
-        "cafe",
-        "kitchen"
+        "comx"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-02",
+      "due": "2026-11-06",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Помещение освобождено",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "BK-02",
+      "wave": "C",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "DK-20"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-bk-03",
+      "title": "Замер COMX",
+      "description": "",
+      "zone": "comx",
+      "zones": [
+        "comx"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-06",
+      "due": "2026-11-07",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Размеры",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "BK-03",
+      "wave": "C",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "BK-02"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-bk-04",
+      "title": "Планировка COMX",
+      "description": "",
+      "zone": "comx",
+      "zones": [
+        "comx"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-07",
+      "due": "2026-11-12",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Схема",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "BK-04",
+      "wave": "C",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "BK-03"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-bk-05",
+      "title": "Дизайн COMX",
+      "description": "",
+      "zone": "comx",
+      "zones": [
+        "comx"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-12",
+      "due": "2026-11-20",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Дизайн-проект",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "BK-05",
+      "wave": "C",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "BK-04"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-bk-06",
+      "title": "Согласование COMX",
+      "description": "",
+      "zone": "comx",
+      "zones": [
+        "comx"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-20",
+      "due": "2026-11-24",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Согласие на работы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "BK-06",
+      "wave": "C",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "BK-05"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-bk-07",
+      "title": "Ремонт COMX",
+      "description": "",
+      "zone": "comx",
+      "zones": [
+        "comx"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-24",
+      "due": "2026-12-08",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Помещение готово",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "BK-07",
+      "wave": "C",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "BK-06"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-bk-08",
+      "title": "Поставщики книг и комиксов, первая закупка",
+      "description": "",
+      "zone": "comx",
+      "zones": [
+        "comx"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-11-01",
       "due": "2026-11-25",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-11-01",
-      "attachments": [],
-      "code": "NOR-082",
-      "wave": "C",
-      "workstream": "Меню / продукт",
-      "dependsOn": [
-        "NOR-029",
-        "NOR-022"
-      ]
-    },
-    {
-      "id": "t83",
-      "title": "CAFE: бар-карта 8–12 и поставщик алкоголя",
-      "description": "Первая поставка согласована. Учёт и замок",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-10-20",
-      "due": "2026-12-01",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-10-20",
-      "attachments": [],
-      "code": "NOR-083",
-      "wave": "C",
-      "workstream": "Поставщики",
-      "dependsOn": [
-        "NOR-032"
-      ]
-    },
-    {
-      "id": "t84",
-      "title": "CAFE: обучение бармена + 2 официантов 3 дня",
-      "description": "Умеют завтрак, обед, бар, шкафчики Time Café",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-12-05",
-      "due": "2026-12-12",
-      "priority": "critical",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-12-05",
-      "attachments": [],
-      "code": "NOR-084",
-      "wave": "C",
-      "workstream": "Обучение",
-      "dependsOn": [
-        "NOR-033",
-        "NOR-029",
-        "NOR-034"
-      ]
-    },
-    {
-      "id": "t85",
-      "title": "CAFE: SOP зала 1 страница + правило стола Time Café",
-      "description": "Нет безлимита на 1 американо. Слот стола понятен гостю",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-armen",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-11-20",
-      "due": "2026-12-10",
-      "priority": "high",
-      "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-11-20",
-      "attachments": [],
-      "code": "NOR-085",
-      "wave": "C",
-      "workstream": "SOP / процессы",
-      "dependsOn": [
-        "NOR-034"
-      ]
-    },
-    {
-      "id": "t86",
-      "title": "CAFE: уборка зала и WC — кто и график",
-      "description": "График до открытия. Не вешают на поваров в пик доставки",
-      "zone": "cafe",
-      "zones": [
-        "cafe"
-      ],
-      "assigneeId": "u-cpo",
-      "authorId": "u-cpo",
-      "participantIds": [],
-      "startDate": "2026-11-15",
-      "due": "2026-12-10",
-      "priority": "high",
+      "priority": "medium",
       "status": "todo",
       "weight": 1,
       "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-11-15",
+      "result": "Первая партия заказана",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-086",
+      "code": "BK-08",
       "wave": "C",
-      "workstream": "Операции",
-      "dependsOn": []
+      "workstream": "EQUIPMENT & SUPPLY",
+      "dependsOn": [
+        "BK-01"
+      ],
+      "blockReason": ""
     },
     {
-      "id": "t87",
-      "title": "CAFE: меню-носители зала (QR / листы) без покерной",
-      "description": "Завтрак / день / вечер. Game Room не упоминаем",
-      "zone": "cafe",
+      "id": "t-bk-09",
+      "title": "Стеллажи и мебель",
+      "description": "",
+      "zone": "comx",
       "zones": [
-        "cafe"
+        "comx"
       ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-11-20",
-      "due": "2026-12-10",
-      "priority": "high",
+      "due": "2026-12-05",
+      "priority": "medium",
       "status": "todo",
       "weight": 1,
       "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-11-20",
+      "result": "Мебель на месте",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-087",
+      "code": "BK-09",
       "wave": "C",
-      "workstream": "POSM",
+      "workstream": "EQUIPMENT & SUPPLY",
       "dependsOn": [
-        "NOR-029"
-      ]
+        "BK-05"
+      ],
+      "blockReason": ""
     },
     {
-      "id": "t88",
-      "title": "CAFE: пре-опенинг зала — не путать с окном WAFL",
-      "description": "Отдельная точка «зал открыт». Окно вафель не закрываем в коммуникации",
-      "zone": "cafe",
+      "id": "t-bk-10",
+      "title": "Персонал COMX",
+      "description": "",
+      "zone": "comx",
       "zones": [
-        "cafe",
-        "wafl"
+        "comx"
       ],
-      "assigneeId": "u-market",
-      "authorId": "u-cpo",
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-11-25",
+      "startDate": "2026-11-20",
+      "due": "2026-12-08",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Команда",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "BK-10",
+      "wave": "C",
+      "workstream": "PEOPLE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-bk-11",
+      "title": "Soft launch COMX",
+      "description": "",
+      "zone": "comx",
+      "zones": [
+        "comx"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-12-10",
       "due": "2026-12-13",
       "priority": "high",
       "status": "todo",
       "weight": 1,
       "criticalPath": false,
-      "result": "",
-      "createdAt": "2026-11-25",
+      "result": "Первые продажи",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-088",
+      "code": "BK-11",
       "wave": "C",
-      "workstream": "Маркетинг",
+      "workstream": "LAUNCH",
       "dependsOn": [
-        "NOR-013"
-      ]
+        "BK-07",
+        "BK-09"
+      ],
+      "blockReason": ""
     },
     {
-      "id": "t89",
-      "title": "CAFE: soft завтрак один день",
-      "description": "20 завтраков. Кухня в это же время отдаёт доставку",
+      "id": "t-bk-12",
+      "title": "🚀 Открытие COMX",
+      "description": "",
+      "zone": "comx",
+      "zones": [
+        "comx"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-12-15",
+      "due": "2026-12-15",
+      "priority": "high",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Работающий книжный",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "BK-12",
+      "wave": "C",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "BK-11"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-caf-01",
+      "title": "Концепция кафе: меню, зал, бар",
+      "description": "",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-01",
+      "due": "2026-11-15",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Концепция утверждена",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "CAF-01",
+      "wave": "C",
+      "workstream": "PRODUCT",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-caf-02",
+      "title": "Демонтаж кафе",
+      "description": "",
+      "zone": "cafe",
+      "zones": [
+        "cafe"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-16",
+      "due": "2026-11-20",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Помещение освобождено",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "CAF-02",
+      "wave": "C",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "BK-02"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-caf-03",
+      "title": "Замер кафе",
+      "description": "",
+      "zone": "cafe",
+      "zones": [
+        "cafe"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-20",
+      "due": "2026-11-21",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Размеры",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "CAF-03",
+      "wave": "C",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "CAF-02"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-caf-04",
+      "title": "Планировка кафе",
+      "description": "",
+      "zone": "cafe",
+      "zones": [
+        "cafe"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-21",
+      "due": "2026-11-27",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Схема",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "CAF-04",
+      "wave": "C",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "CAF-03"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-caf-05",
+      "title": "Дизайн кафе",
+      "description": "",
+      "zone": "cafe",
+      "zones": [
+        "cafe"
+      ],
+      "assigneeId": "u-vladimir",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-27",
+      "due": "2026-12-07",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Дизайн-проект",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "CAF-05",
+      "wave": "C",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "CAF-04"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-caf-06",
+      "title": "Согласование кафе",
+      "description": "",
+      "zone": "cafe",
+      "zones": [
+        "cafe"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-12-07",
+      "due": "2026-12-10",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Согласие на работы",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "CAF-06",
+      "wave": "C",
+      "workstream": "SPACE",
+      "dependsOn": [
+        "CAF-05"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-caf-07",
+      "title": "Ремонт кафе",
+      "description": "",
+      "zone": "cafe",
+      "zones": [
+        "cafe"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-12-10",
-      "due": "2026-12-12",
-      "priority": "critical",
+      "due": "2027-01-08",
+      "priority": "medium",
       "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-12-10",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Помещение готово",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-089",
+      "code": "CAF-07",
       "wave": "C",
-      "workstream": "Тестирование",
+      "workstream": "SPACE",
       "dependsOn": [
-        "NOR-082",
-        "NOR-033",
-        "NOR-035"
-      ]
+        "CAF-06"
+      ],
+      "blockReason": ""
     },
     {
-      "id": "t90",
-      "title": "CAFE: soft обед + вечер с алкоголем",
-      "description": "Два слоя. Если доставка падает — режем Time Café, не витрины",
+      "id": "t-caf-08",
+      "title": "Оборудование и мебель кафе",
+      "description": "",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
       "assigneeId": "u-armen",
-      "authorId": "u-cpo",
+      "authorId": "u-armen",
       "participantIds": [],
-      "startDate": "2026-12-12",
-      "due": "2026-12-14",
-      "priority": "critical",
+      "startDate": "2026-12-01",
+      "due": "2027-01-05",
+      "priority": "medium",
       "status": "todo",
-      "weight": 3,
-      "criticalPath": true,
-      "result": "",
-      "createdAt": "2026-12-12",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Всё на месте",
+      "createdAt": "2026-09-24",
       "attachments": [],
-      "code": "NOR-090",
+      "code": "CAF-08",
       "wave": "C",
-      "workstream": "Тестирование",
+      "workstream": "EQUIPMENT & SUPPLY",
       "dependsOn": [
-        "NOR-031",
-        "NOR-032",
-        "NOR-033",
-        "NOR-089"
-      ]
+        "CAF-04"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-caf-09",
+      "title": "Меню и рецептуры кафе",
+      "description": "",
+      "zone": "cafe",
+      "zones": [
+        "cafe"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-11-15",
+      "due": "2026-12-20",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Меню, техкарты",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "CAF-09",
+      "wave": "C",
+      "workstream": "PRODUCT",
+      "dependsOn": [
+        "CAF-01"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-caf-10",
+      "title": "Персонал: бариста, бармен, официанты",
+      "description": "",
+      "zone": "cafe",
+      "zones": [
+        "cafe"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2026-12-10",
+      "due": "2027-01-08",
+      "priority": "medium",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Команда",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "CAF-10",
+      "wave": "C",
+      "workstream": "PEOPLE",
+      "dependsOn": [],
+      "blockReason": ""
+    },
+    {
+      "id": "t-caf-11",
+      "title": "Soft launch кафе",
+      "description": "",
+      "zone": "cafe",
+      "zones": [
+        "cafe"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2027-01-10",
+      "due": "2027-01-13",
+      "priority": "high",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Первые гости",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "CAF-11",
+      "wave": "C",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "CAF-07",
+        "CAF-10"
+      ],
+      "blockReason": ""
+    },
+    {
+      "id": "t-caf-12",
+      "title": "🚀 Открытие CAFE",
+      "description": "",
+      "zone": "cafe",
+      "zones": [
+        "cafe"
+      ],
+      "assigneeId": "u-armen",
+      "authorId": "u-armen",
+      "participantIds": [],
+      "startDate": "2027-01-15",
+      "due": "2027-01-15",
+      "priority": "high",
+      "status": "todo",
+      "weight": 1,
+      "criticalPath": false,
+      "result": "Работающее кафе",
+      "createdAt": "2026-09-24",
+      "attachments": [],
+      "code": "CAF-12",
+      "wave": "C",
+      "workstream": "LAUNCH",
+      "dependsOn": [
+        "CAF-11"
+      ],
+      "blockReason": ""
     }
   ],
   "comments": [],
-  "subtasks": [],
+  "subtasks": [
+    {
+      "id": "s-gen-07-1",
+      "taskId": "t-gen-07",
+      "title": "Первоначальные инвестиции",
+      "done": false
+    },
+    {
+      "id": "s-gen-07-2",
+      "taskId": "t-gen-07",
+      "title": "Ремонт и инженерия",
+      "done": false
+    },
+    {
+      "id": "s-gen-07-3",
+      "taskId": "t-gen-07",
+      "title": "Оборудование",
+      "done": false
+    },
+    {
+      "id": "s-gen-07-4",
+      "taskId": "t-gen-07",
+      "title": "Упаковка и мебель",
+      "done": false
+    },
+    {
+      "id": "s-gen-07-5",
+      "taskId": "t-gen-07",
+      "title": "Зарплаты",
+      "done": false
+    },
+    {
+      "id": "s-gen-07-6",
+      "taskId": "t-gen-07",
+      "title": "Аренда и коммунальные",
+      "done": false
+    },
+    {
+      "id": "s-gen-07-7",
+      "taskId": "t-gen-07",
+      "title": "Продукты и доставка",
+      "done": false
+    },
+    {
+      "id": "s-gen-07-8",
+      "taskId": "t-gen-07",
+      "title": "Маркетинг",
+      "done": false
+    },
+    {
+      "id": "s-gen-07-9",
+      "taskId": "t-gen-07",
+      "title": "Налоги",
+      "done": false
+    },
+    {
+      "id": "s-gen-07-10",
+      "taskId": "t-gen-07",
+      "title": "Резерв 10–15%",
+      "done": false
+    },
+    {
+      "id": "s-gen-23-1",
+      "taskId": "t-gen-23",
+      "title": "Электричество: мощность и точки",
+      "done": false
+    },
+    {
+      "id": "s-gen-23-2",
+      "taskId": "t-gen-23",
+      "title": "Вода: точки подключения",
+      "done": false
+    },
+    {
+      "id": "s-gen-23-3",
+      "taskId": "t-gen-23",
+      "title": "Канализация",
+      "done": false
+    },
+    {
+      "id": "s-gen-23-4",
+      "taskId": "t-gen-23",
+      "title": "Вентиляция",
+      "done": false
+    },
+    {
+      "id": "s-gen-23-5",
+      "taskId": "t-gen-23",
+      "title": "Возможность вытяжки",
+      "done": false
+    },
+    {
+      "id": "s-gen-23-6",
+      "taskId": "t-gen-23",
+      "title": "Отопление / кондиционирование",
+      "done": false
+    },
+    {
+      "id": "s-gen-26-1",
+      "taskId": "t-gen-26",
+      "title": "Электрик / инженер",
+      "done": false
+    },
+    {
+      "id": "s-gen-26-2",
+      "taskId": "t-gen-26",
+      "title": "Сантехник",
+      "done": false
+    },
+    {
+      "id": "s-gen-26-3",
+      "taskId": "t-gen-26",
+      "title": "Вентиляционная компания",
+      "done": false
+    },
+    {
+      "id": "s-gen-70-1",
+      "taskId": "t-gen-70",
+      "title": "Касса / фискализация",
+      "done": false
+    },
+    {
+      "id": "s-gen-70-2",
+      "taskId": "t-gen-70",
+      "title": "Эквайринг",
+      "done": false
+    },
+    {
+      "id": "s-gen-70-3",
+      "taskId": "t-gen-70",
+      "title": "Учётная система",
+      "done": false
+    },
+    {
+      "id": "s-gen-70-4",
+      "taskId": "t-gen-70",
+      "title": "Склад и списания",
+      "done": false
+    },
+    {
+      "id": "s-gen-70-5",
+      "taskId": "t-gen-70",
+      "title": "Себестоимость и отчётность",
+      "done": false
+    },
+    {
+      "id": "s-gen-70-6",
+      "taskId": "t-gen-70",
+      "title": "Интеграция с доставкой",
+      "done": false
+    },
+    {
+      "id": "s-gen-70-7",
+      "taskId": "t-gen-70",
+      "title": "Интеграция с приложением лояльности",
+      "done": false
+    },
+    {
+      "id": "s-gen-71-1",
+      "taskId": "t-gen-71",
+      "title": "Кто закупает",
+      "done": false
+    },
+    {
+      "id": "s-gen-71-2",
+      "taskId": "t-gen-71",
+      "title": "Что и где",
+      "done": false
+    },
+    {
+      "id": "s-gen-71-3",
+      "taskId": "t-gen-71",
+      "title": "Как часто",
+      "done": false
+    },
+    {
+      "id": "s-gen-71-4",
+      "taskId": "t-gen-71",
+      "title": "Минимальная партия",
+      "done": false
+    },
+    {
+      "id": "s-gen-71-5",
+      "taskId": "t-gen-71",
+      "title": "Срок поставки",
+      "done": false
+    },
+    {
+      "id": "s-gen-71-6",
+      "taskId": "t-gen-71",
+      "title": "Резервный поставщик для критичных продуктов",
+      "done": false
+    },
+    {
+      "id": "s-gen-80-1",
+      "taskId": "t-gen-80",
+      "title": "Графики уборки",
+      "done": false
+    },
+    {
+      "id": "s-gen-80-2",
+      "taskId": "t-gen-80",
+      "title": "Температурный контроль",
+      "done": false
+    },
+    {
+      "id": "s-gen-80-3",
+      "taskId": "t-gen-80",
+      "title": "Контроль сроков годности",
+      "done": false
+    },
+    {
+      "id": "s-gen-80-4",
+      "taskId": "t-gen-80",
+      "title": "Личная гигиена",
+      "done": false
+    },
+    {
+      "id": "s-gen-80-5",
+      "taskId": "t-gen-80",
+      "title": "HACCP-логика процессов",
+      "done": false
+    },
+    {
+      "id": "s-gen-80-6",
+      "taskId": "t-gen-80",
+      "title": "Документы поставщиков",
+      "done": false
+    },
+    {
+      "id": "s-waf-23-1",
+      "taskId": "t-waf-23",
+      "title": "Время производства",
+      "done": false
+    },
+    {
+      "id": "s-waf-23-2",
+      "taskId": "t-waf-23",
+      "title": "Мощность оборудования",
+      "done": false
+    },
+    {
+      "id": "s-waf-23-3",
+      "taskId": "t-waf-23",
+      "title": "Сколько людей на смене",
+      "done": false
+    },
+    {
+      "id": "s-waf-23-4",
+      "taskId": "t-waf-23",
+      "title": "Максимальный объём",
+      "done": false
+    },
+    {
+      "id": "s-waf-23-5",
+      "taskId": "t-waf-23",
+      "title": "Пиковая нагрузка",
+      "done": false
+    },
+    {
+      "id": "s-waf-26-1",
+      "taskId": "t-waf-26",
+      "title": "Холодильник",
+      "done": false
+    },
+    {
+      "id": "s-waf-26-2",
+      "taskId": "t-waf-26",
+      "title": "Морозильник",
+      "done": false
+    },
+    {
+      "id": "s-waf-26-3",
+      "taskId": "t-waf-26",
+      "title": "Сухой склад",
+      "done": false
+    },
+    {
+      "id": "s-waf-26-4",
+      "taskId": "t-waf-26",
+      "title": "Место под упаковку",
+      "done": false
+    },
+    {
+      "id": "s-waf-26-5",
+      "taskId": "t-waf-26",
+      "title": "Маркировка FIFO/FEFO",
+      "done": false
+    },
+    {
+      "id": "s-waf-51-1",
+      "taskId": "t-waf-51",
+      "title": "Кондитеры",
+      "done": false
+    },
+    {
+      "id": "s-waf-51-2",
+      "taskId": "t-waf-51",
+      "title": "Бариста",
+      "done": false
+    },
+    {
+      "id": "s-app-01-1",
+      "taskId": "t-app-01",
+      "title": "Баллы или кэшбэк",
+      "done": false
+    },
+    {
+      "id": "s-app-01-2",
+      "taskId": "t-app-01",
+      "title": "Цифровые штампы",
+      "done": false
+    },
+    {
+      "id": "s-app-01-3",
+      "taskId": "t-app-01",
+      "title": "Уровни гостя",
+      "done": false
+    },
+    {
+      "id": "s-app-01-4",
+      "taskId": "t-app-01",
+      "title": "Приветственный бонус",
+      "done": false
+    },
+    {
+      "id": "s-app-02-1",
+      "taskId": "t-app-02",
+      "title": "Челленджи",
+      "done": false
+    },
+    {
+      "id": "s-app-02-2",
+      "taskId": "t-app-02",
+      "title": "Стрики (серии визитов)",
+      "done": false
+    },
+    {
+      "id": "s-app-02-3",
+      "taskId": "t-app-02",
+      "title": "Коллекции / ачивки",
+      "done": false
+    },
+    {
+      "id": "s-app-02-4",
+      "taskId": "t-app-02",
+      "title": "Мини-игра или колесо",
+      "done": false
+    },
+    {
+      "id": "s-app-02-5",
+      "taskId": "t-app-02",
+      "title": "Награды",
+      "done": false
+    },
+    {
+      "id": "s-app-04-1",
+      "taskId": "t-app-04",
+      "title": "User stories",
+      "done": false
+    },
+    {
+      "id": "s-app-04-2",
+      "taskId": "t-app-04",
+      "title": "Экраны",
+      "done": false
+    },
+    {
+      "id": "s-app-04-3",
+      "taskId": "t-app-04",
+      "title": "Вход через Telegram (без паролей)",
+      "done": false
+    },
+    {
+      "id": "s-app-04-4",
+      "taskId": "t-app-04",
+      "title": "Уведомления от бота",
+      "done": false
+    },
+    {
+      "id": "s-app-04-5",
+      "taskId": "t-app-04",
+      "title": "Админка",
+      "done": false
+    },
+    {
+      "id": "s-app-04-6",
+      "taskId": "t-app-04",
+      "title": "Интеграция с POS",
+      "done": false
+    },
+    {
+      "id": "s-app-04-7",
+      "taskId": "t-app-04",
+      "title": "Аналитика",
+      "done": false
+    },
+    {
+      "id": "s-app-14-1",
+      "taskId": "t-app-14",
+      "title": "Бот создан через BotFather",
+      "done": false
+    },
+    {
+      "id": "s-app-14-2",
+      "taskId": "t-app-14",
+      "title": "Название, аватар, описание в айдентике",
+      "done": false
+    },
+    {
+      "id": "s-app-14-3",
+      "taskId": "t-app-14",
+      "title": "Кнопка меню открывает Mini App",
+      "done": false
+    },
+    {
+      "id": "s-app-14-4",
+      "taskId": "t-app-14",
+      "title": "Приветственное сообщение",
+      "done": false
+    },
+    {
+      "id": "s-app-14-5",
+      "taskId": "t-app-14",
+      "title": "Домен Mini App подключён",
+      "done": false
+    },
+    {
+      "id": "s-dk-14-1",
+      "taskId": "t-dk-14",
+      "title": "Дизайн",
+      "done": false
+    },
+    {
+      "id": "s-dk-14-2",
+      "taskId": "t-dk-14",
+      "title": "Тест на время доставки",
+      "done": false
+    },
+    {
+      "id": "s-dk-14-3",
+      "taskId": "t-dk-14",
+      "title": "Заказ",
+      "done": false
+    },
+    {
+      "id": "s-dk-16-1",
+      "taskId": "t-dk-16",
+      "title": "Договоры",
+      "done": false
+    },
+    {
+      "id": "s-dk-16-2",
+      "taskId": "t-dk-16",
+      "title": "Загрузка меню и цен",
+      "done": false
+    },
+    {
+      "id": "s-dk-16-3",
+      "taskId": "t-dk-16",
+      "title": "Фото",
+      "done": false
+    },
+    {
+      "id": "s-dk-16-4",
+      "taskId": "t-dk-16",
+      "title": "Модерация",
+      "done": false
+    },
+    {
+      "id": "s-dk-34-1",
+      "taskId": "t-dk-34",
+      "title": "Холодильные камеры",
+      "done": false
+    },
+    {
+      "id": "s-dk-34-2",
+      "taskId": "t-dk-34",
+      "title": "Заморозка",
+      "done": false
+    },
+    {
+      "id": "s-dk-34-3",
+      "taskId": "t-dk-34",
+      "title": "Сухой склад",
+      "done": false
+    },
+    {
+      "id": "s-dk-34-4",
+      "taskId": "t-dk-34",
+      "title": "Маркировка FIFO/FEFO",
+      "done": false
+    }
+  ],
   "wiki": [
     {
       "id": "w1",
-      "title": "CRM X",
-      "body": "Кинотеатр Москва, Ереван. A 10 окт окно Corner. B 31 окт Dark Kitchen. C 10 янв зал. Ремонт: Corner → кухня → зал.",
+      "title": "Master-план запуска",
       "zone": "all",
-      "visibility": "staff"
+      "visibility": "staff",
+      "body": "Старт 24.09.2026. Ремонт по очереди: WAFL → Dark Kitchen → COMX → CAFE (демонтаж → замер → планировка → дизайн → согласование → ремонт).\n\nОткрытия (план): WAFL 28.10.2026 · Dark Kitchen 10.11.2026 · COMX 15.12.2026 · CAFE 15.01.2027. Даты COMX и CAFE — ориентир, уточняются после запуска кухни.\n\n7 потоков: LEGAL · SPACE · BRAND · PRODUCT · EQUIPMENT & SUPPLY · PEOPLE · LAUNCH. Готовность проекта считается из закрытых задач (critical path весит ×3).\n\nКаждый запуск: тест производства → тестовые смены → soft launch → анализ → полноценный запуск.\n\nРезерв: держим 10–15% по времени — 28.10 и 10.11 плановые, не гарантированные даты.\n\nПолный план: data/master-plan.csv в репозитории."
     }
   ],
-  "notices": [
-    {
-      "id": "n1",
-      "userId": "u-cpo",
-      "text": "Новый бэклог: 90 задач, старт 15 сен",
-      "createdAt": "2026-09-15T09:00:00",
-      "read": false,
-      "kind": "task_new"
-    },
-    {
-      "id": "n2",
-      "userId": "u-armen",
-      "text": "WAFL 15 окт · kitchen+COMX 30 окт · CAFE 15 дек",
-      "createdAt": "2026-09-15T09:00:00",
-      "read": false,
-      "kind": "task_new"
-    }
-  ],
+  "notices": [],
   "contacts": [
     {
-      "id": "k1",
-      "name": "Owner",
+      "id": "k-armen",
+      "name": "Armen",
       "company": "CRM X",
-      "title": "CPO",
+      "title": "Owner проекта",
       "phone": "",
-      "email": "1111",
+      "email": "",
       "zone": "all",
       "telegram": "",
       "whatsapp": "",
       "kind": "staff"
     },
     {
-      "id": "k2",
-      "name": "Armen",
+      "id": "k-vladimir",
+      "name": "Vladimir",
       "company": "CRM X",
-      "title": "Product Owner",
+      "title": "Креативный директор",
       "phone": "",
-      "email": "2222",
-      "zone": "wafl",
+      "email": "",
+      "zone": "all",
+      "telegram": "",
+      "whatsapp": "",
+      "kind": "staff"
+    },
+    {
+      "id": "k-karina",
+      "name": "Karina",
+      "company": "CRM X",
+      "title": "Маркетинг",
+      "phone": "",
+      "email": "",
+      "zone": "all",
       "telegram": "",
       "whatsapp": "",
       "kind": "staff"
@@ -2780,9 +5457,9 @@ export const seed: AppState = {
     }
   ],
   "broadcast": {
-    "text": "Сегодня строим окно. Маленький шаг — тоже путь.",
-    "emoji": "💪",
-    "authorId": "u-cpo",
-    "updatedAt": "2026-09-15T09:00:00"
+    "text": "Стартуем master-план: WAFL 28.10, Dark Kitchen 10.11. Сначала договоры и демонтаж.",
+    "emoji": "🚀",
+    "authorId": "u-armen",
+    "updatedAt": "2026-09-24T09:00:00"
   }
 };
