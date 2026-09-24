@@ -36,15 +36,9 @@ export function ensureHashed(password: string) {
   return isHashed(password) ? password : hashPassword(password);
 }
 
-function secret() {
-  const base = process.env.SESSION_SECRET || process.env.BLOB_READ_WRITE_TOKEN;
-  if (base) return createHash("sha256").update(`crmx-session:${base}`).digest();
-  if (process.env.VERCEL) throw new Error("SESSION_SECRET не задан");
-  return createHash("sha256").update("crmx-local-dev-only").digest();
-}
-
-function sign(payload: string) {
-  return createHmac("sha256", secret()).update(payload).digest("base64url");
+function sign(payload: string, secret: string) {
+  const key = createHash("sha256").update(`crmx-session:${secret}`).digest();
+  return createHmac("sha256", key).update(payload).digest("base64url");
 }
 
 /** Отпечаток пароля в сессии: смена пароля разлогинивает остальные устройства. */
@@ -54,19 +48,19 @@ function passwordMark(stored: string) {
 
 export const SESSION_MAX_AGE = 60 * 60 * 24 * SESSION_DAYS;
 
-export function createSession(user: User) {
+export function createSession(user: User, secret: string) {
   const exp = Date.now() + SESSION_MAX_AGE * 1000;
   const payload = `${user.id}.${exp}.${passwordMark(user.password)}`;
-  return `${payload}.${sign(payload)}`;
+  return `${payload}.${sign(payload, secret)}`;
 }
 
-export function readSession(token: string | undefined | null, users: User[]): User | null {
+export function readSession(token: string | undefined | null, users: User[], secret: string): User | null {
   if (!token) return null;
   const parts = token.split(".");
   if (parts.length < 4) return null;
   const sig = parts.pop()!;
   const payload = parts.join(".");
-  if (!safeEqual(sig, sign(payload))) return null;
+  if (!safeEqual(sig, sign(payload, secret))) return null;
   const mark = parts.pop()!;
   const exp = Number(parts.pop());
   const uid = parts.join(".");
