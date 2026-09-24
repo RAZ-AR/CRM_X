@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { canManagePeople, canSeeTask, isCpo, statusMeta, subordinateIds, taskZones } from "@/lib/access";
 import { openDeps } from "@/lib/taskRules";
@@ -19,7 +19,12 @@ const FILTER_KEY = "crmx-home-filters";
 export default function HomePage() {
   const { current, tasks, zones, users, setPreviewId, broadcast, setBroadcast, activity } = useStore();
   const [changesDays, setChangesDays] = useState(1);
-  const [openedAt] = useState(() => Date.now());
+  // «Сейчас» для окна «24 ч / 7 дней»: обновляется раз в минуту и при переключении.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(t);
+  }, []);
   const today = todayYerevan();
   const [picked, setPicked] = useState(today);
   // Фильтры храним отдельно для каждого пользователя: один браузер может быть общим.
@@ -109,7 +114,7 @@ export default function HomePage() {
 
   // Что изменилось: журнал по задачам в текущих фильтрах
   const scopedIds = new Set(scoped.map((t) => t.id));
-  const sinceIso = new Date(openedAt - changesDays * 86400000).toISOString();
+  const sinceIso = new Date(now - changesDays * 86400000).toISOString();
   const changes = (activity ?? []).filter(
     (a) => a.at >= sinceIso && (scopedIds.has(a.taskId) || (owner && a.kind === "deleted" && !assigneeId && zone === "all")),
   );
@@ -239,7 +244,7 @@ export default function HomePage() {
                 [1, "24 ч"],
                 [7, "7 дней"],
               ].map(([d, l]) => (
-                <button key={d} type="button" onClick={() => setChangesDays(Number(d))} className={`rounded-full px-3 py-1 ${changesDays === d ? "bg-black text-white" : "text-[#6b6b70]"}`}>
+                <button key={d} type="button" onClick={() => { setChangesDays(Number(d)); setNow(Date.now()); }} className={`rounded-full px-3 py-1 ${changesDays === d ? "bg-black text-white" : "text-[#6b6b70]"}`}>
                   {l}
                 </button>
               ))}

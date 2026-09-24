@@ -26,7 +26,7 @@ export function filterState(state: AppState, user: User): AppState {
     comments: state.comments.filter((c) => ids.has(c.taskId)),
     subtasks: state.subtasks.filter((s) => ids.has(s.taskId)),
     notices: state.notices.filter((n) => n.userId === user.id),
-    activity: (state.activity ?? []).filter((a) => ids.has(a.taskId) || (canManagePeople(user) && a.kind === "deleted")),
+    activity: (state.activity ?? []).filter((a) => ids.has(a.taskId) || (user.role === "cpo" && a.kind === "deleted")),
     wiki: state.wiki.filter((p) => canSeeWiki(user, p)),
     contacts: state.contacts.filter((c) => canSeeContact(user, c)),
   };

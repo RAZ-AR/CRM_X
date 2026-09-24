@@ -17,7 +17,7 @@ export default function MeetingPage() {
 
   const today = todayYerevan();
   const list = tasks.filter((t) => canSeeTask(current, t, users) && (zone === "all" || taskZones(t).includes(zone)));
-  const sections = buildAgenda(state, list, users, today, days);
+  const sections = buildAgenda(state, list, users, today, days, zone);
   const text = agendaText(sections, today);
 
   return (

@@ -7,7 +7,7 @@ export type AgendaItem = { task?: Task; text: string; who?: string };
 export type AgendaSection = { title: string; items: AgendaItem[] };
 
 /** Повестка планёрки за последние `days` дней и на неделю вперёд. */
-export function buildAgenda(state: AppState, tasks: Task[], users: User[], today: string, days: number): AgendaSection[] {
+export function buildAgenda(state: AppState, tasks: Task[], users: User[], today: string, days: number, zone = "all"): AgendaSection[] {
   const since = addDays(today, -days);
   const name = (id: string) => users.find((u) => u.id === id)?.name ?? "—";
   const ids = new Set(tasks.map((t) => t.id));
@@ -19,7 +19,7 @@ export function buildAgenda(state: AppState, tasks: Task[], users: User[], today
   };
 
   const launches = state.zones
-    .filter((z) => z.slug !== "common" && z.deadline >= today)
+    .filter((z) => z.slug !== "common" && z.deadline >= today && (zone === "all" || z.slug === zone))
     .sort((a, b) => a.deadline.localeCompare(b.deadline))
     .map((z) => ({ text: `${z.emoji} ${z.name}: ${weightedDone(zoneTasks(z.slug, tasks))}% · открытие ${shortDate(z.deadline)} (через ${diffDays(today, z.deadline)} дн)` }));
 

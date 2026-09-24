@@ -207,6 +207,7 @@ export default function SettingsPage() {
               const on = (u.streams ?? []).includes(st);
               return (
                 <button
+                  type="button"
                   key={st}
                   className={`pill px-3 py-1.5 text-sm ${on ? "bg-black text-white" : "bg-gray-100"}`}
                   onClick={() => setStreams(u.id, on ? (u.streams ?? []).filter((x) => x !== st) : [...(u.streams ?? []), st])}
