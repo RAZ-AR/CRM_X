@@ -34,6 +34,10 @@ type Store = AppState & {
   cloud: boolean;
   addTask: (t: Omit<Task, "id" | "createdAt">) => string;
   updateTask: (id: string, patch: Partial<Task>) => { ok: true } | { ok: false; error: string };
+  /** Сохраняет новые даты нескольких задач: сначала сервер, потом экран. При ошибке останавливается. */
+  saveTaskDates: (
+    changes: { id: string; startDate: string; due: string }[],
+  ) => Promise<{ ok: true } | { ok: false; error: string; saved: number }>;
   addComment: (taskId: string, text: string) => void;
   deleteTask: (id: string) => Promise<{ ok: true } | { ok: false; error: string }>;
   grant: (userId: string, permissions: User["permissions"]) => void;
@@ -395,6 +399,37 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return result;
   }, [current]);
 
+  const saveTaskDates = useCallback(
+    async (changes: { id: string; startDate: string; due: string }[]) => {
+      let saved = 0;
+      for (const c of changes) {
+        const patch = { startDate: c.startDate, due: c.due };
+        if (remoteRef.current) {
+          try {
+            const res = await enqueue(() =>
+              fetch(`/api/tasks/${c.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify(patch),
+              }),
+            );
+            const data = await res.json().catch(() => null);
+            if (!res.ok || !data?.ok) {
+              return { ok: false as const, error: data?.error || `Сервер не сохранил задачу (${res.status})`, saved };
+            }
+          } catch {
+            return { ok: false as const, error: "Нет связи с сервером", saved };
+          }
+        }
+        setState((s) => ({ ...s, tasks: s.tasks.map((t) => (t.id === c.id ? { ...t, ...patch } : t)) }));
+        saved += 1;
+      }
+      return { ok: true as const };
+    },
+    [enqueue],
+  );
+
   const addComment = useCallback(
     (taskId: string, text: string) => {
       if (!current) return;
@@ -685,6 +720,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       logout,
       addTask,
       updateTask,
+      saveTaskDates,
       addComment,
       grant,
       addSubtask,
@@ -716,6 +752,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       logout,
       addTask,
       updateTask,
+      saveTaskDates,
       addComment,
       grant,
       addSubtask,
