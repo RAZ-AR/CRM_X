@@ -21,7 +21,14 @@ export function parseQuickTask(text: string, today: string, zones: Zone[], users
     const year = y ? (y.length === 2 ? `20${y}` : y) : today.slice(0, 4);
     let iso = `${year}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
     if (!y && iso < today) iso = `${Number(year) + 1}${iso.slice(4)}`;
-    if (!Number.isNaN(Date.parse(iso))) due = iso;
+    // Date нормализует 31.02 в 03.03 — сверяем компоненты, чтобы не поставить чужую дату.
+    const parsed = new Date(`${iso}T00:00:00Z`);
+    const real =
+      parsed.getUTCFullYear() === Number(iso.slice(0, 4)) &&
+      parsed.getUTCMonth() + 1 === Number(m) &&
+      parsed.getUTCDate() === Number(d);
+    if (!real) return { error: `Даты ${d}.${m} не существует. Пример: «до 15.10»` };
+    due = iso;
     rest = rest.replace(date[0], " ");
   } else if (/\sзавтра(?=\s)/i.test(rest)) {
     due = addDays(today, 1);

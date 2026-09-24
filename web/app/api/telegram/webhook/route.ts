@@ -61,14 +61,20 @@ export async function POST(req: Request) {
     await saveSharedState(withActivity({ ...state, tasks: [task, ...state.tasks] }, [created(linked, task)]));
     const who = state.users.find((u) => u.id === task.assigneeId);
     const zone = state.zones.find((z) => z.slug === task.zone);
+    let delivery = "";
+    if (who && who.id !== linked.id) {
+      const ok = await sendTo(who, `🆕 Новая задача от ${escapeHtml(linked.name)}: ${escapeHtml(task.title)}\nСрок: ${shortDate(task.due)}`);
+      if (!ok) {
+        delivery = who.telegramChatId
+          ? `\n⚠️ ${escapeHtml(who.name)} не получил(а) уведомление — Telegram не принял сообщение.`
+          : `\n⚠️ ${escapeHtml(who.name)} не подключил(а) Telegram — уведомление не отправлено, предупредите лично.`;
+      }
+    }
     await reply(
       `✅ Задача в бэклоге: <a href="${escapeHtml(appUrlFrom(req))}/tasks/${task.id}">${escapeHtml(task.title)}</a>\n` +
         `Срок ${shortDate(task.due)} · ${escapeHtml(zone ? `${zone.emoji} ${zone.name}` : task.zone)} · ${escapeHtml(who?.name ?? "")}\n` +
-        `Добавьте «готово когда» в CRM.${q.note ? `\n${escapeHtml(q.note)}` : ""}`,
+        `Добавьте «готово когда» в CRM.${q.note ? `\n${escapeHtml(q.note)}` : ""}${delivery}`,
     );
-    if (who && who.id !== linked.id) {
-      await sendTo(who, `🆕 Новая задача от ${escapeHtml(linked.name)}: ${escapeHtml(task.title)}\nСрок: ${shortDate(task.due)}`);
-    }
   } else if (cmd === "/stop") {
     await saveSharedState({
       ...state,
