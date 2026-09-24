@@ -362,7 +362,9 @@ function Group({
   const { current, updateTask } = useStore();
   const [all, setAll] = useState(false);
   const canWork = (t: Task) => Boolean(current && canWorkTask(current, t));
-  const setStatus = (id: string, status: Task["status"]) => updateTask(id, { status });
+  // Выход из блока через меню — как «Снять блок» в карточке: причина и срок очищаются.
+  const setStatus = (t: Task, status: Task["status"]) =>
+    updateTask(t.id, t.status === "blocked" ? { status, blockReason: "", blockUntil: "" } : { status });
   if (!list.length) return null;
   const shown = all ? list : list.slice(0, limit);
   return (
@@ -381,7 +383,7 @@ function Group({
                 status={t.status}
                 disabled={!canWork(t)}
                 onPick={(st) => {
-                  const r = setStatus(t.id, st);
+                  const r = setStatus(t, st);
                   if (!r.ok) {
                     alert(r.error);
                     if (r.error.includes("готово когда")) open(t.id);

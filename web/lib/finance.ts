@@ -33,8 +33,9 @@ const SIGN: Record<Currency, string> = { AMD: "AMD", USD: "$", EUR: "€" };
 
 export function money(amount: number, currency: Currency) {
   const rounded = currency === "AMD" ? Math.round(amount) : Math.round(amount * 100) / 100;
-  const text = rounded.toLocaleString("ru-RU", { maximumFractionDigits: currency === "AMD" ? 0 : 2 });
-  return currency === "USD" ? `${SIGN.USD}${text}` : `${text} ${SIGN[currency]}`;
+  const text = Math.abs(rounded).toLocaleString("ru-RU", { maximumFractionDigits: currency === "AMD" ? 0 : 2 });
+  const minus = rounded < 0 ? "−" : "";
+  return currency === "USD" ? `${minus}${SIGN.USD}${text}` : `${minus}${text} ${SIGN[currency]}`;
 }
 
 export type Totals = { plan: number; paid: number; committed: number; left: number };
