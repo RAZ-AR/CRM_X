@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { sessionUser } from "@/lib/session";
-import { canDeleteTask, canEditTask, canWorkTask } from "@/lib/access";
+import { canDeleteTask, canEditTask, canSeeContact, canWorkTask } from "@/lib/access";
 import { canMoveStatus } from "@/lib/taskRules";
 import { loadSharedState, saveSharedState } from "@/lib/blobState";
 import type { Task } from "@/lib/types";
@@ -9,7 +9,7 @@ import { statusMeta } from "@/lib/access";
 import { appUrlFrom, escapeHtml, sendTo, taskLink } from "@/lib/telegram";
 import { shortDate } from "@/lib/dates";
 
-const WORK = ["status", "result", "blockReason", "blockUntil", "blockFromStatus", "attachments"] as const;
+const WORK = ["status", "result", "blockReason", "blockUntil", "blockFromStatus", "attachments", "contactIds"] as const;
 
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const user = await sessionUser();
@@ -22,6 +22,18 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   const edit = canEditTask(user, prev);
   const work = canWorkTask(user, prev);
   if (!work && !edit) return NextResponse.json({ ok: false, error: "Нет доступа" }, { status: 403 });
+
+  if ("contactIds" in patch) {
+    const ids = patch.contactIds;
+    if (!Array.isArray(ids) || !ids.every((x) => typeof x === "string")) {
+      return NextResponse.json({ ok: false, error: "contactIds должен быть списком" }, { status: 400 });
+    }
+    // Привязать можно только существующих и видимых этому пользователю контрагентов;
+    // уже привязанные, но скрытые от него — сохраняем как есть.
+    const visible = new Set(state.contacts.filter((c) => canSeeContact(user, c)).map((c) => c.id));
+    const hidden = (prev.contactIds ?? []).filter((id) => !visible.has(id));
+    patch.contactIds = [...new Set([...ids.filter((id) => visible.has(id)), ...hidden])];
+  }
 
   const nextPatch: Partial<Task> = {};
   for (const [k, v] of Object.entries(patch)) {

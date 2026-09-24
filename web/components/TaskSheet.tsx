@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { canDeleteTask, canEditTask, canSeeTask, canWorkTask, columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
+import { canDeleteTask, canEditTask, canSeeContact, canSeeTask, canWorkTask, columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
 import { openDeps, unlockedBy } from "@/lib/taskRules";
 import { filesToAttachments } from "@/lib/files";
-import { STREAMS, type Priority } from "@/lib/types";
+import { CONTRACTOR_STATUS, STREAMS, type Priority } from "@/lib/types";
+import { telHref, tgHref } from "@/lib/links";
 import { formatDate } from "@/lib/dates";
 import { Flame, Trash2, X } from "lucide-react";
 import { EMOJIS } from "@/lib/emoji";
@@ -19,7 +20,7 @@ export function TaskSheet({
 }) {
   const {
     current, tasks, users, zones, comments, subtasks,
-    updateTask, addComment, addSubtask, toggleSubtask, toggleReaction, deleteTask, setPreviewId,
+    updateTask, addComment, addSubtask, toggleSubtask, toggleReaction, deleteTask, setPreviewId, contacts,
   } = useStore();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState("");
@@ -305,6 +306,51 @@ export function TaskSheet({
             </div>
           </div>
         )}
+
+        <div>
+          <div className="text-xs text-[#9a9aa0] mb-2">Контрагенты</div>
+          {(() => {
+            const visible = contacts.filter((c) => canSeeContact(current, c));
+            const ids = task.contactIds ?? [];
+            const linked = visible.filter((c) => ids.includes(c.id));
+            const free = visible.filter((c) => !ids.includes(c.id)).sort((a, b) => Number(a.kind === "staff") - Number(b.kind === "staff") || a.name.localeCompare(b.name));
+            return (
+              <>
+                {linked.length === 0 && <p className="text-sm text-[#9a9aa0]">Не привязаны</p>}
+                <div className="flex flex-wrap gap-2">
+                  {linked.map((c) => (
+                    <span key={c.id} className="pill bg-[#f4f4f6] px-3 py-1.5 text-xs flex items-center gap-2">
+                      <span>
+                        <b className="font-medium">{c.name}</b>
+                        {c.specialty ? ` · ${c.specialty}` : ""}
+                        {c.status && c.kind !== "staff" ? ` · ${CONTRACTOR_STATUS[c.status].label}` : ""}
+                      </span>
+                      {c.phone && <a className="underline" href={telHref(c.phone)}>📞</a>}
+                      {c.telegram && <a className="underline" href={tgHref(c.telegram)} target="_blank" rel="noreferrer">TG</a>}
+                      {canWork && (
+                        <button type="button" aria-label="Отвязать" onClick={() => updateTask(task.id, { contactIds: ids.filter((x) => x !== c.id) })}>
+                          <X size={12} />
+                        </button>
+                      )}
+                    </span>
+                  ))}
+                </div>
+                {canWork && free.length > 0 && (
+                  <select
+                    className="mt-2 text-sm w-full"
+                    value=""
+                    onChange={(e) => e.target.value && updateTask(task.id, { contactIds: [...ids, e.target.value] })}
+                  >
+                    <option value="">+ Привязать контрагента</option>
+                    {free.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}{c.specialty ? ` — ${c.specialty}` : ""}</option>
+                    ))}
+                  </select>
+                )}
+              </>
+            );
+          })()}
+        </div>
 
         <div>
           <div className="text-xs text-[#9a9aa0] mb-2">Чеклист</div>

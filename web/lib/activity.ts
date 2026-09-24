@@ -34,6 +34,13 @@ export function taskChanges(user: User, prev: Task, next: Task, users: User[]): 
     const name = users.find((u) => u.id === next.assigneeId)?.name ?? "—";
     out.push({ ...base(user, next), kind: "assignee", text: `исполнитель → ${name}` });
   }
+  const before = new Set(prev.contactIds ?? []);
+  const after = new Set(next.contactIds ?? []);
+  const added = [...after].filter((id) => !before.has(id));
+  const removed = [...before].filter((id) => !after.has(id));
+  if (added.length || removed.length) {
+    out.push({ ...base(user, next), kind: "edited", text: `контрагенты: ${added.length ? `+${added.length}` : ""}${added.length && removed.length ? ", " : ""}${removed.length ? `−${removed.length}` : ""}` });
+  }
   if (prev.title !== next.title || prev.result !== next.result || prev.description !== next.description) {
     out.push({ ...base(user, next), kind: "edited", text: prev.title !== next.title ? `переименована (было «${prev.title}»)` : "обновлены описание или «готово когда»" });
   }
