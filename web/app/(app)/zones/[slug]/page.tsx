@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useStore } from "@/lib/store";
-import { canSeeTask, hasPerm, isCpo, statusMeta } from "@/lib/access";
+import { canSeeTask, hasPerm, isCpo } from "@/lib/access";
 import { streamProgress, zoneTaskProgress, zoneTasks } from "@/lib/readiness";
 import { formatDate } from "@/lib/dates";
+import { StatusIcon } from "@/components/StatusIcon";
 
 export default function ZonePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -52,7 +53,7 @@ export default function ZonePage() {
       <div className="card p-5">
         {visible.map((t) => (
           <Link key={t.id} href={`/tasks/${t.id}`} className="flex gap-2 py-2 text-sm">
-            <span>{statusMeta[t.status].emoji || "⚪"}</span>
+            <StatusIcon status={t.status} size={14} />
             <span className="text-[#9a9aa0] w-20 shrink-0">{t.code}</span>
             <span className="flex-1">{t.title}</span>
             <span className="text-[#9a9aa0] shrink-0">{formatDate(t.due).slice(0, 5)}</span>

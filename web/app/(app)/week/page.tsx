@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { canSeeTask, statusMeta, taskZones } from "@/lib/access";
+import { canSeeTask, taskZones } from "@/lib/access";
 import { openDeps } from "@/lib/taskRules";
 import { addDays, shortDate, todayYerevan, weekStart } from "@/lib/dates";
 import type { Task } from "@/lib/types";
 import { ChevronLeft, ChevronRight, Flame } from "lucide-react";
+import { StatusIcon } from "@/components/StatusIcon";
 
 /** Что каждому делать на неделе: задачи, которые идут в эти дни, плюс хвосты с прошлых недель. */
 export default function WeekPage() {
@@ -87,7 +88,7 @@ export default function WeekPage() {
                       className="w-full text-left rounded-2xl px-3 py-2 text-sm flex items-start gap-2"
                       style={{ background: late(t) ? "#fee2e2" : "#f4f4f6" }}
                     >
-                      <span className="shrink-0 mt-0.5">{late(t) ? <Flame size={14} className="text-[#e86a4a]" /> : statusMeta[t.status].emoji || "⚪"}</span>
+                      <span className="shrink-0 mt-0.5">{late(t) ? <Flame size={14} className="text-[#e86a4a]" /> : <StatusIcon status={t.status} size={14} />}</span>
                       <span className="flex-1 min-w-0">
                         <span className="font-medium">{t.title}</span>
                         <span className="block text-[11px] text-[#6b6b70] mt-0.5">

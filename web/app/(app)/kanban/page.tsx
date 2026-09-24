@@ -8,6 +8,7 @@ import { AddTaskModal } from "@/components/AddTaskModal";
 import { TaskCard } from "@/components/TaskCard";
 import type { ZoneSlug } from "@/lib/types";
 import { formatDate } from "@/lib/dates";
+import { StatusIcon } from "@/components/StatusIcon";
 
 export default function KanbanPage() {
   const { current, tasks, zones, users, updateTask } = useStore();
@@ -90,7 +91,7 @@ export default function KanbanPage() {
           {boardColumns.map((col) => (
             <div key={col} className="card p-3 w-[min(85vw,18rem)] md:w-auto md:flex-1 md:min-w-[13.5rem] shrink-0 snap-center min-w-0">
               <div className="text-sm font-medium mb-2 px-1">
-                {statusMeta[col].emoji} {statusMeta[col].label}
+                <StatusIcon status={col} size={14} /> {statusMeta[col].label}
               </div>
               <div
                 className="space-y-2 min-h-[200px]"

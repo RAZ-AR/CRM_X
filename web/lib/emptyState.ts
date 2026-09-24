@@ -12,4 +12,7 @@ export const EMPTY_STATE: AppState = {
   notices: [],
   broadcast: null,
   activity: [],
+  budget: [],
+  expenses: [],
+  risks: [],
 };

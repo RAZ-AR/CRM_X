@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { canDeleteTask, canEditTask, canSeeContact, canSeeTask, canWorkTask, columns, isOverdue, statusMeta, taskZones } from "@/lib/access";
+import { canDeleteTask, canEditTask, canSeeContact, canSeeTask, canWorkTask, isOverdue, statusMeta, taskZones } from "@/lib/access";
 import { openDeps, unlockedBy } from "@/lib/taskRules";
 import { filesToAttachments } from "@/lib/files";
 import { CONTRACTOR_STATUS, STREAMS, type Priority } from "@/lib/types";
@@ -10,6 +10,7 @@ import { telHref, tgHref } from "@/lib/links";
 import { formatDate } from "@/lib/dates";
 import { Flame, Trash2, X } from "lucide-react";
 import { EMOJIS } from "@/lib/emoji";
+import { STATUS_ICON, STATUS_ORDER, StatusIcon } from "@/components/StatusIcon";
 
 export function TaskSheet({
   taskId,
@@ -98,7 +99,7 @@ export function TaskSheet({
 
       <div className="px-7 pb-6 overflow-y-auto space-y-5">
         <div className="grid grid-cols-2 gap-3 text-sm">
-          <Meta k="Статус" v={`${statusMeta[task.status].emoji} ${statusMeta[task.status].label}`} />
+          <Meta k="Статус" v={<span className="inline-flex items-center gap-1.5"><StatusIcon status={task.status} size={14} />{statusMeta[task.status].label}</span>} />
           <Meta k="Исполнитель" v={assignee?.name ?? "—"} />
           <Meta k="Создал" v={author?.name ?? "—"} />
           <Meta k="Начало" v={formatDate(task.startDate)} />
@@ -111,24 +112,35 @@ export function TaskSheet({
         {canWork && (
           <div className="space-y-2">
             {task.status !== "blocked" && (
-            <label className="text-xs text-[#9a9aa0] block">Статус
-              <select
-                className="w-full mt-1"
-                value={task.status}
-                onChange={(e) => {
-                  const status = e.target.value as typeof task.status;
-                  const r = updateTask(task.id, { status });
-                  if (!r.ok) {
-                    alert(r.error);
-                    e.target.value = task.status;
-                  }
-                }}
-              >
-                {columns.map((c) => (
-                  <option key={c} value={c}>{statusMeta[c].label}</option>
-                ))}
-              </select>
-            </label>
+              <div>
+                <div className="text-xs text-[#9a9aa0] mb-1">Статус</div>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5" role="radiogroup" aria-label="Статус задачи">
+                  {STATUS_ORDER.map((c) => {
+                    const on = task.status === c;
+                    return (
+                      <button
+                        key={c}
+                        type="button"
+                        role="radio"
+                        aria-checked={on}
+                        className={`flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-1.5 py-2 text-xs border ${on ? "bg-black text-white border-black" : "bg-white border-black/10 hover:bg-[#f4f4f6]"}`}
+                        onClick={() => {
+                          if (on) return;
+                          if (c === "blocked") {
+                            setBlockOpen(true);
+                            return;
+                          }
+                          const r = updateTask(task.id, { status: c });
+                          if (!r.ok) alert(r.error);
+                        }}
+                      >
+                        <StatusIcon status={c} size={15} />
+                        {STATUS_ICON[c].short}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             )}
             <label className="text-xs text-[#9a9aa0] block">Готово когда
               <textarea
@@ -426,7 +438,7 @@ export function TaskSheet({
   );
 }
 
-function Meta({ k, v }: { k: string; v: string }) {
+function Meta({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="bg-[#f7f7f8] rounded-2xl px-3 py-2">
       <div className="text-[10px] text-[#9a9aa0]">{k}</div>

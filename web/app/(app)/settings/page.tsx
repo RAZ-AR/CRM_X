@@ -12,6 +12,7 @@ const PERMS: { id: Permission; label: string }[] = [
   { id: "zone_team_tasks", label: "Задачи команды" },
   { id: "wiki", label: "Wiki" },
   { id: "contacts", label: "Контакты" },
+  { id: "finance", label: "Деньги" },
 ];
 
 export default function SettingsPage() {

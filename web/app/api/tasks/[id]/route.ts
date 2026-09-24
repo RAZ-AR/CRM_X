@@ -105,6 +105,8 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
           comments: state.comments.filter((c) => c.taskId !== id),
           subtasks: state.subtasks.filter((st) => st.taskId !== id),
           notices: state.notices.filter((n) => n.taskId !== id),
+          risks: (state.risks ?? []).map((r) => (r.taskIds.includes(id) ? { ...r, taskIds: r.taskIds.filter((x) => x !== id) } : r)),
+          expenses: (state.expenses ?? []).map((e) => (e.taskId === id ? { ...e, taskId: undefined } : e)),
         },
         [deleted(user, task)],
       ),

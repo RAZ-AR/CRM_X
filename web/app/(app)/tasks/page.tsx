@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useStore } from "@/lib/store";
-import { canSeeTask, isOverdue, statusMeta } from "@/lib/access";
+import { canSeeTask, isOverdue } from "@/lib/access";
 import { formatDate } from "@/lib/dates";
 import { useState } from "react";
+import { StatusIcon } from "@/components/StatusIcon";
 
 export default function TasksPage() {
   const { current, tasks, users, zones } = useStore();
@@ -32,7 +33,7 @@ export default function TasksPage() {
           const z = zones.find((z) => z.slug === t.zone);
           return (
             <Link key={t.id} href={`/tasks/${t.id}`} className="flex flex-wrap items-center gap-3 rounded-2xl bg-gray-50 px-4 py-3">
-              <span>{statusMeta[t.status].emoji}</span>
+              <StatusIcon status={t.status} size={14} />
               <span className="flex-1 font-medium text-sm">{t.title}</span>
               <span className="text-xs">{z?.emoji} {z?.name}</span>
               <span className="text-xs text-gray-500">{a?.name}</span>
