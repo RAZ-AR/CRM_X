@@ -16,6 +16,7 @@ import { canSeeFinance, DEFAULT_FX, money, totals } from "@/lib/finance";
 import { riskScore, topRisks } from "@/lib/risks";
 import { Legend, Meter, OTHER, RED, Ring, SERIES, Spark, StackedWeeks } from "@/components/Charts";
 import { Section } from "@/components/PageHeader";
+import { MilestoneLegend, Milestones } from "@/components/Milestones";
 
 const FILTER_KEY = "crmx-home-filters";
 const TASK_TABS: HomeView[] = ["overdue", "today", "work", "start", "critical", "blocked", "review", "ready"];
@@ -272,6 +273,13 @@ export default function HomePage() {
           )}
         </Section>
       </div>
+
+      {/* Roadmap по основным вехам */}
+      {zone !== "common" && (
+        <Section eyebrow="Roadmap · основные вехи" title="От демонтажа до открытия" action={<MilestoneLegend />}>
+          <Milestones tasks={byZone} zones={zone === "all" ? zones : zones.filter((z) => z.slug === zone)} today={picked} onOpen={setPreviewId} />
+        </Section>
+      )}
 
       {/* Четыре цифры */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-5">
