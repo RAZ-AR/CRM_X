@@ -1,7 +1,7 @@
 import { addDays } from "./dates";
 import { openDeps } from "./taskRules";
 import type { Task, User } from "./types";
-import { canSeeTask, isCpo, subordinateIds, taskZones } from "./access";
+import { accessOf, canSeeTask, isCpo, subordinateIds, taskZones } from "./access";
 
 /** Списки задач главной. Одни и те же правила на главной и на полной странице списка. */
 export const HOME_VIEWS = {
@@ -55,7 +55,7 @@ export function scopeTasks(
   who: string,
   zone: string,
 ): { seen: Task[]; byZone: Task[]; scoped: Task[]; manager: boolean; whoValue: string; assigneeId: string | null } {
-  const manager = isCpo(me) || subordinateIds(me.id, users).length > 0;
+  const manager = isCpo(me) || accessOf(me) === "manager" || subordinateIds(me.id, users).length > 0;
   const whoValue = manager ? who || "all" : "me";
   const seen = tasks.filter((t) => canSeeTask(me, t, users));
   const byZone = zone === "all" ? seen : seen.filter((t) => taskZones(t).includes(zone));

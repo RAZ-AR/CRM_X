@@ -1,7 +1,44 @@
-import type { Contact, Permission, Task, User, WikiPage, ZoneSlug } from "./types";
+import type { Access, Contact, Permission, Task, User, WikiPage, ZoneSlug } from "./types";
 
 export function isCpo(user: User) {
   return user.role === "cpo";
+}
+
+export const ACCESS_META: Record<Access, { label: string; hint: string; perms: Permission[] }> = {
+  owner: { label: "Owner", hint: "Видит и правит всё, управляет командой и деньгами", perms: [] },
+  manager: {
+    label: "Управляющий",
+    hint: "Все задачи своих проектов: видит, ведёт статусы, правит сроки",
+    perms: ["zone_page", "zone_team_tasks", "zone_team", "zone_roadmap", "zone_readiness", "wiki", "contacts"],
+  },
+  marketer: { label: "Маркетолог", hint: "Поток BRAND & MARKETING в своих проектах и свои задачи", perms: ["wiki", "contacts"] },
+  staff: { label: "Сотрудник", hint: "Свои задачи, задачи, где участвует, и задачи подчинённых", perms: ["wiki"] },
+};
+export const ACCESS_ORDER: Access[] = ["owner", "manager", "marketer", "staff"];
+export const MARKETING_STREAM = "BRAND & MARKETING";
+
+export function accessOf(user: User): Access {
+  if (user.role === "cpo") return "owner";
+  return user.access && user.access !== "owner" ? user.access : "staff";
+}
+
+/** Руководители человека: новое поле managerIds, для старых данных — managerId. */
+export function managersOf(user: User): string[] {
+  return user.managerIds ?? (user.managerId ? [user.managerId] : []);
+}
+
+/** Проекты человека (доски). */
+export function projectsOf(user: User): ZoneSlug[] {
+  return user.boardZones?.length ? user.boardZones : user.zone ? [user.zone] : [];
+}
+
+/** Задача в зоне роли: управляющему — все задачи его проектов, маркетологу — маркетинг в его проектах. */
+export function inMyProjects(user: User, task: Task) {
+  const a = accessOf(user);
+  if (a !== "manager" && a !== "marketer") return false;
+  const mine = projectsOf(user);
+  if (!taskZones(task).some((z) => mine.includes(z))) return false;
+  return a === "manager" || task.workstream === MARKETING_STREAM;
 }
 
 export function canManagePeople(user: User) {
@@ -21,7 +58,7 @@ export function subordinateIds(userId: string, users: User[]): string[] {
   const out: string[] = [];
   const walk = (id: string) => {
     for (const u of users) {
-      if (u.managerId === id) {
+      if (managersOf(u).includes(id) && !out.includes(u.id) && u.id !== userId) {
         out.push(u.id);
         walk(u.id);
       }
@@ -39,6 +76,7 @@ export function canSeeTask(user: User, task: Task, users: User[] = []) {
   if ((task.participantIds ?? []).includes(user.id)) return true;
   if (users.length && subordinateIds(user.id, users).includes(task.assigneeId)) return true;
   if (inMyStreams(user, task)) return true;
+  if (inMyProjects(user, task)) return true;
   return false;
 }
 
@@ -47,9 +85,9 @@ export function inMyStreams(user: User, task: Task) {
   return Boolean(task.workstream && (user.streams ?? []).includes(task.workstream as never));
 }
 
-/** Срок, вес, critical path, название — автор / CPO / Armen. */
+/** Срок, вес, critical path, название — автор / Owner / управляющий проекта. */
 export function canEditTask(user: User, task: Task) {
-  return isCpo(user) || canManagePeople(user) || task.authorId === user.id;
+  return isCpo(user) || canManagePeople(user) || task.authorId === user.id || (accessOf(user) === "manager" && inMyProjects(user, task));
 }
 
 /** Удалить: Owner — любую, остальные — только созданные ими. */
@@ -63,6 +101,7 @@ export function canWorkTask(user: User, task: Task) {
   if (task.assigneeId === user.id) return true;
   if ((task.participantIds ?? []).includes(user.id)) return true;
   if (inMyStreams(user, task)) return true;
+  if (inMyProjects(user, task)) return true;
   return false;
 }
 

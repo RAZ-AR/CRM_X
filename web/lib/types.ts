@@ -1,5 +1,8 @@
 export type Role = "cpo" | "employee";
 
+/** Роль в команде. Owner = role "cpo"; остальные — role "employee" с разным охватом задач. */
+export type Access = "owner" | "manager" | "marketer" | "staff";
+
 export type TaskStatus = "todo" | "in_progress" | "blocked" | "review" | "done";
 
 export type Priority = "low" | "medium" | "high" | "critical";
@@ -52,7 +55,12 @@ export type User = {
   avatar: string;
   permissions: Permission[];
   boardZones: ZoneSlug[];
+  /** Устарело: первый из managerIds (для старых данных и копии в Postgres). */
   managerId: string | null;
+  /** Руководители: видят задачи человека. Может не быть ни одного или быть несколько. */
+  managerIds?: string[];
+  /** Роль в команде; для role "cpo" всегда owner. Нет поля — «Сотрудник». */
+  access?: Access;
   /** Потоки, которые человек видит целиком (и может вести статус), например BRAND для креативного директора. */
   streams?: Stream[];
   /** Только на сервере: чат Telegram для уведомлений. */
