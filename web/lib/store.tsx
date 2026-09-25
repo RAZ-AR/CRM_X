@@ -12,9 +12,10 @@ import {
 import { EMPTY_STATE } from "./emptyState";
 import { isValidLogin, isValidPassword, loginTaken } from "./pin";
 import { canMoveStatus } from "./taskRules";
-import { canDeleteTask } from "./access";
+import { ACCESS_META, canDeleteTask } from "./access";
 import { normalizeState } from "./normalize";
 import type {
+  Access,
   AppState,
   Comment,
   Contact,
@@ -62,9 +63,12 @@ type Store = AppState & {
     email: string;
     password: string;
     title: string;
-    zone: ZoneSlug;
-    managerId?: string | null;
+    access: Access;
+    projects: ZoneSlug[];
+    managerIds: string[];
   }) => { ok: true } | { ok: false; error: string };
+  setAccess: (userId: string, access: Access) => void;
+  setManagers: (userId: string, managerIds: string[]) => void;
   setUserPin: (userId: string, pin: string) => { ok: true } | { ok: false; error: string };
   setUserLogin: (userId: string, login: string) => { ok: true } | { ok: false; error: string };
   markRead: (id: string) => void;
@@ -75,7 +79,6 @@ type Store = AppState & {
   addZone: (z: { name: string; emoji: string; color: string; deadline: string }) => void;
   setBroadcast: (text: string, emoji: string) => void;
   toggleReaction: (commentId: string, emoji: string) => void;
-  setManager: (userId: string, managerId: string | null) => void;
   changeOwnPassword: (current: string, next: string) => Promise<{ ok: true } | { ok: false; error: string }>;
 };
 
@@ -604,10 +607,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
-  const setManager = useCallback((userId: string, managerId: string | null) => {
+  const setManagers = useCallback((userId: string, managerIds: string[]) => {
+    const ids = [...new Set(managerIds.filter((id) => id !== userId))];
     setState((s) => ({
       ...s,
-      users: s.users.map((u) => (u.id === userId ? { ...u, managerId } : u)),
+      users: s.users.map((u) => (u.id === userId ? { ...u, managerIds: ids, managerId: ids[0] ?? null } : u)),
+    }));
+  }, []);
+
+  /** Роль меняет охват задач и ставит набор прав по умолчанию (дальше их можно поправить вручную). */
+  const setAccess = useCallback((userId: string, access: Access) => {
+    setState((s) => ({
+      ...s,
+      users: s.users.map((u) =>
+        u.id === userId
+          ? { ...u, access, role: access === "owner" ? "cpo" : "employee", permissions: [...ACCESS_META[access].perms] }
+          : u,
+      ),
     }));
   }, []);
 
@@ -626,8 +642,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       email: string;
       password: string;
       title: string;
-      zone: ZoneSlug;
-      managerId?: string | null;
+      access: Access;
+      projects: ZoneSlug[];
+      managerIds: string[];
     }): { ok: true } | { ok: false; error: string } => {
       const email = u.email.trim();
       const password = u.password.trim();
@@ -639,18 +656,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         name: u.name.trim(),
         email,
         password,
-        role: "employee",
-        zone: u.zone,
+        role: u.access === "owner" ? "cpo" : "employee",
+        access: u.access,
+        zone: u.projects[0] ?? null,
         title: u.title.trim(),
         avatar: u.name.trim().slice(0, 1).toUpperCase(),
-        permissions: [],
-        boardZones: [u.zone],
-        managerId: u.managerId ?? current?.id ?? null,
+        permissions: [...ACCESS_META[u.access].perms],
+        boardZones: u.projects,
+        managerIds: u.managerIds,
+        managerId: u.managerIds[0] ?? null,
       };
       setState((s) => ({ ...s, users: [...s.users, user] }));
       return { ok: true };
     },
-    [current, state.users],
+    [state.users],
   );
 
   const setUserPin = useCallback((userId: string, pin: string): { ok: true } | { ok: false; error: string } => {
@@ -840,7 +859,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       addZone,
       setBroadcast,
       toggleReaction,
-      setManager,
+      setManagers,
+      setAccess,
       changeOwnPassword,
       deleteTask,
       saveRecord,
@@ -876,7 +896,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       addZone,
       setBroadcast,
       toggleReaction,
-      setManager,
+      setManagers,
+      setAccess,
       changeOwnPassword,
       deleteTask,
       saveRecord,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useStore } from "@/lib/store";
-import { hasPerm, isCpo } from "@/lib/access";
+import { hasPerm, isCpo, projectsOf } from "@/lib/access";
 
 export default function TeamPage() {
   const { current, users, tasks } = useStore();
@@ -9,9 +9,10 @@ export default function TeamPage() {
   if (!isCpo(current) && !hasPerm(current, "zone_team")) {
     return <div className="card p-6">Нет доступа к команде.</div>;
   }
+  const mine = projectsOf(current);
   const list = isCpo(current)
-    ? users.filter((u) => u.role === "employee")
-    : users.filter((u) => u.zone === current.zone);
+    ? users.filter((u) => u.id !== current.id)
+    : users.filter((u) => u.id !== current.id && projectsOf(u).some((z) => mine.includes(z)));
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {list.map((u) => (

@@ -2,6 +2,7 @@ import type { AppState, User } from "./types";
 import { ensureHashed } from "./auth";
 import { canSeeFinance } from "./finance";
 import {
+  isCpo,
   hasPerm,
   canManagePeople,
   canSeeContact,
@@ -90,16 +91,29 @@ export function mergeState(existing: AppState, incoming: AppState, user: User): 
   };
   if (!manager) return base;
 
-  const users = (incoming.users?.length ? incoming.users : existing.users).map((u) => {
+  const owner = isCpo(user);
+  let users = (incoming.users?.length ? incoming.users : existing.users).map((u): User => {
     const prev = existing.users.find((x) => x.id === u.id);
+    // Назначать и снимать Owner может только Owner; учётки Owner остальные не трогают.
+    if (!owner && prev?.role === "cpo") return prev;
     const { telegramLinked: _linked, ...rest } = u;
     void _linked;
+    const role = owner ? (u.role === "cpo" ? "cpo" : "employee") : "employee";
+    const access = role === "cpo" ? "owner" : u.access === "owner" ? undefined : u.access;
     return {
       ...rest,
+      role,
+      access,
       password: u.password ? ensureHashed(u.password) : prev?.password || "",
       telegramChatId: prev?.telegramChatId,
     };
   });
+  // Удалить Owner из команды тоже может только Owner.
+  if (!owner) for (const prev of existing.users) if (prev.role === "cpo" && !users.some((u) => u.id === prev.id)) users.push(prev);
+  // Без Owner в команде управлять ею некому — такую правку не принимаем.
+  if (!users.some((u) => u.role === "cpo")) {
+    users = users.map((u) => (existing.users.some((x) => x.id === u.id && x.role === "cpo") ? { ...u, role: "cpo", access: "owner" } : u));
+  }
   return {
     ...base,
     users,
