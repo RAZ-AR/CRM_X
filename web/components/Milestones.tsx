@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
 import type { Task, Zone } from "@/lib/types";
 import { addDays, diffDays, shortDate } from "@/lib/dates";
 import { milestoneLanes, type Phase, type PhaseState } from "@/lib/milestones";
@@ -17,6 +17,10 @@ const STATE: Record<PhaseState, { label: string }> = {
   late: { label: "просрочено" },
   todo: { label: "впереди" },
 };
+
+const STEP: Record<PhaseState, string> = { done: "var(--ink)", active: "var(--blue)", late: "var(--red)", todo: "var(--track)" };
+
+export const roadmapHref = (zone?: string) => (zone ? `/roadmap?zone=${zone}` : "/roadmap");
 
 /** Roadmap по основным вехам: дорожка на каждый проект, от демонтажа до открытия. */
 export function Milestones({ tasks, zones, today, onOpen }: { tasks: Task[]; zones: Zone[]; today: string; onOpen: (id: string) => void }) {
@@ -41,7 +45,8 @@ export function Milestones({ tasks, zones, today, onOpen }: { tasks: Task[]; zon
 
   return (
     <div className="flex flex-col gap-5">
-      <div ref={ref} className="overflow-x-auto -mx-1 px-1">
+      {/* Десктоп: шкала времени */}
+      <div ref={ref} className="hidden sm:block overflow-x-auto -mx-1 px-1">
         <div className="relative" style={{ width: labelW + trackW, height: HEAD_H + lanes.length * LANE_H }}>
           {/* Месяцы */}
           {months.map((m) => (
@@ -70,12 +75,14 @@ export function Milestones({ tasks, zones, today, onOpen }: { tasks: Task[]; zon
             const elapsed = Math.max(0, Math.min(x1, x(today)) - x0);
             const dots = place(l.phases.filter((p) => p.id !== "open"), x, x1);
             return (
-              <div key={l.zone.slug} className="absolute left-0 flex border-t border-[var(--line)]" style={{ top: HEAD_H + i * LANE_H, height: LANE_H, width: labelW + trackW }}>
-                <Link
-                  href={`/zones/${l.zone.slug}`}
-                  className="sticky left-0 z-[4] flex flex-col justify-center gap-0.5 bg-[var(--card)] pr-3 min-w-0"
-                  style={{ width: labelW }}
-                >
+              <Link
+                key={l.zone.slug}
+                href={roadmapHref(l.zone.slug)}
+                aria-label={`${l.zone.name}: открыть roadmap проекта`}
+                className="group absolute left-0 flex border-t border-[var(--line)] transition-colors hover:bg-[var(--soft)]/60"
+                style={{ top: HEAD_H + i * LANE_H, height: LANE_H, width: labelW + trackW }}
+              >
+                <span className="sticky left-0 z-[4] flex flex-col justify-center gap-0.5 bg-[var(--card)] pr-3 min-w-0 group-hover:bg-[var(--soft)]" style={{ width: labelW }}>
                   <span className="flex items-center gap-1.5 text-[13px] font-semibold min-w-0">
                     <span aria-hidden="true">{l.zone.emoji}</span>
                     <span className="truncate">{l.zone.name}</span>
@@ -92,9 +99,9 @@ export function Milestones({ tasks, zones, today, onOpen }: { tasks: Task[]; zon
                       "открыт"
                     )}
                   </span>
-                </Link>
+                </span>
 
-                <div className="relative h-full" style={{ width: trackW }}>
+                <span className="relative block h-full" style={{ width: trackW }}>
                   {/* План проекта и прошедшее время */}
                   <div className="absolute h-2 rounded-full" style={{ left: x0, width: Math.max(8, x1 - x0), top: LANE_H / 2 - 4, background: /^#[0-9a-f]{6}$/i.test(l.zone.color) ? `${l.zone.color}66` : "var(--track)" }} />
                   {elapsed > 0 && (
@@ -102,23 +109,18 @@ export function Milestones({ tasks, zones, today, onOpen }: { tasks: Task[]; zon
                   )}
 
                   {dots.map(({ p, px, dy }) => (
-                    <button
+                    <span
                       key={p.id}
-                      type="button"
-                      onClick={() => onOpen(p.taskId)}
-                      className="absolute z-[2] -translate-x-1/2 -translate-y-1/2 transition-transform hover:scale-125 focus-visible:scale-125"
+                      className="absolute z-[2] -translate-x-1/2 -translate-y-1/2 transition-transform hover:scale-125"
                       style={{ left: px, top: LANE_H / 2 + dy }}
                       title={`${l.zone.name} · ${p.label}: ${shortDate(p.start)}–${shortDate(p.end)} · ${p.done}/${p.total} · ${STATE[p.state].label}`}
-                      aria-label={`${l.zone.name}: ${p.label}, ${shortDate(p.end)}, ${STATE[p.state].label}`}
                     >
                       <Dot state={p.state} />
-                    </button>
+                    </span>
                   ))}
 
                   {/* Открытие */}
-                  <button
-                    type="button"
-                    onClick={() => (l.launchTaskId ? onOpen(l.launchTaskId) : undefined)}
+                  <span
                     className="absolute z-[3] flex items-center gap-1.5 -translate-y-1/2"
                     style={{ left: x1 - 11, top: LANE_H / 2 }}
                     title={`${l.zone.name}: открытие ${shortDate(l.launch)}`}
@@ -130,12 +132,62 @@ export function Milestones({ tasks, zones, today, onOpen }: { tasks: Task[]; zon
                         {days > 0 ? `через ${days} дн` : days === 0 ? "сегодня" : "открыт"}
                       </span>
                     </span>
-                  </button>
-                </div>
-              </div>
+                  </span>
+                </span>
+              </Link>
             );
           })}
         </div>
+      </div>
+
+      {/* Мобильный: карточка на проект, этапы — степпером */}
+      <div className="flex flex-col gap-2.5 sm:hidden">
+        {lanes.map((l) => {
+          const pct = weightedDone(zoneTasks(l.zone.slug, tasks));
+          const days = diffDays(today, l.launch);
+          const steps = l.phases.filter((p) => p.id !== "open");
+          const doneSteps = steps.filter((p) => p.state === "done").length;
+          return (
+            <Link key={l.zone.slug} href={roadmapHref(l.zone.slug)} className="flex flex-col gap-3 rounded-2xl border border-[var(--line)] p-3.5 active:bg-[var(--soft)]">
+              <span className="flex items-center gap-2.5 min-w-0">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-[17px]" style={{ background: l.zone.color }} aria-hidden="true">
+                  {l.zone.emoji}
+                </span>
+                <span className="flex flex-col min-w-0 flex-1">
+                  <span className="text-[15px] font-semibold truncate">{l.zone.name}</span>
+                  <span className="cap num">
+                    {pct}% готово · {doneSteps}/{steps.length} этапов
+                  </span>
+                </span>
+                <span className="flex flex-col items-end shrink-0 leading-tight">
+                  <span className="num text-[15px] font-semibold">🚀 {shortDate(l.launch)}</span>
+                  <span className={`num cap !text-[11px] ${days >= 0 && days <= 14 ? "!text-[var(--orange)]" : ""}`}>
+                    {days > 0 ? `через ${days} дн` : days === 0 ? "сегодня" : "открыт"}
+                  </span>
+                </span>
+              </span>
+              <span className="flex gap-[3px]" aria-hidden="true">
+                {steps.map((p) => (
+                  <span key={p.id} className="relative h-2 flex-1 overflow-hidden rounded-full" style={{ background: STEP[p.state] }} title={p.label}>
+                    {p.state === "active" && <span className="absolute inset-0 animate-pulse bg-white/40" />}
+                  </span>
+                ))}
+              </span>
+              <span className="flex items-center justify-between gap-2 cap !text-[12px]">
+                <span className="truncate">
+                  {l.next ? (
+                    <>
+                      далее: <span className={`font-medium ${l.next.state === "late" ? "!text-[var(--red)]" : "text-[var(--ink)]"}`}>{l.next.label}</span> · {shortDate(l.next.end)}
+                    </>
+                  ) : (
+                    "все этапы закрыты"
+                  )}
+                </span>
+                <ChevronRight size={15} className="shrink-0" />
+              </span>
+            </Link>
+          );
+        })}
       </div>
 
       {/* Ближайшие вехи */}
