@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { canSeeTask, isCpo, isOverdue, taskZones } from "@/lib/access";
 import { STREAMS } from "@/lib/types";
@@ -15,9 +16,20 @@ const LABEL_W = 220;
 
 /** Roadmap по 7 потокам с вехами запусков и предпросмотром переноса сроков. */
 export default function TimelinePage() {
+  return (
+    <Suspense>
+      <Timeline />
+    </Suspense>
+  );
+}
+
+function Timeline() {
   const { current, tasks, users, zones, saveTaskDates, setPreviewId } = useStore();
   const today = todayYerevan();
-  const [zone, setZone] = useState("all");
+  // ?zone=wafl — переход с главной сразу на нужный проект; выбор в фильтре важнее.
+  const params = useSearchParams();
+  const [pickedZone, setZone] = useState<string | null>(null);
+  const zone = pickedZone ?? params.get("zone") ?? "all";
   const [who, setWho] = useState("all");
   const [selected, setSelected] = useState<string | null>(null);
   const [draft, setDraft] = useState<{ start: string; due: string } | null>(null);
