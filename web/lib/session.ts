@@ -1,19 +1,15 @@
 import { cookies } from "next/headers";
 import { loadSessionSecret, loadSharedState } from "./blobState";
-import { seed } from "./seed";
 import { sameLogin } from "./pin";
 import { createSession, readSession, SESSION_MAX_AGE, verifyPassword } from "./auth";
 import type { User } from "./types";
 
 export const SESSION_COOKIE = "crmx_session";
 
+/** Без запасного seed: при сбое хранилища иначе пускало бы по стартовым паролям из кода. */
 export async function allUsers(): Promise<User[]> {
-  try {
-    const { state } = await loadSharedState();
-    return state.users;
-  } catch {
-    return seed.users;
-  }
+  const { state } = await loadSharedState();
+  return state.users;
 }
 
 export async function findUserByLogin(login: string, password: string): Promise<User | null> {

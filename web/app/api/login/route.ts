@@ -3,7 +3,7 @@ import { allUsers, findUserByLogin, sessionCookie } from "@/lib/session";
 import { sameLogin } from "@/lib/pin";
 import { publicUser } from "@/lib/publicUser";
 import { isHashed, hashPassword, loginBlocked, loginFailed, loginSucceeded } from "@/lib/auth";
-import { updateSharedState } from "@/lib/blobState";
+import { StorageUnavailableError, updateSharedState } from "@/lib/blobState";
 
 export async function POST(req: Request) {
   try {
@@ -45,6 +45,9 @@ export async function POST(req: Request) {
     return res;
   } catch (e) {
     console.error("login error", e);
+    if (e instanceof StorageUnavailableError) {
+      return NextResponse.json({ ok: false, error: e.message }, { status: 503 });
+    }
     const msg = e instanceof Error ? e.message : String(e);
     return NextResponse.json({ ok: false, error: `Ошибка сервера: ${msg}` }, { status: 500 });
   }

@@ -175,6 +175,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!ready || !current) return;
     const t = setInterval(async () => {
+      // Скрытые вкладки не опрашивают сервер: каждое чтение — платная операция хранилища.
+      if (document.visibilityState === "hidden") return;
       try {
         const startedAt = Date.now();
         const res = await fetch("/api/state", { cache: "no-store", credentials: "same-origin" });
@@ -189,7 +191,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       } catch {
         /* ignore */
       }
-    }, 4000);
+    }, 10_000);
     return () => clearInterval(t);
   }, [ready, current?.id, applyServer]);
 
