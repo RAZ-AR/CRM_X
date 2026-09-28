@@ -1,168 +1,104 @@
-import { createHash, randomBytes } from "node:crypto";
-import {
-  BlobAccessError,
-  BlobNotFoundError,
-  BlobPreconditionFailedError,
-  BlobServiceNotAvailable,
-  BlobServiceRateLimited,
-  BlobStoreNotFoundError,
-  BlobStoreSuspendedError,
-  get as blobGet,
-  head as blobHead,
-  put as blobPut,
-} from "@vercel/blob";
+import { randomBytes } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import type { PrismaClient } from "@prisma/client";
 import { LEGACY_STREAMS, type AppState } from "./types";
 import { normalizeState } from "./normalize";
 import { seed } from "./seed";
+import { getPrisma } from "./prisma";
 
-const KEY = "crmx/state.json";
-
-/** Локальная разработка без Vercel Blob: те же ключи, но в файлах web/.local-store/. */
-const LOCAL = !process.env.VERCEL && !process.env.BLOB_READ_WRITE_TOKEN && !process.env.BLOB_STORE_ID;
+/**
+ * Общее состояние хранится в Postgres (Aiven) одной JSON-строкой в таблице StateStore —
+ * та же схема, что раньше была в Vercel Blob (один файл, конкурентная запись через версию),
+ * только без месячных лимитов на число операций. Таблицы не в prisma/schema.prisma: применить
+ * их туда можно только командой `db push` с доступом к самой базе, а этот код должен завестись
+ * и без ручного шага — поэтому таблица создаётся сама при первом обращении (idempotent DDL).
+ *
+ * Локальная разработка без DATABASE_URL — как раньше, JSON-файл в web/.local-store/.
+ */
+const LOCAL = !process.env.DATABASE_URL;
 const localPath = (key: string) => join(process.cwd(), ".local-store", key);
+const STATE_ROW = "main";
+const SECRET_ROW = "session-secret";
 
-type GetOptions = Parameters<typeof blobGet>[1];
-type PutOptions = Parameters<typeof blobPut>[2];
-
-type Stored = { stream: ReadableStream<Uint8Array>; etag: string | null } | null;
-
-const hashOf = (body: string | Buffer) => `"${createHash("sha1").update(body).digest("hex")}"`;
-
-async function get(key: string, options: GetOptions): Promise<Stored> {
-  if (!LOCAL) {
-    const file = await blobGet(key, options);
-    if (!file || file.statusCode !== 200) return null;
-    return { stream: file.stream, etag: file.blob.etag ?? null };
-  }
-  try {
-    const body = readFileSync(localPath(key));
-    return { stream: new Blob([body]).stream(), etag: hashOf(body) };
-  } catch {
-    return null;
+export class StorageUnavailableError extends Error {
+  constructor(reason: string) {
+    super(`Хранилище данных недоступно: ${reason}`);
+    this.name = "StorageUnavailableError";
   }
 }
 
-async function put(key: string, body: string, options: PutOptions) {
-  if (!LOCAL) return blobPut(key, body, options);
-  const file = localPath(key);
-  let current: Buffer | null = null;
-  try {
-    current = readFileSync(file);
-  } catch {
-    current = null;
+let tableReady: Promise<void> | null = null;
+/** CREATE TABLE IF NOT EXISTS — безопасно вызывать на каждый инстанс, выполняется один раз на процесс. */
+function ensureTable(prisma: PrismaClient): Promise<void> {
+  if (!tableReady) {
+    tableReady = prisma
+      .$executeRaw`CREATE TABLE IF NOT EXISTS "StateStore" (id TEXT PRIMARY KEY, rev INTEGER NOT NULL DEFAULT 0, data JSONB NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`
+      .then(() => undefined)
+      .catch((e) => {
+        tableReady = null; // не запоминаем провал — следующий вызов попробует снова
+        throw e;
+      });
   }
-  if (options?.allowOverwrite === false && current) throw new Error("exists");
-  if (options?.ifMatch && (!current || hashOf(current) !== options.ifMatch)) throw new BlobPreconditionFailedError();
-  mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, body);
+  return tableReady;
 }
 
-export function blobConfigured() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID || process.env.VERCEL);
+async function pgReadRow(prisma: PrismaClient, id: string): Promise<{ data: unknown; rev: number } | null> {
+  await ensureTable(prisma);
+  const rows = await prisma.$queryRaw<{ data: unknown; rev: number }[]>`SELECT data, rev FROM "StateStore" WHERE id = ${id}`;
+  return rows[0] ?? null;
 }
 
-const SECRET_KEY = "crmx/session-secret.txt";
+/** true — строка вставлена/обновлена; false — кто-то другой уже записал новее (гонка, нужно повторить). */
+async function pgWriteRow(prisma: PrismaClient, id: string, data: unknown, rev: number, expectedRev: number | null): Promise<boolean> {
+  await ensureTable(prisma);
+  const json = JSON.stringify(data);
+  if (expectedRev === null) {
+    const inserted = await prisma.$executeRaw`INSERT INTO "StateStore" (id, rev, data) VALUES (${id}, ${rev}, ${json}::jsonb) ON CONFLICT (id) DO NOTHING`;
+    return inserted > 0;
+  }
+  const updated = await prisma.$executeRaw`UPDATE "StateStore" SET data = ${json}::jsonb, rev = ${rev}, updated_at = now() WHERE id = ${id} AND rev = ${expectedRev}`;
+  return updated > 0;
+}
+
+async function explainPgFailure(e: unknown): Promise<StorageUnavailableError> {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (/password authentication|authentication failed/i.test(msg)) return new StorageUnavailableError("Postgres отклонил пароль — проверьте DATABASE_URL в Vercel.");
+  if (/does not exist|unknown database/i.test(msg)) return new StorageUnavailableError("база данных не найдена — проверьте адрес и имя базы в DATABASE_URL.");
+  if (/timeout|ECONNREFUSED|ENOTFOUND|Can't reach database/i.test(msg)) return new StorageUnavailableError("не удалось подключиться к Postgres — база спит, перегружена или адрес недоступен.");
+  return new StorageUnavailableError(msg);
+}
+
+/**
+ * Ключ подписи сессий: SESSION_SECRET из env, иначе случайный ключ, который создаётся один раз
+ * и хранится в Postgres (для инстансов, где env настроить нельзя или неудобно).
+ */
 let cachedSecret: string | null = null;
 
-async function readSecretBlob() {
-  try {
-    const file = await get(SECRET_KEY, { access: "private", useCache: false });
-    if (!file?.stream) return null;
-    return (await new Response(file.stream).text()).trim() || null;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Ключ подписи сессий: SESSION_SECRET из env, иначе BLOB_READ_WRITE_TOKEN, иначе случайный ключ,
- * который создаётся один раз и хранится в приватном Blob (для хранилищ с OIDC, где токена нет).
- */
 export async function loadSessionSecret(): Promise<string> {
-  const env = process.env.SESSION_SECRET || process.env.BLOB_READ_WRITE_TOKEN;
+  const env = process.env.SESSION_SECRET;
   if (env) return env;
   if (cachedSecret) return cachedSecret;
-  let secret = await readSecretBlob();
-  if (!secret) {
-    const fresh = randomBytes(32).toString("hex");
-    try {
-      await put(SECRET_KEY, fresh, {
-        access: "private",
-        addRandomSuffix: false,
-        allowOverwrite: false,
-        contentType: "text/plain",
-      });
-      secret = fresh;
-    } catch {
-      secret = await readSecretBlob(); // другой инстанс успел создать первым
-    }
-  }
-  if (!secret) {
-    if (process.env.VERCEL) throw new Error("Не удалось получить ключ сессий из Blob");
-    secret = "crmx-local-dev-only";
-  }
-  cachedSecret = secret;
-  return secret;
-}
-
-/** Состояние из Blob вместе с ETag версии (null — файла ещё нет). */
-/**
- * Версия файла для условной записи. Берём её у самого хранилища (head), а не из ответа CDN на get:
- * CDN может отдать изменённый (weak/сжатый) ETag, и тогда ifMatch никогда не совпадёт.
- */
-async function storeEtag(key: string): Promise<string | null> {
   if (LOCAL) {
-    try {
-      return hashOf(readFileSync(localPath(key)));
-    } catch {
-      return null;
+    cachedSecret = "crmx-local-dev-only";
+    return cachedSecret;
+  }
+  const prisma = getPrisma();
+  if (!prisma) throw new StorageUnavailableError("не настроен DATABASE_URL.");
+  try {
+    const row = await pgReadRow(prisma, SECRET_ROW);
+    if (row) {
+      cachedSecret = (row.data as { secret: string }).secret;
+      return cachedSecret;
     }
-  }
-  try {
-    return (await blobHead(key)).etag || null;
+    const fresh = randomBytes(32).toString("hex");
+    await pgWriteRow(prisma, SECRET_ROW, { secret: fresh }, 0, null);
+    const saved = await pgReadRow(prisma, SECRET_ROW); // другой инстанс мог успеть записать первым
+    cachedSecret = (saved!.data as { secret: string }).secret;
+    return cachedSecret;
   } catch (e) {
-    if (e instanceof BlobNotFoundError || (e instanceof Error && e.name === "BlobNotFoundError")) return null;
-    throw e;
+    throw await explainPgFailure(e);
   }
-}
-
-/**
- * withEtag — нужна версия для записи. Берём её ДО чтения: если файл поменялся после этого,
- * запись с ifMatch не пройдёт и updateSharedState повторит всё на свежих данных. Так содержимое
- * никогда не окажется новее версии, с которой мы пишем.
- */
-async function loadBlobVersioned(withEtag = false): Promise<{ state: AppState; etag: string | null } | null> {
-  const before = withEtag ? await storeEtag(KEY) : null;
-  const file = await get(KEY, { access: "private", useCache: false });
-  if (!file?.stream) return null;
-  const text = await new Response(file.stream).text();
-  if (!text) return null;
-  return { state: normalizeState(JSON.parse(text)), etag: withEtag ? before : file.etag };
-}
-
-export async function loadBlobState(): Promise<AppState | null> {
-  try {
-    return (await loadBlobVersioned())?.state ?? null;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Запись с защитой от гонок: ifMatch — только если файл не менялся с момента чтения;
- * без etag (файла ещё нет) — только создание, не перезапись.
- */
-async function writeBlobState(state: AppState, etag: string | null) {
-  await put(KEY, JSON.stringify(state), {
-    access: "private",
-    addRandomSuffix: false,
-    allowOverwrite: etag !== null,
-    ...(etag ? { ifMatch: etag } : {}),
-    contentType: "application/json",
-    cacheControlMaxAge: 0,
-  });
 }
 
 /**
@@ -245,109 +181,47 @@ function applyMigrations(input: AppState): { state: AppState; changed: boolean }
   return { state, changed };
 }
 
-type Via = "db" | "blob" | "seed";
+type Via = "db" | "seed";
 
-export class StorageUnavailableError extends Error {
-  constructor(reason: string) {
-    super(`Хранилище данных недоступно: ${reason}`);
-    this.name = "StorageUnavailableError";
-  }
-}
-
-/**
- * get() приватного Blob отдаёт только «Failed to fetch blob: 403» без причины.
- * head() идёт через API и возвращает конкретную ошибку — по ней объясняем, что случилось.
- */
-async function explainBlobFailure(e: unknown): Promise<StorageUnavailableError> {
-  let cause = e;
-  if (!LOCAL) {
+/** Версия для условной записи: null — строки ещё нет (только вставка, не перезапись). */
+async function loadVersioned(): Promise<{ state: AppState; rev: number | null; via: Via; changed: boolean }> {
+  if (LOCAL) {
+    let text: string | null = null;
     try {
-      await blobHead(KEY);
-    } catch (h) {
-      cause = h;
-    }
-  }
-  if (cause instanceof BlobStoreSuspendedError) {
-    return new StorageUnavailableError("Vercel приостановил Blob-хранилище (обычно — превышены лимиты тарифа). Проверьте Storage и Usage в Vercel.");
-  }
-  if (cause instanceof BlobStoreNotFoundError) return new StorageUnavailableError("Blob-хранилище не найдено — его удалили или отключили от проекта в Vercel.");
-  if (cause instanceof BlobAccessError) return new StorageUnavailableError("Vercel отказал в доступе к Blob — токен хранилища недействителен или хранилище заблокировано.");
-  if (cause instanceof BlobServiceRateLimited) return new StorageUnavailableError("слишком много запросов к Blob, попробуйте через минуту.");
-  if (cause instanceof BlobServiceNotAvailable) return new StorageUnavailableError("сервис Vercel Blob временно не работает, попробуйте позже.");
-  return new StorageUnavailableError(e instanceof Error ? e.message : String(e));
-}
-
-/** Текущая версия: из Blob, иначе из Postgres (если доступен), иначе seed. etag null — Blob ещё пуст. */
-async function loadVersioned(withEtag = false): Promise<{ state: AppState; etag: string | null; via: Via; changed: boolean }> {
-  let blob: Awaited<ReturnType<typeof loadBlobVersioned>>;
-  try {
-    blob = await loadBlobVersioned(withEtag);
-  } catch (e) {
-    // Blob недоступен (лимиты тарифа, приостановлен и т.п.): для ЧТЕНИЯ подстраховываемся
-    // последним зеркалом в Postgres, если оно есть — люди хотя бы смогут войти и посмотреть
-    // данные. changed:false обязателен: писать это обратно в Blob нельзя, пока он не отвечает,
-    // иначе следующая же запись попытается перетереть его тем же кодом, что и упал сейчас.
-    const { getPrisma } = await import("./prisma");
-    const { loadDbState } = await import("./persist");
-    const prisma = getPrisma();
-    if (prisma) {
-      try {
-        await prisma.$queryRaw`SELECT 1`;
-        if ((await prisma.user.count()) > 0) {
-          const { state } = applyMigrations(await loadDbState(prisma));
-          return { state, etag: null, via: "db", changed: false };
-        }
-      } catch {
-        /* Postgres тоже недоступен — переходим к обычной ошибке ниже */
-      }
-    }
-    throw await explainBlobFailure(e);
-  }
-  if (blob) return { ...applyMigrations(blob.state), etag: blob.etag, via: "blob" };
-  const { getPrisma } = await import("./prisma");
-  const { loadDbState } = await import("./persist");
-  const prisma = getPrisma();
-  if (prisma) {
-    try {
-      await prisma.$queryRaw`SELECT 1`;
-      if ((await prisma.user.count()) > 0) {
-        return { ...applyMigrations(await loadDbState(prisma)), etag: null, via: "db", changed: true };
-      }
+      text = readFileSync(localPath("state.json"), "utf8");
     } catch {
-      /* Postgres недоступен — работаем от Blob */
+      /* файла ещё нет — начинаем с seed */
     }
+    if (text) return { ...applyMigrations(normalizeState(JSON.parse(text))), rev: null, via: "db" };
+    return { state: seed, rev: null, via: "seed", changed: true };
   }
-  return { state: seed, etag: null, via: "seed", changed: true };
-}
-
-/**
- * Копия в Postgres. Записи могут финишировать в другом порядке, чем попали в Blob, поэтому после
- * сохранения сверяемся с Blob: если там уже более новая версия (rev больше), кладём в базу её.
- * Кто сохраняет последним, тот и видит последнюю версию, так что база не откатывается на старую.
- */
-async function mirrorToDb(state: AppState) {
-  const { getPrisma } = await import("./prisma");
-  const { saveDbState } = await import("./persist");
   const prisma = getPrisma();
-  if (!prisma) return false;
+  if (!prisma) throw new StorageUnavailableError("не настроен DATABASE_URL — задайте его в переменных окружения Vercel.");
+  let row: { data: unknown; rev: number } | null;
   try {
-    await prisma.$queryRaw`SELECT 1`;
-    let current = state;
-    for (let i = 0; i < 4; i++) {
-      await saveDbState(prisma, current);
-      const latest = await loadBlobVersioned().catch(() => null);
-      if (!latest || (latest.state.rev ?? 0) <= (current.rev ?? 0)) break;
-      current = latest.state;
-    }
-    return true;
-  } catch {
-    return false;
+    row = await pgReadRow(prisma, STATE_ROW);
+  } catch (e) {
+    throw await explainPgFailure(e);
   }
+  if (row) return { ...applyMigrations(normalizeState(row.data as AppState)), rev: row.rev, via: "db" };
+  return { state: seed, rev: null, via: "seed", changed: true };
 }
 
-const isConflict = (e: unknown) =>
-  e instanceof BlobPreconditionFailedError ||
-  (e instanceof Error && (e.name === "BlobPreconditionFailedError" || /exists|precondition/i.test(e.message)));
+async function writeVersioned(state: AppState, expectedRev: number | null): Promise<boolean> {
+  if (LOCAL) {
+    const file = localPath("state.json");
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, JSON.stringify(state));
+    return true;
+  }
+  const prisma = getPrisma();
+  if (!prisma) throw new StorageUnavailableError("не настроен DATABASE_URL — задайте его в переменных окружения Vercel.");
+  try {
+    return await pgWriteRow(prisma, STATE_ROW, state, state.rev ?? 0, expectedRev);
+  } catch (e) {
+    throw await explainPgFailure(e);
+  }
+}
 
 export class StateConflictError extends Error {
   constructor() {
@@ -366,29 +240,26 @@ export async function updateSharedState<T>(
   change: (state: AppState) => { state?: AppState; result: T } | Promise<{ state?: AppState; result: T }>,
 ): Promise<T & { via?: Via }> {
   for (let attempt = 0; attempt < 8; attempt++) {
-    const cur = await loadVersioned(true);
+    const cur = await loadVersioned();
     const out = await change(cur.state);
     const changed = out.state ?? (cur.changed ? cur.state : undefined);
     if (!changed) return out.result as T & { via?: Via };
     const next = { ...changed, rev: (cur.state.rev ?? 0) + 1 };
-    try {
-      await writeBlobState(next, cur.etag);
-    } catch (e) {
-      if (!isConflict(e)) throw await explainBlobFailure(e);
+    const ok = await writeVersioned(next, cur.rev);
+    if (!ok) {
       await new Promise((r) => setTimeout(r, 30 + Math.random() * 120 * (attempt + 1)));
       continue;
     }
-    recent = { at: Date.now(), state: next, via: "blob" };
-    const db = await mirrorToDb(next);
-    return Object.assign(out.result as object, { via: db ? "db" : "blob" }) as T & { via?: Via };
+    recent = { at: Date.now(), state: next, via: cur.via };
+    return Object.assign(out.result as object, { via: cur.via }) as T & { via?: Via };
   }
   throw new StateConflictError();
 }
 
 /**
- * Каждое чтение Blob — платная операция Vercel, а один запрос читает состояние дважды
- * (проверка сессии + данные), и каждая вкладка опрашивает сервер. Короткий кэш в памяти
- * инстанса убирает повторы; записи идут мимо него (updateSharedState читает заново).
+ * Каждое чтение — запрос к Postgres, а один запрос страницы читает состояние дважды (проверка
+ * сессии + данные), и каждая вкладка опрашивает сервер. Короткий кэш в памяти инстанса убирает
+ * повторы; записи идут мимо него (updateSharedState читает заново).
  */
 const RECENT_MS = 3000;
 let recent: { at: number; state: AppState; via: Via } | null = null;
