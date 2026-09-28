@@ -283,8 +283,24 @@ async function loadVersioned(withEtag = false): Promise<{ state: AppState; etag:
   try {
     blob = await loadBlobVersioned(withEtag);
   } catch (e) {
-    // Хранилище есть, но не отвечает: нельзя подменять данные на Postgres-копию или seed —
-    // следующая запись перетёрла бы ими настоящие данные.
+    // Blob недоступен (лимиты тарифа, приостановлен и т.п.): для ЧТЕНИЯ подстраховываемся
+    // последним зеркалом в Postgres, если оно есть — люди хотя бы смогут войти и посмотреть
+    // данные. changed:false обязателен: писать это обратно в Blob нельзя, пока он не отвечает,
+    // иначе следующая же запись попытается перетереть его тем же кодом, что и упал сейчас.
+    const { getPrisma } = await import("./prisma");
+    const { loadDbState } = await import("./persist");
+    const prisma = getPrisma();
+    if (prisma) {
+      try {
+        await prisma.$queryRaw`SELECT 1`;
+        if ((await prisma.user.count()) > 0) {
+          const { state } = applyMigrations(await loadDbState(prisma));
+          return { state, etag: null, via: "db", changed: false };
+        }
+      } catch {
+        /* Postgres тоже недоступен — переходим к обычной ошибке ниже */
+      }
+    }
     throw await explainBlobFailure(e);
   }
   if (blob) return { ...applyMigrations(blob.state), etag: blob.etag, via: "blob" };
@@ -358,7 +374,7 @@ export async function updateSharedState<T>(
     try {
       await writeBlobState(next, cur.etag);
     } catch (e) {
-      if (!isConflict(e)) throw e;
+      if (!isConflict(e)) throw await explainBlobFailure(e);
       await new Promise((r) => setTimeout(r, 30 + Math.random() * 120 * (attempt + 1)));
       continue;
     }
