@@ -1,5 +1,16 @@
 import { createHash, randomBytes } from "node:crypto";
-import { BlobNotFoundError, BlobPreconditionFailedError, get as blobGet, head as blobHead, put as blobPut } from "@vercel/blob";
+import {
+  BlobAccessError,
+  BlobNotFoundError,
+  BlobPreconditionFailedError,
+  BlobServiceNotAvailable,
+  BlobServiceRateLimited,
+  BlobStoreNotFoundError,
+  BlobStoreSuspendedError,
+  get as blobGet,
+  head as blobHead,
+  put as blobPut,
+} from "@vercel/blob";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { LEGACY_STREAMS, type AppState } from "./types";
@@ -236,9 +247,46 @@ function applyMigrations(input: AppState): { state: AppState; changed: boolean }
 
 type Via = "db" | "blob" | "seed";
 
+export class StorageUnavailableError extends Error {
+  constructor(reason: string) {
+    super(`Хранилище данных недоступно: ${reason}`);
+    this.name = "StorageUnavailableError";
+  }
+}
+
+/**
+ * get() приватного Blob отдаёт только «Failed to fetch blob: 403» без причины.
+ * head() идёт через API и возвращает конкретную ошибку — по ней объясняем, что случилось.
+ */
+async function explainBlobFailure(e: unknown): Promise<StorageUnavailableError> {
+  let cause = e;
+  if (!LOCAL) {
+    try {
+      await blobHead(KEY);
+    } catch (h) {
+      cause = h;
+    }
+  }
+  if (cause instanceof BlobStoreSuspendedError) {
+    return new StorageUnavailableError("Vercel приостановил Blob-хранилище (обычно — превышены лимиты тарифа). Проверьте Storage и Usage в Vercel.");
+  }
+  if (cause instanceof BlobStoreNotFoundError) return new StorageUnavailableError("Blob-хранилище не найдено — его удалили или отключили от проекта в Vercel.");
+  if (cause instanceof BlobAccessError) return new StorageUnavailableError("Vercel отказал в доступе к Blob — токен хранилища недействителен или хранилище заблокировано.");
+  if (cause instanceof BlobServiceRateLimited) return new StorageUnavailableError("слишком много запросов к Blob, попробуйте через минуту.");
+  if (cause instanceof BlobServiceNotAvailable) return new StorageUnavailableError("сервис Vercel Blob временно не работает, попробуйте позже.");
+  return new StorageUnavailableError(e instanceof Error ? e.message : String(e));
+}
+
 /** Текущая версия: из Blob, иначе из Postgres (если доступен), иначе seed. etag null — Blob ещё пуст. */
 async function loadVersioned(withEtag = false): Promise<{ state: AppState; etag: string | null; via: Via; changed: boolean }> {
-  const blob = await loadBlobVersioned(withEtag);
+  let blob: Awaited<ReturnType<typeof loadBlobVersioned>>;
+  try {
+    blob = await loadBlobVersioned(withEtag);
+  } catch (e) {
+    // Хранилище есть, но не отвечает: нельзя подменять данные на Postgres-копию или seed —
+    // следующая запись перетёрла бы ими настоящие данные.
+    throw await explainBlobFailure(e);
+  }
   if (blob) return { ...applyMigrations(blob.state), etag: blob.etag, via: "blob" };
   const { getPrisma } = await import("./prisma");
   const { loadDbState } = await import("./persist");
@@ -314,19 +362,30 @@ export async function updateSharedState<T>(
       await new Promise((r) => setTimeout(r, 30 + Math.random() * 120 * (attempt + 1)));
       continue;
     }
+    recent = { at: Date.now(), state: next, via: "blob" };
     const db = await mirrorToDb(next);
     return Object.assign(out.result as object, { via: db ? "db" : "blob" }) as T & { via?: Via };
   }
   throw new StateConflictError();
 }
 
+/**
+ * Каждое чтение Blob — платная операция Vercel, а один запрос читает состояние дважды
+ * (проверка сессии + данные), и каждая вкладка опрашивает сервер. Короткий кэш в памяти
+ * инстанса убирает повторы; записи идут мимо него (updateSharedState читает заново).
+ */
+const RECENT_MS = 3000;
+let recent: { at: number; state: AppState; via: Via } | null = null;
+
 /** Только чтение (миграции при необходимости сохраняются той же безопасной записью). */
 export async function loadSharedState(): Promise<{ state: AppState; via: Via }> {
+  if (recent && Date.now() - recent.at < RECENT_MS) return { state: recent.state, via: recent.via };
   const cur = await loadVersioned();
   if (cur.changed) {
     // Миграции сохраняем той же безопасной записью (с повторами), затем отдаём сохранённое.
     const saved = await updateSharedState((state) => ({ state, result: { state } }));
     return { state: saved.state, via: cur.via };
   }
+  recent = { at: Date.now(), state: cur.state, via: cur.via };
   return { state: cur.state, via: cur.via };
 }

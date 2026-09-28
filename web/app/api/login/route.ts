@@ -3,7 +3,7 @@ import { allUsers, findUserByLogin, sessionCookie } from "@/lib/session";
 import { sameLogin } from "@/lib/pin";
 import { publicUser } from "@/lib/publicUser";
 import { isHashed, hashPassword, loginBlocked, loginFailed, loginSucceeded } from "@/lib/auth";
-import { updateSharedState } from "@/lib/blobState";
+import { StorageUnavailableError, updateSharedState } from "@/lib/blobState";
 
 export async function POST(req: Request) {
   try {
@@ -23,16 +23,21 @@ export async function POST(req: Request) {
     loginSucceeded(key);
     if (!isHashed(user.password)) {
       // Старый пароль открытым текстом — перехэшируем при первом входе.
-      const hashed = hashPassword(String(password));
-      const plain = user.password;
-      const uid = user.id;
-      const stored = await updateSharedState((state) => {
-        const me = state.users.find((u) => u.id === uid);
-        // Пароль уже перехэширован параллельным входом — берём сохранённый.
-        if (!me || me.password !== plain) return { result: { password: me?.password ?? plain } };
-        return { state: { ...state, users: state.users.map((u) => (u.id === uid ? { ...u, password: hashed } : u)) }, result: { password: hashed } };
-      });
-      user = { ...user, password: stored.password };
+      // Если хранилище недоступно для записи, вход всё равно пропускаем — перехэшируем в другой раз.
+      try {
+        const hashed = hashPassword(String(password));
+        const plain = user.password;
+        const uid = user.id;
+        const stored = await updateSharedState((state) => {
+          const me = state.users.find((u) => u.id === uid);
+          // Пароль уже перехэширован параллельным входом — берём сохранённый.
+          if (!me || me.password !== plain) return { result: { password: me?.password ?? plain } };
+          return { state: { ...state, users: state.users.map((u) => (u.id === uid ? { ...u, password: hashed } : u)) }, result: { password: hashed } };
+        });
+        user = { ...user, password: stored.password };
+      } catch (e) {
+        console.warn("password rehash failed", e);
+      }
     }
     const res = NextResponse.json({ ok: true, user: publicUser(user) });
     const c = await sessionCookie(user);
@@ -40,6 +45,9 @@ export async function POST(req: Request) {
     return res;
   } catch (e) {
     console.error("login error", e);
+    if (e instanceof StorageUnavailableError) {
+      return NextResponse.json({ ok: false, error: e.message }, { status: 503 });
+    }
     const msg = e instanceof Error ? e.message : String(e);
     return NextResponse.json({ ok: false, error: `Ошибка сервера: ${msg}` }, { status: 500 });
   }

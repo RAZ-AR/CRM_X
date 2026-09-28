@@ -92,10 +92,10 @@ export function mergeState(existing: AppState, incoming: AppState, user: User): 
   if (!manager) return base;
 
   const owner = isCpo(user);
-  let users = (incoming.users?.length ? incoming.users : existing.users).map((u): User => {
-    const prev = existing.users.find((x) => x.id === u.id);
+  const incomingById = new Map((incoming.users ?? []).map((u) => [u.id, u]));
+  const applyIncoming = (prev: User, u: User): User => {
     // Назначать и снимать Owner может только Owner; учётки Owner остальные не трогают.
-    if (!owner && prev?.role === "cpo") return prev;
+    if (!owner && prev.role === "cpo") return prev;
     const { telegramLinked: _linked, ...rest } = u;
     void _linked;
     const role = owner ? (u.role === "cpo" ? "cpo" : "employee") : "employee";
@@ -104,12 +104,20 @@ export function mergeState(existing: AppState, incoming: AppState, user: User): 
       ...rest,
       role,
       access,
-      password: u.password ? ensureHashed(u.password) : prev?.password || "",
-      telegramChatId: prev?.telegramChatId,
+      password: u.password ? ensureHashed(u.password) : prev.password || "",
+      telegramChatId: prev.telegramChatId,
     };
+  };
+  // Никогда не удаляем человека из команды только потому, что его нет в присланном
+  // клиентом списке: у клиента список мог устареть (открытая вкладка), и это стирало бы
+  // людей, добавленных в другой вкладке/сессии, пока эта вкладка не обновилась.
+  let users = existing.users.map((prev) => {
+    const u = incomingById.get(prev.id);
+    return u ? applyIncoming(prev, u) : prev;
   });
-  // Удалить Owner из команды тоже может только Owner.
-  if (!owner) for (const prev of existing.users) if (prev.role === "cpo" && !users.some((u) => u.id === prev.id)) users.push(prev);
+  for (const u of incoming.users ?? []) {
+    if (!existing.users.some((x) => x.id === u.id)) users.push(applyIncoming(u, u));
+  }
   // Без Owner в команде управлять ею некому — такую правку не принимаем.
   if (!users.some((u) => u.role === "cpo")) {
     users = users.map((u) => (existing.users.some((x) => x.id === u.id && x.role === "cpo") ? { ...u, role: "cpo", access: "owner" } : u));
