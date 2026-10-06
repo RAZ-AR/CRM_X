@@ -12,11 +12,11 @@ export const STREAM_META: Record<Stream, { label: string; color: string; short: 
   "LAUNCH & OPS": { label: "Тест производства, soft launch, стандарты смен, агрегаторы, отчёты", color: "#67E8F9", short: "LAUNCH" },
 };
 
-/** Взвешенный % закрытых задач: обычная 1, critical path 3. */
+/** Взвешенный % закрытых задач: обычная 1, critical path 3, большая задача 0 (считаются её подзадачи). */
 export function weightedDone(list: Task[]) {
-  const total = list.reduce((s, t) => s + (t.weight || 1), 0);
+  const total = list.reduce((s, t) => s + (t.weight ?? 1), 0);
   if (!total) return 0;
-  const done = list.filter((t) => t.status === "done").reduce((s, t) => s + (t.weight || 1), 0);
+  const done = list.filter((t) => t.status === "done").reduce((s, t) => s + (t.weight ?? 1), 0);
   return Math.round((done / total) * 100);
 }
 
@@ -31,7 +31,7 @@ export function zoneTaskProgress(slug: string, tasks: Task[]) {
 /** Готовность проекта по 7 потокам — из задач, без ручного ввода. */
 export function streamProgress(tasks: Task[]) {
   return STREAMS.map((stream) => {
-    const list = tasks.filter((t) => t.workstream === stream);
+    const list = tasks.filter((t) => t.workstream === stream && t.weight !== 0);
     return {
       stream,
       ...STREAM_META[stream],

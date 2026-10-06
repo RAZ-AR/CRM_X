@@ -8,7 +8,8 @@ import { STREAMS } from "@/lib/types";
 import { STREAM_META, weightedDone } from "@/lib/readiness";
 import { addDays, diffDays, shortDate, todayYerevan, weekStart } from "@/lib/dates";
 import { cascade, isMilestone } from "@/lib/schedule";
-import { X } from "lucide-react";
+import { ChevronDown, ChevronRight, X } from "lucide-react";
+import type { Task } from "@/lib/types";
 
 const DAY_W = 16;
 const ROW_H = 30;
@@ -35,6 +36,15 @@ function Timeline() {
   const [draft, setDraft] = useState<{ start: string; due: string } | null>(null);
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState("");
+  /** Группировка: большие задачи (подзадачи раскрываются по клику) или 7 потоков. */
+  const [group, setGroup] = useState<"tasks" | "streams">("tasks");
+  const [open, setOpen] = useState<Set<string>>(new Set());
+  const toggle = (id: string) => {
+    const next = new Set(open);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setOpen(next);
+  };
 
   const visible = useMemo(
     () =>
@@ -69,9 +79,14 @@ function Timeline() {
   const x = (iso: string) => diffDays(from, iso) * DAY_W;
   const width = days * DAY_W;
 
+  const byId = new Map(tasks.map((t) => [t.id, t]));
+  const kidsOf = new Map<string, Task[]>();
+  for (const t of tasks) if (t.parentId && byId.has(t.parentId)) kidsOf.set(t.parentId, [...(kidsOf.get(t.parentId) ?? []), t]);
+  const byStart = (a: Task, b: Task) => (a.startDate || a.due).localeCompare(b.startDate || b.due);
   const lanes = [...STREAMS, ""].map((stream) => ({
     stream,
     list: visible
+      .filter((t) => !kidsOf.has(t.id))
       .filter((t) => (stream ? t.workstream === stream : !STREAMS.includes(t.workstream as never)))
       .sort((a, b) => (a.startDate || a.due).localeCompare(b.startDate || b.due)),
   })).filter((l) => l.list.length);
@@ -98,67 +113,110 @@ function Timeline() {
   };
   const launchMoves = shifts.filter((s) => isMilestone(s.task));
 
+  const row = (t: Task, depth: 0 | 1) => {
+    const kids = depth === 0 ? kidsOf.get(t.id) ?? [] : [];
+    const s = t.startDate || t.due;
+    const z = zones.find((zz) => zz.slug === t.zone);
+    const m = moved.get(t.id);
+    const late = isOverdue(t, today);
+    const milestone = isMilestone(t);
+    return (
+      <div key={t.id} className="absolute left-0 flex items-center" style={{ top: y, height: ROW_H, width: width + LABEL_W }}>
+        <div className="sticky left-0 z-[2] bg-white h-full flex items-center border-r border-black/5" style={{ width: LABEL_W }}>
+          {kids.length > 0 ? (
+            <button type="button" onClick={() => toggle(t.id)} className="shrink-0 pl-2 text-[#6F6E69]" aria-label={open.has(t.id) ? "Свернуть" : "Развернуть"}>
+              {open.has(t.id) ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            </button>
+          ) : (
+            <span className="shrink-0" style={{ width: depth ? 22 : 8 }} />
+          )}
+          <button type="button" onClick={() => setPreviewId(t.id)} className={`min-w-0 flex-1 px-1.5 text-left text-[11px] truncate ${kids.length ? "font-semibold" : ""}`} title={t.title}>
+            {kids.length ? (
+              <>
+                {t.title} <span className="font-normal text-[#6F6E69]">{kids.filter((k) => k.status === "done").length}/{kids.length}</span>
+              </>
+            ) : (
+              <>
+                <span className="text-[#6F6E69]">{t.code}</span> {t.title}
+              </>
+            )}
+          </button>
+        </div>
+        <div className="relative h-full" style={{ width }}>
+          {m && (
+            <div
+              className="absolute top-1.5 h-[18px] rounded-full border-2 border-dashed border-[#e86a4a]"
+              style={{ left: x(m.toStart), width: Math.max(DAY_W, (diffDays(m.toStart, m.toDue) + 1) * DAY_W) }}
+            />
+          )}
+          {milestone ? (
+            <button
+              type="button"
+              onClick={() => pick(t.id)}
+              className="absolute top-1.5 h-[18px] w-[18px] rotate-45 rounded-[3px]"
+              style={{ left: x(t.due) - 1, background: z?.color ?? "#111", outline: selected === t.id ? "2px solid #111" : undefined, opacity: m ? 0.35 : 1 }}
+              title={`${t.title} · ${shortDate(t.due)}`}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => pick(t.id)}
+              className="absolute top-1.5 h-[18px] rounded-full text-[10px] px-1.5 text-left truncate"
+              style={{
+                left: x(s),
+                width: Math.max(DAY_W, (diffDays(s, t.due) + 1) * DAY_W),
+                background: t.status === "done" ? "#e5e7eb" : z?.color ?? "#ddd",
+                ...(kids.length ? { backgroundImage: "repeating-linear-gradient(135deg, rgba(0,0,0,.08) 0 4px, transparent 4px 8px)" } : {}),
+                boxShadow: t.criticalPath ? "inset 0 0 0 2px #b91c1c" : undefined,
+                outline: selected === t.id ? "2px solid #111" : undefined,
+                opacity: m ? 0.35 : 1,
+              }}
+              title={`${t.title} · ${shortDate(s)}–${shortDate(t.due)}`}
+            >
+              {late ? "🔥 " : ""}{shortDate(t.due)}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   let y = 0;
   const rows: React.ReactNode[] = [];
-  for (const lane of lanes) {
-    const meta = lane.stream ? STREAM_META[lane.stream as keyof typeof STREAM_META] : { label: "Без потока", color: "#E5E7EB" };
-    rows.push(
-      <div key={`h-${lane.stream}`} className="absolute left-0 flex items-center bg-[#F3F2EE] text-xs font-semibold" style={{ top: y, height: ROW_H, width: width + LABEL_W }}>
-        <span className="sticky left-0 px-3 bg-[#F3F2EE] flex items-center gap-2" style={{ width: LABEL_W }}>
-          <span className="h-2.5 w-2.5 rounded-full" style={{ background: meta.color }} />
-          {lane.stream || "—"} <span className="font-normal text-[#6F6E69]">{weightedDone(lane.list)}%</span>
-        </span>
-      </div>,
-    );
-    y += ROW_H;
-    for (const t of lane.list) {
-      const s = t.startDate || t.due;
-      const z = zones.find((zz) => zz.slug === t.zone);
-      const m = moved.get(t.id);
-      const late = isOverdue(t, today);
-      const milestone = isMilestone(t);
+  if (group === "streams") {
+    for (const lane of lanes) {
+      const meta = lane.stream ? STREAM_META[lane.stream as keyof typeof STREAM_META] : { label: "Без потока", color: "#E5E7EB" };
       rows.push(
-        <div key={t.id} className="absolute left-0 flex items-center" style={{ top: y, height: ROW_H, width: width + LABEL_W }}>
-          <button type="button" onClick={() => setPreviewId(t.id)} className="sticky left-0 z-[2] bg-white h-full px-3 text-left text-[11px] truncate border-r border-black/5" style={{ width: LABEL_W }} title={t.title}>
-            <span className="text-[#6F6E69]">{t.code}</span> {t.title}
-          </button>
-          <div className="relative h-full" style={{ width }}>
-            {m && (
-              <div
-                className="absolute top-1.5 h-[18px] rounded-full border-2 border-dashed border-[#e86a4a]"
-                style={{ left: x(m.toStart), width: Math.max(DAY_W, (diffDays(m.toStart, m.toDue) + 1) * DAY_W) }}
-              />
-            )}
-            {milestone ? (
-              <button
-                type="button"
-                onClick={() => pick(t.id)}
-                className="absolute top-1.5 h-[18px] w-[18px] rotate-45 rounded-[3px]"
-                style={{ left: x(t.due) - 1, background: z?.color ?? "#111", outline: selected === t.id ? "2px solid #111" : undefined, opacity: m ? 0.35 : 1 }}
-                title={`${t.title} · ${shortDate(t.due)}`}
-              />
-            ) : (
-              <button
-                type="button"
-                onClick={() => pick(t.id)}
-                className="absolute top-1.5 h-[18px] rounded-full text-[10px] px-1.5 text-left truncate"
-                style={{
-                  left: x(s),
-                  width: Math.max(DAY_W, (diffDays(s, t.due) + 1) * DAY_W),
-                  background: t.status === "done" ? "#e5e7eb" : z?.color ?? "#ddd",
-                  boxShadow: t.criticalPath ? "inset 0 0 0 2px #b91c1c" : undefined,
-                  outline: selected === t.id ? "2px solid #111" : undefined,
-                  opacity: m ? 0.35 : 1,
-                }}
-                title={`${t.title} · ${shortDate(s)}–${shortDate(t.due)}`}
-              >
-                {late ? "🔥 " : ""}{shortDate(t.due)}
-              </button>
-            )}
-          </div>
+        <div key={`h-${lane.stream}`} className="absolute left-0 flex items-center bg-[#F3F2EE] text-xs font-semibold" style={{ top: y, height: ROW_H, width: width + LABEL_W }}>
+          <span className="sticky left-0 px-3 bg-[#F3F2EE] flex items-center gap-2" style={{ width: LABEL_W }}>
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: meta.color }} />
+            {lane.stream || "—"} <span className="font-normal text-[#6F6E69]">{weightedDone(lane.list)}%</span>
+          </span>
         </div>,
       );
       y += ROW_H;
+      for (const t of lane.list) {
+        rows.push(row(t, 0));
+        y += ROW_H;
+      }
+    }
+  } else {
+    const heads = new Map<string, Task[]>();
+    for (const t of visible) {
+      const parent = t.parentId ? byId.get(t.parentId) : undefined;
+      const key = parent && canSeeTask(current, parent, users) ? parent.id : t.id;
+      if (!heads.has(key)) heads.set(key, []);
+      if (key !== t.id) heads.get(key)!.push(t);
+    }
+    const order = [...heads.keys()].map((id) => byId.get(id)!).sort(byStart);
+    for (const head of order) {
+      rows.push(row(head, 0));
+      y += ROW_H;
+      if (!open.has(head.id)) continue;
+      for (const k of heads.get(head.id)!.sort(byStart)) {
+        rows.push(row(k, 1));
+        y += ROW_H;
+      }
     }
   }
 
@@ -171,6 +229,22 @@ function Timeline() {
           <span className="pill bg-[#F3F2EE] px-2 py-1">◆ запуск</span>
           <span className="pill bg-[#F3F2EE] px-2 py-1"><span className="text-[#e86a4a]">|</span> сегодня</span>
         </div>
+        <div className="flex rounded-full bg-[#F3F2EE] p-0.5 text-xs">
+          {([["tasks", "Большие задачи"], ["streams", "Потоки"]] as const).map(([id, label]) => (
+            <button key={id} type="button" onClick={() => setGroup(id)} className={`rounded-full px-3 py-1.5 ${group === id ? "bg-black text-white" : "text-[#6F6E69]"}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+        {group === "tasks" && kidsOf.size > 0 && (
+          <button
+            type="button"
+            className="pill bg-[#F3F2EE] px-3 py-1.5 text-xs"
+            onClick={() => setOpen(open.size ? new Set() : new Set(kidsOf.keys()))}
+          >
+            {open.size ? "Свернуть все" : "Развернуть все"}
+          </button>
+        )}
         <select className="text-sm" aria-label="Сотрудник" value={who} onChange={(e) => setWho(e.target.value)}>
           <option value="all">Все сотрудники</option>
           {users

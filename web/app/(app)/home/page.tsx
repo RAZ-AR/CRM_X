@@ -61,7 +61,8 @@ export default function HomePage() {
   if (!current) return null;
 
   const owner = isCpo(current);
-  const { seen, byZone, scoped, manager, whoValue, assigneeId } = scopeTasks(tasks, current, users, who, zone);
+  // Большие задачи (weight 0) — только группы подзадач: в счётчики, нагрузку и списки дня не попадают.
+  const { seen, byZone, scoped, manager, whoValue, assigneeId } = scopeTasks(tasks.filter((t) => t.weight !== 0), current, users, who, zone);
   const people = users.filter((u) => seen.some((t) => t.assigneeId === u.id));
   const L = homeLists(scoped, tasks, picked, { id: current.id, owner });
   const more = (view: HomeView) => `/tasks?${new URLSearchParams({ view, who: whoValue, zone, date: picked })}`;

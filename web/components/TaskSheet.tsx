@@ -44,6 +44,8 @@ export function TaskSheet({
   const canDelete = canDeleteTask(current, task);
   const waiting = openDeps(task, tasks);
   const unlocks = unlockedBy(task, tasks);
+  const parent = task.parentId ? tasks.find((t) => t.id === task.parentId) : undefined;
+  const kids = tasks.filter((t) => t.parentId === task.id && canSeeTask(current, t, users));
   const comms = comments.filter((c) => c.taskId === task.id);
   const subs = subtasks.filter((s) => s.taskId === task.id);
   const author = users.find((u) => u.id === task.authorId);
@@ -316,6 +318,36 @@ export function TaskSheet({
           <p className="text-sm text-[#b91c1c]">Закрытие ждёт: {waiting.map((t) => t.code || t.title).join(", ")}</p>
         )}
 
+        {parent && (
+          <div>
+            <div className="text-xs text-[#6F6E69] mb-1">Входит в</div>
+            <button type="button" onClick={() => setPreviewId(parent.id)} className="pill bg-[#F3F2EE] px-3 py-1 text-xs">
+              {parent.code} {parent.title}
+            </button>
+          </div>
+        )}
+
+        {kids.length > 0 && (
+          <div>
+            <div className="text-xs text-[#6F6E69] mb-1">
+              Подзадачи · готово {kids.filter((k) => k.status === "done").length} из {kids.length}
+            </div>
+            <div className="flex flex-col gap-1">
+              {kids
+                .slice()
+                .sort((a, b) => (a.startDate || a.due).localeCompare(b.startDate || b.due))
+                .map((k) => (
+                  <button key={k.id} type="button" onClick={() => setPreviewId(k.id)} className="flex items-center gap-2 text-left text-sm rounded-lg px-2 py-1 hover:bg-[#F3F2EE]">
+                    <StatusIcon status={k.status} />
+                    <span className="text-xs text-[#6F6E69] shrink-0">{k.code}</span>
+                    <span className={`min-w-0 truncate ${k.status === "done" ? "line-through text-[#6F6E69]" : ""}`}>{k.title}</span>
+                    <span className={`ml-auto text-xs shrink-0 ${isOverdue(k) ? "text-[#b91c1c]" : "text-[#6F6E69]"}`}>{formatDate(k.due)}</span>
+                  </button>
+                ))}
+            </div>
+          </div>
+        )}
+
         {(task.dependsOn ?? []).length > 0 && (
           <div>
             <div className="text-xs text-[#6F6E69] mb-1">Ждёт</div>
@@ -479,7 +511,7 @@ export function TaskModal() {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 grid place-items-end md:place-items-center p-0 md:p-4" onClick={() => setPreviewId(null)}>
       <div className="w-full max-w-xl max-h-[92dvh] md:max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-        <TaskSheet taskId={previewId} onClose={() => setPreviewId(null)} />
+        <TaskSheet key={previewId} taskId={previewId} onClose={() => setPreviewId(null)} />
       </div>
     </div>
   );
