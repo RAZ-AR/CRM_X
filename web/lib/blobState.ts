@@ -136,7 +136,7 @@ export function migrateLegacyState(state: AppState): AppState {
  */
 export const AUTH_VERSION = 2;
 
-/** Разовая очистка всех задач (06.10.2026): Owner актуализирует план и пришлёт новые данные. */
+/** Разовая замена всех задач на актуальный master-план от 06.10.2026 (старые задачи, чеклисты и комментарии удаляются). */
 export const TASKS_VERSION = 1;
 
 export function resetTeamCredentials(state: AppState): AppState {
@@ -163,10 +163,11 @@ function applyMigrations(input: AppState): { state: AppState; changed: boolean }
   if ((state.tasksVersion ?? 0) < TASKS_VERSION) {
     state = {
       ...state,
-      tasks: [],
-      subtasks: [],
+      tasks: seed.tasks,
+      subtasks: seed.subtasks,
       comments: [],
       notices: state.notices.filter((n) => !n.taskId),
+      zones: state.zones.map((z) => ({ ...z, deadline: seed.zones.find((x) => x.slug === z.slug)?.deadline ?? z.deadline })),
       tasksVersion: TASKS_VERSION,
     };
     changed = true;

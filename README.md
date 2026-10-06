@@ -17,7 +17,7 @@
 
 Ремонт строго по очереди: WAFL → Dark Kitchen → COMX → CAFE. В каждом: демонтаж → замер → планировка → дизайн → согласование → ремонт.
 
-Весь план: [`data/master-plan.csv`](data/master-plan.csv), 173 задачи с датами, результатом, исполнителем и зависимостями. Правится в [`web/scripts/master-plan.py`](web/scripts/master-plan.py), затем `python3 web/scripts/master-plan.py` пересобирает сид и CSV.
+Весь план: [`data/master-plan.xlsx`](data/master-plan.xlsx), 262 задачи (20 выполнено) с датами, результатом, исполнителем и зависимостями. Правится в `data/master-plan.xlsx`, затем `python3 web/scripts/master-plan.py` пересобирает сид (`web/lib/seed.ts`) и CSV.
 
 **7 потоков:** LEGAL · SPACE · BRAND · PRODUCT · EQUIPMENT & SUPPLY · PEOPLE · LAUNCH. Готовность проекта и каждого потока считается автоматически из закрытых задач: обычная весит **1**, critical path **3**.
 
