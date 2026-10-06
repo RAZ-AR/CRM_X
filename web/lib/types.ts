@@ -124,6 +124,8 @@ export type Task = {
   wave: "A" | "B" | "C" | "";
   workstream: string;
   dependsOn: string[];
+  /** Большая задача, в которую входит эта (подзадача). У большой задачи weight 0 — готовность считается по подзадачам. */
+  parentId?: string;
   /** Контрагенты и контакты, привязанные к задаче. */
   contactIds?: string[];
   blockReason?: string;

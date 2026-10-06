@@ -136,8 +136,11 @@ export function migrateLegacyState(state: AppState): AppState {
  */
 export const AUTH_VERSION = 2;
 
-/** Разовая замена всех задач на актуальный master-план от 06.10.2026 (старые задачи, чеклисты и комментарии удаляются). */
-export const TASKS_VERSION = 1;
+/**
+ * Разовая замена всех задач на план из портала XSpace (06.10.2026): большие задачи с подзадачами (parentId),
+ * чек-листы, проект Secret Door, шефы. Старые задачи, чеклисты и комментарии удаляются.
+ */
+export const TASKS_VERSION = 2;
 
 export function resetTeamCredentials(state: AppState): AppState {
   const users = state.users.map((u) => {
@@ -161,19 +164,30 @@ function applyMigrations(input: AppState): { state: AppState; changed: boolean }
     changed = true;
   }
   if ((state.tasksVersion ?? 0) < TASKS_VERSION) {
-    // Artur заведён в приложении с произвольным id — находим по имени; Design (дизайнер интерьера) добавляем из seed.
+    // Artur заведён в приложении с произвольным id — находим по имени; Design и шефов добавляем из seed.
     const artur = state.users.find((u) => u.name.toLowerCase() === "artur")?.id ?? "u-armen";
     const remap = (id: string) => (id === "u-artur" ? artur : id);
-    const design = seed.users.find((u) => u.id === "u-design");
-    const hasDesign = state.users.some((u) => u.id === "u-design" || u.name.toLowerCase() === "design");
+    const newZones = seed.zones.filter((z) => !state.zones.some((x) => x.slug === z.slug));
+    const added = seed.users.filter((u) => !state.users.some((x) => x.id === u.id || x.name.toLowerCase() === u.name.toLowerCase()));
     state = {
       ...state,
-      users: design && !hasDesign ? [...state.users, design] : state.users,
+      zones: [
+        ...state.zones.map((z) => ({ ...z, deadline: seed.zones.find((x) => x.slug === z.slug)?.deadline ?? z.deadline })),
+        ...newZones,
+      ],
+      // Кто видел кафе на доске, видит и игровую комнату (Secret Door) — она часть CAFE.
+      users: [
+        ...state.users.map((u) =>
+          u.boardZones.includes("cafe") && !u.boardZones.includes("secret") ? { ...u, boardZones: [...u.boardZones, "secret"] } : u,
+        ),
+        ...added,
+      ],
       tasks: seed.tasks.map((t) => ({ ...t, assigneeId: remap(t.assigneeId), participantIds: t.participantIds.map(remap) })),
       subtasks: seed.subtasks,
       comments: [],
       notices: state.notices.filter((n) => !n.taskId),
-      zones: state.zones.map((z) => ({ ...z, deadline: seed.zones.find((x) => x.slug === z.slug)?.deadline ?? z.deadline })),
+      // Объявление со старыми датами запусков меняем, только если его не правили вручную.
+      broadcast: state.broadcast?.text.startsWith("Стартуем master-план: WAFL 28.10") ? seed.broadcast : state.broadcast,
       tasksVersion: TASKS_VERSION,
     };
     changed = true;
