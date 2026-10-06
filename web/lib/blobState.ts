@@ -161,9 +161,15 @@ function applyMigrations(input: AppState): { state: AppState; changed: boolean }
     changed = true;
   }
   if ((state.tasksVersion ?? 0) < TASKS_VERSION) {
+    // Artur заведён в приложении с произвольным id — находим по имени; Design (дизайнер интерьера) добавляем из seed.
+    const artur = state.users.find((u) => u.name.toLowerCase() === "artur")?.id ?? "u-armen";
+    const remap = (id: string) => (id === "u-artur" ? artur : id);
+    const design = seed.users.find((u) => u.id === "u-design");
+    const hasDesign = state.users.some((u) => u.id === "u-design" || u.name.toLowerCase() === "design");
     state = {
       ...state,
-      tasks: seed.tasks,
+      users: design && !hasDesign ? [...state.users, design] : state.users,
+      tasks: seed.tasks.map((t) => ({ ...t, assigneeId: remap(t.assigneeId), participantIds: t.participantIds.map(remap) })),
       subtasks: seed.subtasks,
       comments: [],
       notices: state.notices.filter((n) => !n.taskId),

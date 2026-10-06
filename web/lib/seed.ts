@@ -111,6 +111,25 @@ export const seed: AppState = {
         "common"
       ],
       "managerId": "u-vladimir"
+    },
+    {
+      "id": "u-design",
+      "name": "Design",
+      "email": "Design",
+      "password": "1234",
+      "role": "employee",
+      "zone": null,
+      "title": "Дизайнер интерьера (внешний)",
+      "avatar": "D",
+      "permissions": [],
+      "boardZones": [
+        "wafl",
+        "kitchen",
+        "cafe",
+        "comx",
+        "common"
+      ],
+      "managerId": "u-armen"
     }
   ],
   "tasks": [
@@ -542,14 +561,16 @@ export const seed: AppState = {
     {
       "id": "t-gen-45",
       "title": "Выбор направления логотипа",
-      "description": "Исполнитель по плану: Armen + Artur\nСрок в старом плане прошёл — подтвердить статус",
+      "description": "Срок в старом плане прошёл — подтвердить статус",
       "zone": "common",
       "zones": [
         "common"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-10-05",
       "due": "2026-10-06",
       "priority": "medium",
@@ -1438,12 +1459,12 @@ export const seed: AppState = {
     {
       "id": "t-art-01",
       "title": "Artur: утверждение финмодели и бюджета запуска (CAPEX)",
-      "description": "Исполнитель по плану: Artur\nНОВАЯ. Armen готовит, Artur утверждает",
+      "description": "НОВАЯ. Armen готовит, Artur утверждает",
       "zone": "common",
       "zones": [
         "common"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-artur",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-07",
@@ -1464,14 +1485,16 @@ export const seed: AppState = {
     {
       "id": "t-art-02",
       "title": "Artur + Armen: утверждение айдентики и бренд-гайда (готовит Vladimir)",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ. Vladimir представляет, Armen и Artur утверждают",
+      "description": "НОВАЯ. Vladimir представляет, Armen и Artur утверждают",
       "zone": "common",
       "zones": [
         "common"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-10-25",
       "due": "2026-10-25",
       "priority": "critical",
@@ -1492,14 +1515,16 @@ export const seed: AppState = {
     {
       "id": "t-art-03",
       "title": "Artur + Armen: утверждение концепций COMX и CAFE",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "common",
       "zones": [
         "common"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-10-20",
       "due": "2026-10-20",
       "priority": "critical",
@@ -1521,12 +1546,12 @@ export const seed: AppState = {
     {
       "id": "t-art-05",
       "title": "Artur: согласование заказа оборудования Waffle (КП, сумма, предоплата)",
-      "description": "Исполнитель по плану: Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "wafl",
       "zones": [
         "wafl"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-artur",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-09",
@@ -1550,12 +1575,12 @@ export const seed: AppState = {
     {
       "id": "t-art-06",
       "title": "Artur: согласование заказа оборудования Dark Kitchen",
-      "description": "Исполнитель по плану: Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "kitchen",
       "zones": [
         "kitchen"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-artur",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-16",
@@ -1578,12 +1603,12 @@ export const seed: AppState = {
     {
       "id": "t-art-07",
       "title": "Artur: согласование первой закупки товара COMX ($10–30k)",
-      "description": "Исполнитель по плану: Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "comx",
       "zones": [
         "comx"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-artur",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-25",
@@ -1606,12 +1631,12 @@ export const seed: AppState = {
     {
       "id": "t-art-08",
       "title": "Artur: согласование заказа оборудования и мебели CAFE",
-      "description": "Исполнитель по плану: Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-artur",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-11-10",
@@ -1634,12 +1659,12 @@ export const seed: AppState = {
     {
       "id": "t-art-09",
       "title": "Artur: согласование сметы и договора на Mini App",
-      "description": "Исполнитель по плану: Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "wafl",
       "zones": [
         "wafl"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-artur",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-13",
@@ -1662,14 +1687,16 @@ export const seed: AppState = {
     {
       "id": "t-art-10",
       "title": "Artur: согласование шеф-повара CAFE (оффер)",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-11-10",
       "due": "2026-11-12",
       "priority": "critical",
@@ -1690,14 +1717,16 @@ export const seed: AppState = {
     {
       "id": "t-art-12",
       "title": "Go/no-go запуска Waffle (Armen + Artur)",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "wafl",
       "zones": [
         "wafl"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-11-05",
       "due": "2026-11-05",
       "priority": "critical",
@@ -1718,14 +1747,16 @@ export const seed: AppState = {
     {
       "id": "t-art-13",
       "title": "Go/no-go запуска Dark Kitchen (Armen + Artur)",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "kitchen",
       "zones": [
         "kitchen"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-11-20",
       "due": "2026-11-20",
       "priority": "critical",
@@ -1746,14 +1777,16 @@ export const seed: AppState = {
     {
       "id": "t-art-14",
       "title": "Go/no-go открытия COMX (Armen + Artur)",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "comx",
       "zones": [
         "comx"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-11-24",
       "due": "2026-11-24",
       "priority": "critical",
@@ -1774,14 +1807,16 @@ export const seed: AppState = {
     {
       "id": "t-art-15",
       "title": "Go/no-go технического открытия CAFE (Armen + Artur)",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-12-24",
       "due": "2026-12-24",
       "priority": "critical",
@@ -1803,14 +1838,16 @@ export const seed: AppState = {
     {
       "id": "t-art-16",
       "title": "Go/no-go реального открытия CAFE (Armen + Artur)",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2027-01-14",
       "due": "2027-01-14",
       "priority": "critical",
@@ -1971,12 +2008,12 @@ export const seed: AppState = {
     {
       "id": "t-waf-06",
       "title": "Дизайн точки Waffle",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nДизайн утверждается до 14.10 — подзадачи ниже (было 08.10–13.10). Интерьер — внешний дизайнер, общается Armen; Vladimir проверяет соответствие айдентике",
+      "description": "Дизайн утверждается до 14.10 — подзадачи ниже (было 08.10–13.10). Интерьер — внешний дизайнер, общается Armen; Vladimir проверяет соответствие айдентике",
       "zone": "wafl",
       "zones": [
         "wafl"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-08",
@@ -2028,12 +2065,12 @@ export const seed: AppState = {
     {
       "id": "t-waf-06.2",
       "title": "Концепт точки (2 варианта)",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "wafl",
       "zones": [
         "wafl"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-09",
@@ -2056,12 +2093,12 @@ export const seed: AppState = {
     {
       "id": "t-waf-06.3",
       "title": "Правки и финальный проект: размеры, материалы, спецификация",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "wafl",
       "zones": [
         "wafl"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-12",
@@ -2084,14 +2121,16 @@ export const seed: AppState = {
     {
       "id": "t-waf-06.4",
       "title": "УТВЕРЖДЕНИЕ ДИЗАЙНА Waffle",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "wafl",
       "zones": [
         "wafl"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-10-14",
       "due": "2026-10-14",
       "priority": "critical",
@@ -2781,14 +2820,16 @@ export const seed: AppState = {
     {
       "id": "t-waf-42",
       "title": "Концепция продукта и ассортимент",
-      "description": "Исполнитель по плану: Armen + Artur\nПросрочено в старом плане — перенесено на ближайшие дни (было 29.09–05.10)",
+      "description": "Просрочено в старом плане — перенесено на ближайшие дни (было 29.09–05.10)",
       "zone": "wafl",
       "zones": [
         "wafl"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-10-06",
       "due": "2026-10-08",
       "priority": "medium",
@@ -2836,14 +2877,16 @@ export const seed: AppState = {
     {
       "id": "t-waf-44",
       "title": "Тестирование рецептур",
-      "description": "Исполнитель по плану: Armen + Artur\nБыло 15.10–19.10",
+      "description": "Было 15.10–19.10",
       "zone": "wafl",
       "zones": [
         "wafl"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-10-19",
       "due": "2026-10-24",
       "priority": "medium",
@@ -3847,14 +3890,16 @@ export const seed: AppState = {
     {
       "id": "t-dk-05",
       "title": "Выбор 2–4 брендов для MVP",
-      "description": "Исполнитель по плану: Armen + Artur\nБыло 07.10–08.10",
+      "description": "Было 07.10–08.10",
       "zone": "kitchen",
       "zones": [
         "kitchen"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-10-09",
       "due": "2026-10-10",
       "priority": "critical",
@@ -3988,14 +4033,16 @@ export const seed: AppState = {
     {
       "id": "t-dk-10",
       "title": "Тест-дегустация / фокус-группа",
-      "description": "Исполнитель по плану: Armen + Artur\nБыло 24.10–27.10 (сдвиг по зависимостям)",
+      "description": "Было 24.10–27.10 (сдвиг по зависимостям)",
       "zone": "kitchen",
       "zones": [
         "kitchen"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-11-01",
       "due": "2026-11-05",
       "priority": "critical",
@@ -4379,12 +4426,12 @@ export const seed: AppState = {
     {
       "id": "t-dk-25",
       "title": "Дизайн кухни",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nПодзадачи по утверждению дизайна ниже (было 14.10–18.10). Интерьер — внешний дизайнер, общается Armen; Vladimir проверяет соответствие айдентике",
+      "description": "Подзадачи по утверждению дизайна ниже (было 14.10–18.10). Интерьер — внешний дизайнер, общается Armen; Vladimir проверяет соответствие айдентике",
       "zone": "kitchen",
       "zones": [
         "kitchen"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-21",
@@ -4435,12 +4482,12 @@ export const seed: AppState = {
     {
       "id": "t-dk-25.2",
       "title": "Первая версия: зонирование и 3D/схемы",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "kitchen",
       "zones": [
         "kitchen"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-21",
@@ -4463,12 +4510,12 @@ export const seed: AppState = {
     {
       "id": "t-dk-25.3",
       "title": "Правки, финальные чертежи, спецификация материалов",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "kitchen",
       "zones": [
         "kitchen"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-24",
@@ -4491,14 +4538,16 @@ export const seed: AppState = {
     {
       "id": "t-dk-25.4",
       "title": "УТВЕРЖДЕНИЕ ДИЗАЙНА кухни",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "kitchen",
       "zones": [
         "kitchen"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-10-28",
       "due": "2026-10-28",
       "priority": "critical",
@@ -5223,14 +5272,16 @@ export const seed: AppState = {
     {
       "id": "t-bk-01",
       "title": "Концепция COMX: ассортимент, формат, события",
-      "description": "Исполнитель по плану: Armen + Artur\nРаньше, чем было: нужна для закупки и дизайна (было 20.10–31.10)",
+      "description": "Раньше, чем было: нужна для закупки и дизайна (было 20.10–31.10)",
       "zone": "comx",
       "zones": [
         "comx"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-10-06",
       "due": "2026-10-20",
       "priority": "medium",
@@ -5334,12 +5385,12 @@ export const seed: AppState = {
     {
       "id": "t-bk-05",
       "title": "Дизайн COMX",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nПодзадачи по утверждению дизайна ниже (было 12.11–20.11). Интерьер — внешний дизайнер, общается Armen; Vladimir проверяет соответствие айдентике",
+      "description": "Подзадачи по утверждению дизайна ниже (было 12.11–20.11). Интерьер — внешний дизайнер, общается Armen; Vladimir проверяет соответствие айдентике",
       "zone": "comx",
       "zones": [
         "comx"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-24",
@@ -5390,12 +5441,12 @@ export const seed: AppState = {
     {
       "id": "t-bk-05.2",
       "title": "Концепт интерьера",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "comx",
       "zones": [
         "comx"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-24",
@@ -5418,12 +5469,12 @@ export const seed: AppState = {
     {
       "id": "t-bk-05.3",
       "title": "Правки, чертежи стеллажей, спецификация",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "comx",
       "zones": [
         "comx"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-28",
@@ -5446,14 +5497,16 @@ export const seed: AppState = {
     {
       "id": "t-bk-05.4",
       "title": "УТВЕРЖДЕНИЕ ДИЗАЙНА COMX",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "comx",
       "zones": [
         "comx"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-10-31",
       "due": "2026-10-31",
       "priority": "critical",
@@ -5892,14 +5945,16 @@ export const seed: AppState = {
     {
       "id": "t-caf-01",
       "title": "Концепция кафе: меню, зал, бар",
-      "description": "Исполнитель по плану: Armen + Artur\nБыло 01.11–15.11",
+      "description": "Было 01.11–15.11",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-10-06",
       "due": "2026-10-20",
       "priority": "medium",
@@ -6000,12 +6055,12 @@ export const seed: AppState = {
     {
       "id": "t-caf-05",
       "title": "Дизайн кафе",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nПодзадачи по утверждению дизайна ниже (было 27.11–07.12). Интерьер — внешний дизайнер, общается Armen; Vladimir проверяет соответствие айдентике",
+      "description": "Подзадачи по утверждению дизайна ниже (было 27.11–07.12). Интерьер — внешний дизайнер, общается Armen; Vladimir проверяет соответствие айдентике",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-24",
@@ -6057,12 +6112,12 @@ export const seed: AppState = {
     {
       "id": "t-caf-05.2",
       "title": "Концепт зала и бара (2 варианта)",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-10-27",
@@ -6085,14 +6140,16 @@ export const seed: AppState = {
     {
       "id": "t-caf-05.3",
       "title": "Выбор варианта",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-11-03",
       "due": "2026-11-04",
       "priority": "medium",
@@ -6113,12 +6170,12 @@ export const seed: AppState = {
     {
       "id": "t-caf-05.4",
       "title": "Детальный проект: свет, материалы, мебель, спецификации",
-      "description": "Исполнитель по плану: Дизайнер интерьера (внешний)\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
-      "assigneeId": "u-armen",
+      "assigneeId": "u-design",
       "authorId": "u-armen",
       "participantIds": [],
       "startDate": "2026-11-04",
@@ -6141,14 +6198,16 @@ export const seed: AppState = {
     {
       "id": "t-caf-05.5",
       "title": "УТВЕРЖДЕНИЕ ДИЗАЙНА CAFE",
-      "description": "Исполнитель по плану: Armen + Artur\nНОВАЯ",
+      "description": "НОВАЯ",
       "zone": "cafe",
       "zones": [
         "cafe"
       ],
       "assigneeId": "u-armen",
       "authorId": "u-armen",
-      "participantIds": [],
+      "participantIds": [
+        "u-artur"
+      ],
       "startDate": "2026-11-13",
       "due": "2026-11-13",
       "priority": "critical",

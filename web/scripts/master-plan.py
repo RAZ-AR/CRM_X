@@ -8,8 +8,10 @@ from pathlib import Path
 import openpyxl
 
 ROOT = Path(__file__).resolve().parents[2]
-WHO = {"Armen": "u-armen", "Vladimir": "u-vladimir", "Karina": "u-karina", "Karine": "u-karina"}
-OWNER = "u-armen"  # Artur, подрядчики и шефы — не пользователи системы: задача на Armen, реальный исполнитель в описании
+WHO = {"Armen": "u-armen", "Vladimir": "u-vladimir", "Karina": "u-karina", "Karine": "u-karina",
+       "Artur": "u-artur", "Дизайнер интерьера (внешний)": "u-design"}
+OWNER = "u-armen"  # шефы пока не пользователи системы: задача на Armen, реальный исполнитель в описании
+# u-artur в рабочей базе заменяется на id реального Artur (blobState.ts, миграция по имени)
 WAVE = {"common": "", "wafl": "A", "kitchen": "B", "comx": "C", "cafe": "C"}
 STATUS = {"Не начата": "todo", "В работе": "in_progress", "Готово": "done"}
 DEADLINES = {"wafl": "2026-11-06", "kitchen": "2026-11-21", "comx": "2026-11-25", "cafe": "2027-01-15"}
@@ -60,16 +62,18 @@ tasks, subtasks = [], []
 for r in rows:
     tid = "t-" + r["code"].lower()
     launch = r["title"].startswith("🚀")
-    who = WHO.get(r["who_raw"], OWNER)
+    tokens = [x.strip() for x in r["who_raw"].split("+") if x.strip()]
+    mapped = [WHO[x] for x in tokens if x in WHO]
+    who, others = (mapped[0] if mapped else OWNER), [x for x in tokens if x not in WHO]
     desc = []
-    if r["who_raw"] and r["who_raw"] not in WHO:
+    if others:
         desc.append(f"Исполнитель по плану: {r['who_raw']}")
     if r["note"]:
         desc.append(r["note"])
     tasks.append({
         "id": tid, "title": r["title"], "description": "\n".join(desc),
         "zone": r["zone"], "zones": [r["zone"]],
-        "assigneeId": who, "authorId": "u-armen", "participantIds": [],
+        "assigneeId": who, "authorId": "u-armen", "participantIds": mapped[1:],
         "startDate": r["start"], "due": r["end"],
         "priority": "critical" if r["cp"] else ("high" if launch or r["stream"] == "LAUNCH & OPS" else "medium"),
         "status": r["status"], "weight": 3 if r["cp"] else 1, "criticalPath": r["cp"],
