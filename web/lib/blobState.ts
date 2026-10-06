@@ -136,6 +136,9 @@ export function migrateLegacyState(state: AppState): AppState {
  */
 export const AUTH_VERSION = 2;
 
+/** Разовая замена всех задач на актуальный master-план от 06.10.2026 (старые задачи, чеклисты и комментарии удаляются). */
+export const TASKS_VERSION = 1;
+
 export function resetTeamCredentials(state: AppState): AppState {
   const users = state.users.map((u) => {
     const s = seed.users.find((x) => x.id === u.id);
@@ -155,6 +158,24 @@ function applyMigrations(input: AppState): { state: AppState; changed: boolean }
   }
   if ((state.authVersion ?? 0) < AUTH_VERSION) {
     state = resetTeamCredentials(state);
+    changed = true;
+  }
+  if ((state.tasksVersion ?? 0) < TASKS_VERSION) {
+    // Artur заведён в приложении с произвольным id — находим по имени; Design (дизайнер интерьера) добавляем из seed.
+    const artur = state.users.find((u) => u.name.toLowerCase() === "artur")?.id ?? "u-armen";
+    const remap = (id: string) => (id === "u-artur" ? artur : id);
+    const design = seed.users.find((u) => u.id === "u-design");
+    const hasDesign = state.users.some((u) => u.id === "u-design" || u.name.toLowerCase() === "design");
+    state = {
+      ...state,
+      users: design && !hasDesign ? [...state.users, design] : state.users,
+      tasks: seed.tasks.map((t) => ({ ...t, assigneeId: remap(t.assigneeId), participantIds: t.participantIds.map(remap) })),
+      subtasks: seed.subtasks,
+      comments: [],
+      notices: state.notices.filter((n) => !n.taskId),
+      zones: state.zones.map((z) => ({ ...z, deadline: seed.zones.find((x) => x.slug === z.slug)?.deadline ?? z.deadline })),
+      tasksVersion: TASKS_VERSION,
+    };
     changed = true;
   }
   // Креативный директор видит весь поток BRAND (один раз; дальше настраивает Owner).
