@@ -136,6 +136,9 @@ export function migrateLegacyState(state: AppState): AppState {
  */
 export const AUTH_VERSION = 2;
 
+/** Разовая очистка всех задач (06.10.2026): Owner актуализирует план и пришлёт новые данные. */
+export const TASKS_VERSION = 1;
+
 export function resetTeamCredentials(state: AppState): AppState {
   const users = state.users.map((u) => {
     const s = seed.users.find((x) => x.id === u.id);
@@ -155,6 +158,17 @@ function applyMigrations(input: AppState): { state: AppState; changed: boolean }
   }
   if ((state.authVersion ?? 0) < AUTH_VERSION) {
     state = resetTeamCredentials(state);
+    changed = true;
+  }
+  if ((state.tasksVersion ?? 0) < TASKS_VERSION) {
+    state = {
+      ...state,
+      tasks: [],
+      subtasks: [],
+      comments: [],
+      notices: state.notices.filter((n) => !n.taskId),
+      tasksVersion: TASKS_VERSION,
+    };
     changed = true;
   }
   // Креативный директор видит весь поток BRAND (один раз; дальше настраивает Owner).
