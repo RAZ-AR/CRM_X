@@ -11,7 +11,7 @@ import {
 } from "react";
 import { EMPTY_STATE } from "./emptyState";
 import { isValidLogin, isValidPassword, loginTaken } from "./pin";
-import { canMoveStatus } from "./taskRules";
+import { canMoveStatus, stampDone } from "./taskRules";
 import { ACCESS_META, canDeleteTask } from "./access";
 import { normalizeState } from "./normalize";
 import type {
@@ -369,7 +369,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           return s;
         }
       }
-      const next = s.tasks.map((t) => (t.id === id ? { ...t, ...patch } : t));
+      const next = s.tasks.map((t) => (t.id === id ? stampDone(t, { ...t, ...patch }) : t));
       return { ...s, tasks: next };
     });
     if (!result.ok) return result;

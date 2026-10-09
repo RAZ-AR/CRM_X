@@ -5,6 +5,7 @@ import type { Task } from "@/lib/types";
 import { created, withActivity } from "@/lib/activity";
 import { appUrlFrom, escapeHtml, sendTo, taskLink } from "@/lib/telegram";
 import { shortDate } from "@/lib/dates";
+import { stampDone } from "@/lib/taskRules";
 
 export async function POST(req: Request) {
   const user = await sessionUser();
@@ -13,14 +14,15 @@ export async function POST(req: Request) {
   if (!body?.id || !body.title || !/^[A-Za-z0-9_-]{1,64}$/.test(body.id)) {
     return NextResponse.json({ ok: false }, { status: 400 });
   }
-  const task: Task = {
+  const task: Task = stampDone(undefined, {
     ...body,
     authorId: user.id,
     attachments: body.attachments ?? [],
     dependsOn: body.dependsOn ?? [],
     participantIds: body.participantIds ?? [],
     zones: body.zones?.length ? body.zones : body.zone ? [body.zone] : [],
-  };
+    doneAt: undefined,
+  });
   const { assignee } = await updateSharedState((state) => {
     if (state.tasks.some((t) => t.id === task.id)) return { result: { assignee: undefined } }; // повтор запроса
     return {

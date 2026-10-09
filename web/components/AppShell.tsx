@@ -27,6 +27,7 @@ import {
   Wallet,
   ShieldAlert,
   CircleHelp,
+  Gauge,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { cpoNav, employeeNav, isCpo } from "@/lib/access";
@@ -39,6 +40,7 @@ import { HelpDrawer } from "@/components/Help";
 
 const icons: Record<string, React.ReactNode> = {
   home: <Home size={18} />,
+  me: <Gauge size={18} />,
   week: <CalendarDays size={18} />,
   timeline: <GanttChart size={18} />,
   meeting: <ClipboardList size={18} />,

@@ -130,6 +130,8 @@ export type Task = {
   /** ISO date or "forever" */
   blockUntil?: string;
   blockFromStatus?: TaskStatus;
+  /** Когда задачу закрыли (ISO-время). Ставит сервер при переходе в «Готово», снимает при возврате. */
+  doneAt?: string;
 };
 
 export type WikiPage = {

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { sessionUser } from "@/lib/session";
 import { canDeleteTask, canEditTask, canSeeContact, canWorkTask } from "@/lib/access";
-import { canMoveStatus } from "@/lib/taskRules";
+import { canMoveStatus, stampDone } from "@/lib/taskRules";
 import { updateSharedState } from "@/lib/blobState";
 import type { Task, User } from "@/lib/types";
 import { deleted, taskChanges, withActivity } from "@/lib/activity";
@@ -44,7 +44,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
     }
     const nextPatch: Partial<Task> = {};
     for (const [k, v] of Object.entries(request)) {
-      if (v === undefined) continue;
+      if (v === undefined || k === "doneAt") continue; // дату закрытия ставит только сервер
       if (edit || (work && (WORK as readonly string[]).includes(k))) {
         (nextPatch as Record<string, unknown>)[k] = v;
       }
@@ -57,7 +57,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
       });
       if (!check.ok) return { result: { fail: { error: check.error, status: 400 } } };
     }
-    const tasks = state.tasks.map((t) => (t.id === id ? { ...t, ...nextPatch } : t));
+    const tasks = state.tasks.map((t) => (t.id === id ? stampDone(t, { ...t, ...nextPatch }) : t));
     const task = tasks.find((t) => t.id === id)!;
     return {
       state: withActivity({ ...state, tasks }, taskChanges(user, prev, task, state.users)),

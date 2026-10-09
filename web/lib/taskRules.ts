@@ -19,6 +19,12 @@ export function unlockedBy(task: Task, tasks: Task[]) {
   return tasks.filter((t) => (t.dependsOn ?? []).includes(task.code));
 }
 
+/** Дата закрытия: ставится при переходе в «Готово», снимается при возврате в работу. */
+export function stampDone(prev: Task | undefined, next: Task, now = new Date().toISOString()): Task {
+  if (next.status !== "done") return next.doneAt ? { ...next, doneAt: undefined } : next;
+  return { ...next, doneAt: prev?.status === "done" ? prev.doneAt : now };
+}
+
 export function needsDod(status: TaskStatus) {
   return status === "review" || status === "done";
 }

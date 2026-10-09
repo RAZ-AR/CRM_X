@@ -14,8 +14,10 @@ import type { Activity, Task } from "@/lib/types";
 import { dataIssues } from "@/lib/quality";
 import { canSeeFinance, DEFAULT_FX, money, totals } from "@/lib/finance";
 import { riskScore, topRisks } from "@/lib/risks";
-import { Legend, Meter, OTHER, RED, Ring, SERIES, Spark, StackedWeeks } from "@/components/Charts";
+import { Legend, Meter, RED, Ring, SERIES, Spark, StackedWeeks } from "@/components/Charts";
 import { Section } from "@/components/PageHeader";
+import { Kpi } from "@/components/Kpi";
+import { weekLoad } from "@/lib/weekLoad";
 import { MilestoneLegend, Milestones, roadmapHref } from "@/components/Milestones";
 
 const FILTER_KEY = "crmx-home-filters";
@@ -77,31 +79,8 @@ export default function HomePage() {
   const heroTasks = hero ? zoneTasks(hero.slug, assigneeId ? scoped : byZone) : scoped;
   const heroStreams = streamProgress(heroTasks).filter((s) => s.total > 0);
 
-  // Нагрузка по неделям: 8 недель вперёд, три самых загруженных проекта цветом, остальное — «Прочие».
-  const w0 = weekStart(picked);
-  const weekStarts = Array.from({ length: 8 }, (_, i) => addDays(w0, i * 7));
-  const wEnd = addDays(w0, 8 * 7);
-  const inWindow = scoped.filter((t) => t.due >= w0 && t.due < wEnd);
-  const zoneCount = new Map<string, number>();
-  for (const t of inWindow) zoneCount.set(t.zone, (zoneCount.get(t.zone) ?? 0) + 1);
-  const topZones = [...zoneCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([z]) => z);
-  const hasOther = [...zoneCount.keys()].some((z) => !topZones.includes(z));
-  const series = [
-    ...topZones.map((z, i) => ({ name: zones.find((x) => x.slug === z)?.name ?? z, color: SERIES[i] })),
-    ...(hasOther ? [{ name: "Прочие", color: OTHER }] : []),
-  ];
-  const weeks = weekStarts.map((ws) => {
-    const list = inWindow.filter((t) => t.due >= ws && t.due < addDays(ws, 7));
-    const values = topZones.map((z) => list.filter((t) => t.zone === z).length);
-    if (hasOther) values.push(list.filter((t) => !topZones.includes(t.zone)).length);
-    return { label: shortDate(ws), title: `Неделя с ${shortDate(ws)}`, values };
-  });
-  const markers = zones
-    .filter((z) => z.slug !== "common" && z.deadline >= w0 && z.deadline < wEnd && (zone === "all" || z.slug === zone))
-    .map((z) => {
-      const d = diffDays(w0, z.deadline);
-      return { index: Math.floor(d / 7), frac: ((d % 7) + 0.5) / 7, label: `${z.name} ${shortDate(z.deadline)}` };
-    });
+  // Нагрузка по неделям
+  const { inWindow, series, weeks, markers } = weekLoad(scoped, zones, picked, zone);
 
   // Цифры с мини-графиками
   const last7 = Array.from({ length: 7 }, (_, i) => addDays(picked, i - 6));
@@ -461,48 +440,6 @@ export default function HomePage() {
         )}
       </div>
     </div>
-  );
-}
-
-function Kpi({
-  icon,
-  label,
-  value,
-  sub,
-  tone,
-  href,
-  children,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  sub: string;
-  tone?: "bad";
-  href?: string;
-  children?: React.ReactNode;
-}) {
-  const body = (
-    <>
-      <span className="flex items-center gap-2 text-[var(--muted)]">
-        {icon}
-        <span className="cap truncate">{label}</span>
-      </span>
-      <span className="flex items-end justify-between gap-2">
-        <span className="flex flex-col gap-0.5 min-w-0">
-          <span className={`num text-[28px] md:text-[34px] leading-none font-semibold tracking-[-0.02em] ${tone === "bad" ? "text-[var(--red)]" : ""}`}>{value}</span>
-          <span className="cap truncate">{sub}</span>
-        </span>
-        {children}
-      </span>
-    </>
-  );
-  const cls = "card p-4 md:px-5 md:py-5 flex flex-col gap-3 min-w-0";
-  return href ? (
-    <Link href={href} className={`${cls} hover:border-[#d9d6ce]`}>
-      {body}
-    </Link>
-  ) : (
-    <div className={cls}>{body}</div>
   );
 }
 
