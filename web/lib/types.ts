@@ -223,6 +223,8 @@ export type AppState = {
   risks?: Risk[];
   /** Личные дела с напоминаниями: каждый видит только свои. */
   todos?: Todo[];
+  /** Последняя синхронизация с Helix (пишет только /api/cron/helix). */
+  helixSync?: { at: string; count: number; firstAt: string; unmapped?: string[]; source?: "server" | "mac" };
 };
 
 export type TodoRepeat = "none" | "daily" | "weekdays" | "weekly";
