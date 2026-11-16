@@ -58,6 +58,13 @@ struct CRMState: Decodable {
     let tasks: [CRMTask]
     let comments: [CRMComment]?
     let zones: [CRMZone]?
+    let helixSync: HelixSync?
+}
+
+/// Последняя синхронизация Helix → CRM X (пишет сервер).
+struct HelixSync: Decodable {
+    let at: String
+    let by: String?
 }
 
 struct StateResponse: Decodable {

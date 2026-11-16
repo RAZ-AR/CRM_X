@@ -158,6 +158,12 @@ div.today { margin-top: var(--s5); }
 .sources ul { list-style: none; margin: var(--s3) 0 0; padding: 0; }
 .sources li { display: flex; align-items: center; gap: var(--s2); font-size: var(--t-sm); padding: 10px 0; border-top: 1px solid var(--hair); }
 .sources li small { margin-left: auto; color: var(--ink-3); font-size: var(--t-xs); text-align: right; }
+/* Helix: «синхронизировать сейчас» — круглая кнопка в строке источника. */
+.sources .sync { flex: none; width: 32px; height: 32px; margin: -4px 0; border-radius: 50%; border: 1.5px solid var(--hair); background: transparent; color: var(--ink); display: grid; place-items: center; font-size: 16px; line-height: 1; transition: background var(--dur) var(--ease); }
+.sources .sync:hover { background: var(--apricot-2); }
+.sources .sync[aria-busy="true"] { animation: spin 1s linear infinite; pointer-events: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.sources small.bad { color: var(--red, #c4370b); }
 .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink); flex: none; }
 .dot.warn { background: var(--orange); } .dot.off { background: transparent; border: 1.5px solid var(--grey); }
 
@@ -623,6 +629,7 @@ html.crm-mode, html.crm-mode body { overflow: hidden; }
         <span class="label" id="src-h">Источники</span>
         <ul id="src">
           <li><i class="dot"></i>CRM X<small>обновлено 2 мин назад</small></li>
+          <li><i class="dot"></i>Helix<small>сегодня, 12:15</small><button class="sync" type="button" data-act="syncHelix" aria-label="Синхронизировать с Helix сейчас" title="Синхронизировать сейчас · автоматически раз в 6 часов">↻</button></li>
           <li><i class="dot"></i>Оплаты · Google Sheets<small>сегодня, 11:05</small></li>
           <li><i class="dot warn"></i>Почта mail.ru<small>нужен пароль приложения</small></li>
           <li><i class="dot off"></i>Telegram<small>не подключён</small></li>
@@ -972,8 +979,13 @@ function renderLive() {
   AGENTS.pochta.on = false; AGENTS.tg.on = false;
   const synced = d.lastSync ? new Date(d.lastSync).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }) : "";
   const crmState = d.phase === "ok" ? ["", `обновлено в ${synced}`] : d.phase === "needsLogin" ? ["warn", "нужен вход"] : d.phase === "error" ? ["warn", "нет связи"] : ["off", "загрузка…"];
+  const hx = d.helix || {}, hxAt = hx.at ? new Date(hx.at) : null;
+  const hxWhen = hxAt ? (iso(hxAt) === iso(TODAY()) ? "сегодня, " + hxAt.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }) : ddmm(dayStart(hxAt))) : "ещё не было";
+  const hxText = hx.busy ? "синхронизирую…" : hx.error ? esc(hx.error) : hxWhen;
+  const hxBtn = d.phase === "ok" ? `<button class="sync" type="button" data-act="syncHelix" aria-busy="${hx.busy ? "true" : "false"}" aria-label="Синхронизировать с Helix сейчас" title="Синхронизировать сейчас · автоматически раз в 6 часов">↻</button>` : "";
   $("#src").innerHTML = `
     <li><i class="dot ${crmState[0]}"></i>CRM X<small>${crmState[1]}</small></li>
+    <li><i class="dot ${hx.error ? "warn" : hxAt ? "" : "off"}"></i>Helix<small class="${hx.error ? "bad" : ""}">${hxText}</small>${hxBtn}</li>
     <li><i class="dot off"></i>Оплаты · Google Sheets<small>пришли ссылку на таблицу</small></li>
     <li><i class="dot off"></i>Почта mail.ru<small>нужен пароль приложения</small></li>
     <li><i class="dot off"></i>Telegram<small>не подключён</small></li>`;

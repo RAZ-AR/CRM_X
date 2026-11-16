@@ -36,6 +36,7 @@ import { TaskModal } from "@/components/TaskSheet";
 import { Reminders } from "@/components/Reminders";
 import { CommandPalette } from "@/components/CommandPalette";
 import { HelpDrawer } from "@/components/Help";
+import { HelixSyncButton } from "@/components/HelixSyncButton";
 
 const icons: Record<string, React.ReactNode> = {
   home: <Home size={18} />,
@@ -232,6 +233,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="flex-1 truncate">Поиск и команды…</span>
               <kbd className="hidden md:inline text-[11px] font-bold rounded-full px-2 py-0.5 bg-[var(--apricot)] text-[var(--ink)]">⌘K</kbd>
             </button>
+            <HelixSyncButton />
             <button
               type="button"
               className="h-10 w-10 rounded-full bg-[var(--card)] grid place-items-center shrink-0 text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--apricot-2)] transition-colors"
