@@ -47,10 +47,17 @@ struct CRMComment: Decodable {
     let text: String
 }
 
+struct CRMZone: Decodable {
+    let slug: String
+    let name: String
+    let deadline: String?
+}
+
 struct CRMState: Decodable {
     let users: [CRMUser]
     let tasks: [CRMTask]
     let comments: [CRMComment]?
+    let zones: [CRMZone]?
 }
 
 struct StateResponse: Decodable {

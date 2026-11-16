@@ -62,13 +62,13 @@ export default function ContactsPage() {
           ) : (
             <div key={c.id} className="card p-5">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#6F6E69] uppercase flex-1">{CONTACT_KINDS.find((k) => k.id === c.kind)?.label ?? c.kind}</span>
+                <span className="text-xs text-[var(--muted)] uppercase flex-1">{CONTACT_KINDS.find((k) => k.id === c.kind)?.label ?? c.kind}</span>
                 {c.status && c.kind !== "staff" && (
                   <span className="pill text-[11px] px-2 py-0.5" style={{ background: CONTRACTOR_STATUS[c.status].color }}>{CONTRACTOR_STATUS[c.status].label}</span>
                 )}
               </div>
               <div className="font-semibold text-lg mt-1">{c.name}</div>
-              <div className="text-sm text-[#6F6E69]">{[c.specialty, c.title, c.company].filter(Boolean).join(" · ")}</div>
+              <div className="text-sm text-[var(--muted)]">{[c.specialty, c.title, c.company].filter(Boolean).join(" · ")}</div>
               <div className="mt-3 space-y-1 text-sm">
                 {c.phone && (
                   <a className="block text-[#2bb673] underline" href={telHref(c.phone)}>
@@ -76,7 +76,7 @@ export default function ContactsPage() {
                   </a>
                 )}
                 {c.email && (
-                  <a className="block text-[#2383e2] underline" href={`mailto:${c.email}`}>
+                  <a className="block text-[var(--ink)] underline" href={`mailto:${c.email}`}>
                     ✉ {c.email}
                   </a>
                 )}
@@ -94,11 +94,11 @@ export default function ContactsPage() {
               {c.notes && <p className="mt-2 text-sm text-[#555] whitespace-pre-wrap">{c.notes}</p>}
               {linked(c.id).length > 0 && (
                 <div className="mt-3">
-                  <div className="text-xs text-[#6F6E69] mb-1">Задачи · {linked(c.id).length}</div>
+                  <div className="text-xs text-[var(--muted)] mb-1">Задачи · {linked(c.id).length}</div>
                   <div className="space-y-1">
                     {linked(c.id).map((t) => (
-                      <button key={t.id} type="button" onClick={() => setPreviewId(t.id)} className="block w-full text-left text-sm rounded-xl bg-[#F3F2EE] px-2 py-1 truncate">
-                        <span className="text-[11px] text-[#6F6E69]">{t.code}</span> {t.title}
+                      <button key={t.id} type="button" onClick={() => setPreviewId(t.id)} className="block w-full text-left text-sm rounded-xl bg-[var(--soft)] px-2 py-1 truncate">
+                        <span className="text-[11px] text-[var(--muted)]">{t.code}</span> {t.title}
                       </button>
                     ))}
                   </div>
@@ -108,7 +108,7 @@ export default function ContactsPage() {
                 <div className="mt-3 flex gap-3 text-sm">
                   <button className="underline" onClick={() => setEditId(c.id)}>Править</button>
                   {isCpo(current) && (
-                    <button className="text-red-500" onClick={() => deleteContact(c.id)}>Удалить</button>
+                    <button className="text-[var(--red)]" onClick={() => deleteContact(c.id)}>Удалить</button>
                   )}
                 </div>
               )}

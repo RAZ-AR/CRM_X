@@ -1,61 +1,52 @@
 import AppKit
 import WebKit
 
-/// Полная CRM в отдельном окне. Вход — обычной формой сайта; cookie сессии живёт
-/// в WKWebsiteDataStore.default(), и строка меню берёт её оттуда же.
+/// CRM X внутри окна Quicky: отдельный WKWebView, который окно Quicky кладёт поверх своей страницы
+/// в область под шапкой (прямоугольник присылает страница). Вход — обычной формой сайта; cookie сессии
+/// живёт в WKWebsiteDataStore.default(), и строка меню берёт её оттуда же.
 @MainActor
-final class CRMWindow: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDelegate {
-    private var window: NSWindow?
-    private var web: WKWebView?
-    var onSessionMaybeChanged: (() -> Void)?
-
-    func show(path: String = "/") {
-        let url = Settings.url(path)
-        if let window, let web {
-            if path != "/" || web.url == nil { web.load(URLRequest(url: url)) }
-            present(window)
-            return
-        }
+final class CRMPane: NSObject, WKNavigationDelegate, WKUIDelegate {
+    private(set) lazy var web: WKWebView = {
         let cfg = WKWebViewConfiguration()
         cfg.websiteDataStore = .default()
-        let web = WKWebView(frame: .zero, configuration: cfg)
-        web.navigationDelegate = self
-        web.uiDelegate = self
-        web.allowsBackForwardNavigationGestures = true
-        web.load(URLRequest(url: url))
+        let w = WKWebView(frame: .zero, configuration: cfg)
+        w.navigationDelegate = self
+        w.uiDelegate = self
+        w.allowsBackForwardNavigationGestures = true
+        w.setValue(false, forKey: "drawsBackground")
+        w.wantsLayer = true
+        w.layer?.cornerRadius = 22
+        w.layer?.masksToBounds = true
+        w.isHidden = true
+        return w
+    }()
+    private var loadedPath: String?
+    var onSessionMaybeChanged: (() -> Void)?
+    /// Текущий путь CRM X (для подсветки раздела в шапке Quicky).
+    var onPathChanged: ((String) -> Void)?
 
-        let w = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 1280, height: 820),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-            backing: .buffered, defer: false)
-        w.title = "CRM X"
-        w.titlebarAppearsTransparent = true
-        w.isReleasedWhenClosed = false
-        w.setFrameAutosaveName("CRMXMainWindow")
-        if w.frame.origin == .zero { w.center() }
-        w.contentView = web
-        w.delegate = self
-        w.minSize = NSSize(width: 380, height: 500)
-        self.window = w
-        self.web = web
-        present(w)
+    func load(path: String) {
+        let p = path.hasPrefix("/") ? path : "/"
+        // Тот же раздел уже открыт — не перезагружаем (сохраняется прокрутка и введённые данные).
+        if p == loadedPath, web.url != nil, p == "/" || web.url?.path == p { return }
+        loadedPath = p
+        web.load(URLRequest(url: Settings.url(p)))
     }
 
-    func reload() { web?.reload() }
-
-    private func present(_ w: NSWindow) {
-        NSApp.setActivationPolicy(.regular)  // в Dock и ⌘Tab, пока окно открыто
-        w.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+    func command(_ cmd: String) {
+        switch cmd {
+        case "back": if web.canGoBack { web.goBack() }
+        case "forward": if web.canGoForward { web.goForward() }
+        case "reload": web.reload()
+        case "browser": if let u = web.url { NSWorkspace.shared.open(u) }
+        default: break
+        }
     }
 
-    func windowWillClose(_ notification: Notification) {
-        NSApp.setActivationPolicy(.accessory)
-    }
-
-    // После входа/выхода на сайте обновляем строку меню.
+    // После входа/выхода на сайте обновляем данные Quicky.
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         onSessionMaybeChanged?()
+        if let p = webView.url?.path { onPathChanged?(p.isEmpty ? "/" : p) }
     }
 
     // Внешние ссылки (Telegram, WhatsApp, почта, чужие сайты) — в системный браузер/приложение.
@@ -99,4 +90,9 @@ final class CRMWindow: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDel
         a.addButton(withTitle: "OK"); a.addButton(withTitle: "Отмена")
         completionHandler(a.runModal() == .alertFirstButtonReturn)
     }
+}
+
+/// Контейнер окна Quicky с началом координат сверху — так прямоугольник со страницы ложится как есть.
+final class FlippedView: NSView {
+    override var isFlipped: Bool { true }
 }

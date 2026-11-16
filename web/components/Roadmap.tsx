@@ -80,13 +80,13 @@ export function Roadmap({
     <section className="bg-white rounded-2xl p-3 sm:p-4 border border-black/5 min-w-0">
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <h3 className="font-semibold mr-auto">Roadmap</h3>
-        <div className="flex rounded-full bg-[#F3F2EE] p-0.5 text-xs">
+        <div className="flex rounded-full bg-[var(--soft)] p-0.5 text-xs">
           {SCALES.map((s) => (
             <button
               key={s.id}
               type="button"
               onClick={() => pick(s.id)}
-              className={`rounded-full px-3 py-1 ${scale === s.id ? "bg-black text-white" : "text-[#6F6E69]"}`}
+              className={`rounded-full px-3 py-1 ${scale === s.id ? "bg-black text-white" : "text-[var(--muted)]"}`}
             >
               {s.label}
             </button>
@@ -94,30 +94,30 @@ export function Roadmap({
         </div>
         {scale !== "all" && (
           <div className="flex items-center gap-1 text-xs">
-            <button type="button" className="pill bg-[#F3F2EE] p-1.5" aria-label="Назад" onClick={() => setOffset(offset - 1)}>
+            <button type="button" className="pill bg-[var(--soft)] p-1.5" aria-label="Назад" onClick={() => setOffset(offset - 1)}>
               <ChevronLeft size={14} />
             </button>
-            <button type="button" className="pill bg-[#F3F2EE] px-2 py-1" onClick={() => setOffset(0)}>
+            <button type="button" className="pill bg-[var(--soft)] px-2 py-1" onClick={() => setOffset(0)}>
               {shortDate(from)} – {shortDate(to)}
             </button>
-            <button type="button" className="pill bg-[#F3F2EE] p-1.5" aria-label="Вперёд" onClick={() => setOffset(offset + 1)}>
+            <button type="button" className="pill bg-[var(--soft)] p-1.5" aria-label="Вперёд" onClick={() => setOffset(offset + 1)}>
               <ChevronRight size={14} />
             </button>
           </div>
         )}
-        <label className="flex items-center gap-1 text-xs text-[#6F6E69]">
+        <label className="flex items-center gap-1 text-xs text-[var(--muted)]">
           <input type="checkbox" checked={showDone} onChange={(e) => setShowDone(e.target.checked)} /> готовые
         </label>
       </div>
 
       <div className="overflow-auto max-h-[280px] sm:max-h-[420px] border border-black/5 rounded-xl">
         <div className="relative" style={{ width: width + LABEL_W, height: 26 + Math.max(1, rows.length) * ROW_H }}>
-          <div className="sticky top-0 z-[3] flex h-6 bg-white border-b border-black/5 text-[10px] text-[#6F6E69]">
+          <div className="sticky top-0 z-[3] flex h-6 bg-white border-b border-black/5 text-[10px] text-[var(--muted)]">
             <div className="sticky left-0 z-[4] bg-white shrink-0" style={{ width: LABEL_W }} />
             {Array.from({ length: Math.ceil(days / tickEvery) }, (_, i) => {
               const d = addDays(from, i * tickEvery);
               return (
-                <div key={i} className={`shrink-0 border-l border-black/5 pl-1 pt-1 ${d === today ? "text-[#e86a4a] font-semibold" : ""}`} style={{ width: tickEvery * dayW }}>
+                <div key={i} className={`shrink-0 border-l border-black/5 pl-1 pt-1 ${d === today ? "text-[var(--orange)] font-semibold" : ""}`} style={{ width: tickEvery * dayW }}>
                   {scale === "week"
                     ? `${["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][i]} ${shortDate(d)}`
                     : shortDate(d)}
@@ -125,12 +125,12 @@ export function Roadmap({
               );
             })}
           </div>
-          {rows.length === 0 && <div className="p-4 text-sm text-[#6F6E69]">В этом периоде задач нет</div>}
+          {rows.length === 0 && <div className="p-4 text-sm text-[var(--muted)]">В этом периоде задач нет</div>}
           {launches.map((z) => (
             <div key={z.slug} className="absolute top-6 bottom-0 w-0.5 z-[1]" style={{ left: LABEL_W + x(z.deadline) + dayW / 2, background: z.color }} title={`${z.name} ${shortDate(z.deadline)}`} />
           ))}
           {today >= from && today <= to && (
-            <div className="absolute top-6 bottom-0 w-px bg-[#e86a4a] z-[1]" style={{ left: LABEL_W + x(today) + dayW / 2 }} />
+            <div className="absolute top-6 bottom-0 w-px bg-[var(--orange)] z-[1]" style={{ left: LABEL_W + x(today) + dayW / 2 }} />
           )}
           {rows.map((t, i) => {
             const s = t.startDate || t.due;
@@ -141,7 +141,7 @@ export function Roadmap({
             return (
               <div key={t.id} className="absolute left-0 flex items-center" style={{ top: 26 + i * ROW_H, height: ROW_H, width: width + LABEL_W }}>
                 <button type="button" onClick={() => onOpen(t.id)} className="sticky left-0 z-[2] h-full bg-white px-2 text-left text-[11px] truncate border-r border-black/5" style={{ width: LABEL_W }} title={t.title}>
-                  <span className="text-[#6F6E69]">{t.code}</span> {t.title}
+                  <span className="text-[var(--muted)]">{t.code}</span> {t.title}
                 </button>
                 <div className="relative h-full" style={{ width }}>
                   {isMilestone(t) ? (
@@ -154,8 +154,8 @@ export function Roadmap({
                       style={{
                         left,
                         width: Math.max(8, right - left - 2),
-                        background: t.status === "done" ? "#e5e7eb" : z?.color ?? "#ddd",
-                        boxShadow: t.criticalPath ? "inset 0 0 0 2px #b91c1c" : undefined,
+                        background: t.status === "done" ? "#E6E6E1" : z?.color ?? "#ddd",
+                        boxShadow: t.criticalPath ? "inset 0 0 0 2px #C4370B" : undefined,
                       }}
                       title={`${t.title} · ${shortDate(s)}–${shortDate(t.due)}`}
                     >

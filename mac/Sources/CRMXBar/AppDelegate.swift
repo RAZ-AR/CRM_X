@@ -6,12 +6,7 @@ import UserNotifications
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     private let store = Store()
-    private let crm = CRMWindow()
-    private lazy var quicky: QuickyWindow = {
-        let q = QuickyWindow(store: store)
-        q.openCRM = { [weak self] path in self?.openCRM(path) }
-        return q
-    }()
+    private lazy var quicky = QuickyWindow(store: store)
     private var item: NSStatusItem!
     private let popover = NSPopover()
     private var bag = Set<AnyCancellable>()
@@ -32,6 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         popover.contentViewController = NSHostingController(rootView: PopoverView(
             store: store,
             prefs: Prefs(),
+            updater: Updater.shared,
             openCRM: { [weak self] path in self?.openCRM(path) },
             openQuicky: { [weak self] in self?.openQuicky() },
             quit: { NSApp.terminate(nil) }))
@@ -41,8 +37,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             .sink { [weak self] _ in self?.updateIcon() }
             .store(in: &bag)
 
-        crm.onSessionMaybeChanged = { [weak self] in Task { await self?.store.refresh() } }
         store.start()
+        Updater.shared.startAutomaticChecks()
+        Updater.shared.$available
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.updateIcon() }
+            .store(in: &bag)
         updateIcon()
 
         // При запуске: без сессии — окно входа, с сессией — Quicky.
@@ -98,6 +98,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         b.toolTip = store.phase == .ok
             ? "Quicky — просрочено: \(store.overdue.count), сегодня: \(store.today.count)"
             : "Quicky"
+        // Есть обновление — к счётчику добавляется «↑».
+        if let v = Updater.shared.available?.version {
+            b.title += " ↑"
+            b.toolTip = (b.toolTip ?? "") + "\nДоступен Quicky \(v)"
+        }
     }
 
     @objc private func toggle() {
@@ -113,7 +118,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     private func openCRM(_ path: String) {
         popover.performClose(nil)
-        crm.show(path: path)
+        quicky.showCRM(path)
     }
 
     // Клик по уведомлению — открыть задачу.

@@ -43,19 +43,19 @@ export default function WeekPage() {
           ))}
         </select>
         <div className="flex items-center gap-1">
-          <button type="button" className="pill bg-[#F3F2EE] p-2" aria-label="Прошлая неделя" onClick={() => setFrom(addDays(from, -7))}>
+          <button type="button" className="pill bg-[var(--soft)] p-2" aria-label="Прошлая неделя" onClick={() => setFrom(addDays(from, -7))}>
             <ChevronLeft size={16} />
           </button>
-          <button type="button" className="pill bg-[#F3F2EE] px-3 py-1.5 text-sm" onClick={() => setFrom(weekStart(today))}>
+          <button type="button" className="pill bg-[var(--soft)] px-3 py-1.5 text-sm" onClick={() => setFrom(weekStart(today))}>
             {shortDate(from)} – {shortDate(to)}
           </button>
-          <button type="button" className="pill bg-[#F3F2EE] p-2" aria-label="Следующая неделя" onClick={() => setFrom(addDays(from, 7))}>
+          <button type="button" className="pill bg-[var(--soft)] p-2" aria-label="Следующая неделя" onClick={() => setFrom(addDays(from, 7))}>
             <ChevronRight size={16} />
           </button>
         </div>
       </div>
 
-      {people.length === 0 && <div className="card p-6 text-sm text-[#6F6E69]">На эту неделю открытых задач нет.</div>}
+      {people.length === 0 && <div className="card p-6 text-sm text-[var(--muted)]">На эту неделю открытых задач нет.</div>}
 
       <div className="grid gap-4 md:gap-5 xl:grid-cols-2">
         {people.map((u) => {
@@ -68,9 +68,9 @@ export default function WeekPage() {
                 <span className="h-9 w-9 rounded-full bg-[var(--soft)] grid place-items-center text-sm font-semibold">{u.avatar}</span>
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold">{u.name}</div>
-                  <div className="text-xs text-[#6F6E69]">{u.title}</div>
+                  <div className="text-xs text-[var(--muted)]">{u.title}</div>
                 </div>
-                <div className="text-right text-xs text-[#6F6E69]">
+                <div className="text-right text-xs text-[var(--muted)]">
                   <div>{mine.length} задач · {deadlines} сдать</div>
                   {overdue > 0 && <div className="text-[var(--red)]">{overdue} просрочено</div>}
                 </div>

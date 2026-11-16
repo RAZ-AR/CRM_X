@@ -21,6 +21,9 @@ if [[ ! -f Resources/AppIcon.icns || "$DESIGN/icon.svg" -nt Resources/AppIcon.ic
 fi
 
 APP="Quicky.app"
+# Версию можно передать явно (так делает release.sh — iCloud иногда откатывает только что записанный файл).
+VERSION="${QUICKY_VERSION:-$(tr -d '[:space:]' < VERSION)}"
+BUILD="$(git rev-list --count HEAD 2>/dev/null || echo 1)"
 rm -rf "$APP" "CRM X.app"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/quicky"
 cp .build/release/CRMXBar "$APP/Contents/MacOS/Quicky"
@@ -36,14 +39,21 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleExecutable</key><string>Quicky</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>0.5.0</string>
-  <key>CFBundleVersion</key><string>5</string>
+  <key>CFBundleShortVersionString</key><string>$VERSION</string>
+  <key>CFBundleVersion</key><string>$BUILD</string>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>LSUIElement</key><true/>
   <key>NSAppTransportSecurity</key><dict><key>NSAllowsLocalNetworking</key><true/></dict>
 </dict></plist>
 PLIST
-codesign --force --deep --sign - "$APP"
+# Постоянный сертификат нужен для автообновления: новая версия должна быть подписана тем же ключом.
+ID=$(security find-identity -p codesigning 2>/dev/null | awk -v n="${SIGN_IDENTITY:-Keyla Local Signing}" 'index($0, "\"" n "\"") {print $2; exit}')
+if [[ -z "$ID" ]]; then
+  echo "⚠️  Сертификат «${SIGN_IDENTITY:-Keyla Local Signing}» не найден — подписываю ad-hoc, автообновление работать не будет." >&2
+fi
+# iCloud Drive вешает на файлы расширенные атрибуты — codesign их не принимает.
+xattr -cr "$APP"
+codesign --force --deep --sign "${ID:--}" "$APP"
 echo "Built $(pwd)/$APP"
 if [[ "${1:-}" == "--install" ]]; then
   pkill -x Quicky || true

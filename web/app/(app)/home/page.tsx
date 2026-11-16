@@ -20,7 +20,7 @@ import { MilestoneLegend, Milestones, roadmapHref } from "@/components/Milestone
 
 const FILTER_KEY = "crmx-home-filters";
 const TASK_TABS: HomeView[] = ["overdue", "today", "work", "start", "critical", "blocked", "review", "ready"];
-const RISK_FILL = ["var(--soft)", "#fbd9c9", "#f5a882", "#e4703f"];
+const RISK_FILL = ["var(--soft)", "#FFE3B8", "#FFD08F", "#FF5B1F"];
 
 /** Главная: цифры и графики сверху, задачи ниже. Минимализм: белые карточки, один акцент для данных. */
 export default function HomePage() {
@@ -316,7 +316,7 @@ export default function HomePage() {
           >
             {cats.length ? (
               <div className="flex flex-col gap-3.5">
-                <Legend items={[{ name: "Оплачено", color: SERIES[0] }, { name: "Ждёт оплаты", color: "#9dc0ec" }]} />
+                <Legend items={[{ name: "Оплачено", color: SERIES[0] }, { name: "Ждёт оплаты", color: "#FFD08F" }]} />
                 {cats.map((c) => (
                   <div key={c.c} className="flex flex-col gap-1.5">
                     <div className="flex justify-between gap-3 text-[13px]">
@@ -325,7 +325,7 @@ export default function HomePage() {
                     </div>
                     <div className="h-2.5 rounded-full bg-[#efede8] flex gap-[2px] overflow-hidden" style={{ width: `${Math.max(8, (c.plan / maxPlan) * 100)}%` }}>
                       <div style={{ width: `${Math.min(100, (c.paid / (c.plan || 1)) * 100)}%`, background: SERIES[0] }} />
-                      <div style={{ width: `${Math.min(100, (c.committed / (c.plan || 1)) * 100)}%`, background: "#9dc0ec" }} />
+                      <div style={{ width: `${Math.min(100, (c.committed / (c.plan || 1)) * 100)}%`, background: "#FFD08F" }} />
                     </div>
                   </div>
                 ))}
@@ -348,7 +348,7 @@ export default function HomePage() {
           <p className="cap text-center mt-1 mb-0">влияние → · вероятность ↑</p>
           {topRisk && (
             <Link href="/risks" className="flex items-center gap-3 mt-4 pt-3 border-t border-[var(--line)]">
-              <span className="h-8 w-8 rounded-lg grid place-items-center text-[13px] font-semibold shrink-0" style={{ background: riskScore(topRisk) >= 6 ? "#e4703f" : "#f5a882", color: riskScore(topRisk) >= 6 ? "#fff" : "var(--ink)" }}>
+              <span className="h-8 w-8 rounded-lg grid place-items-center text-[13px] font-semibold shrink-0" style={{ background: riskScore(topRisk) >= 6 ? "#FF5B1F" : "#f5a882", color: riskScore(topRisk) >= 6 ? "#fff" : "var(--ink)" }}>
                 {riskScore(topRisk)}
               </span>
               <span className="min-w-0">
@@ -415,7 +415,7 @@ export default function HomePage() {
             const pct = weightedDone(list);
             const late = list.filter((t) => t.status !== "done" && t.due < picked).length;
             return (
-              <Link key={z.slug} href={`/zones/${z.slug}`} className="card p-4 md:p-5 flex flex-col gap-2.5 min-w-0 hover:border-[#d9d6ce]">
+              <Link key={z.slug} href={`/zones/${z.slug}`} className="card p-4 md:p-5 flex flex-col gap-2.5 min-w-0 hover:border-[var(--ink)]">
                 <span className="flex items-center gap-2 min-w-0">
                   <span className="h-2.5 w-2.5 rounded-[3px] shrink-0" style={{ background: z.color }} />
                   <span className="text-sm font-semibold truncate">{z.name}</span>
@@ -498,7 +498,7 @@ function Kpi({
   );
   const cls = "card p-4 md:px-5 md:py-5 flex flex-col gap-3 min-w-0";
   return href ? (
-    <Link href={href} className={`${cls} hover:border-[#d9d6ce]`}>
+    <Link href={href} className={`${cls} hover:border-[var(--ink)]`}>
       {body}
     </Link>
   ) : (
@@ -557,7 +557,7 @@ function when(iso: string) {
 
 function Changes({ list, users, open }: { list: Activity[]; users: { id: string; name: string; avatar: string }[]; open: (id: string) => void }) {
   const [all, setAll] = useState(false);
-  if (!list.length) return <p className="text-sm text-[#6F6E69] py-4">Изменений нет</p>;
+  if (!list.length) return <p className="text-sm text-[var(--muted)] py-4">Изменений нет</p>;
   const shown = all ? list : list.slice(0, 12);
   return (
     <div>
@@ -574,14 +574,14 @@ function Changes({ list, users, open }: { list: Activity[]; users: { id: string;
             <span className="h-6 w-6 rounded-full bg-[var(--soft)] grid place-items-center text-[10px] font-semibold shrink-0" title={u?.name}>{u?.avatar ?? "?"}</span>
             <span className="flex-1 min-w-0">
               <span className="font-medium">{a.taskTitle}</span>
-              <span className={`block text-xs ${a.criticalPath && a.kind === "dates" && (a.days ?? 0) > 0 ? "text-[#b91c1c]" : "text-[#6F6E69]"}`}>{a.text}</span>
+              <span className={`block text-xs ${a.criticalPath && a.kind === "dates" && (a.days ?? 0) > 0 ? "text-[var(--red)]" : "text-[var(--muted)]"}`}>{a.text}</span>
             </span>
-            <span className="text-[10px] text-[#6F6E69] shrink-0 mt-0.5">{when(a.at)}</span>
+            <span className="text-[10px] text-[var(--muted)] shrink-0 mt-0.5">{when(a.at)}</span>
           </button>
         );
       })}
       {list.length > 12 && (
-        <button type="button" className="text-[11px] underline text-[#6F6E69]" onClick={() => setAll(!all)}>
+        <button type="button" className="text-[11px] underline text-[var(--muted)]" onClick={() => setAll(!all)}>
           {all ? "свернуть" : `ещё ${list.length - 12}`}
         </button>
       )}
@@ -596,13 +596,13 @@ function IssueList({ issues, open }: { issues: { task: Task; problems: string[] 
     <div>
       {shown.map(({ task, problems }) => (
         <button key={task.id} type="button" onClick={() => open(task.id)} className="w-full text-left px-1 py-2.5 text-sm border-t border-[var(--line)] first:border-t-0">
-          <span className="text-[11px] text-[#6F6E69] mr-1">{task.code}</span>
+          <span className="text-[11px] text-[var(--muted)] mr-1">{task.code}</span>
           {task.title}
-          <span className="block text-xs text-[#b45309]">{problems.join(" · ")}</span>
+          <span className="block text-xs text-[var(--red)]">{problems.join(" · ")}</span>
         </button>
       ))}
       {issues.length > 8 && (
-        <button type="button" className="text-[11px] underline text-[#6F6E69]" onClick={() => setAll(!all)}>
+        <button type="button" className="text-[11px] underline text-[var(--muted)]" onClick={() => setAll(!all)}>
           {all ? "свернуть" : `ещё ${issues.length - 8}`}
         </button>
       )}

@@ -36,7 +36,7 @@ export default function MeetingPage() {
         </select>
         <button
           type="button"
-          className="pill bg-[#F3F2EE] px-3 py-2 text-sm"
+          className="pill bg-[var(--soft)] px-3 py-2 text-sm"
           onClick={async () => {
             try {
               await navigator.clipboard.writeText(text);
@@ -72,15 +72,15 @@ export default function MeetingPage() {
           </button>
         )}
       </div>
-      {note && <p className="text-sm text-[#6F6E69] px-1">{note}</p>}
+      {note && <p className="text-sm text-[var(--muted)] px-1">{note}</p>}
 
       {sections.map((s) => (
         <section key={s.title} className="card p-4">
           <div className="font-semibold mb-2">
-            {s.title} <span className="text-[#6F6E69] font-normal">· {s.items.length}</span>
+            {s.title} <span className="text-[var(--muted)] font-normal">· {s.items.length}</span>
           </div>
           {s.items.length === 0 ? (
-            <p className="text-sm text-[#6F6E69]">Нет</p>
+            <p className="text-sm text-[var(--muted)]">Нет</p>
           ) : (
             <div className="space-y-1">
               {s.items.map((i, n) => (
@@ -89,11 +89,11 @@ export default function MeetingPage() {
                   type="button"
                   disabled={!i.task}
                   onClick={() => i.task && setPreviewId(i.task.id)}
-                  className="w-full text-left rounded-xl bg-[#F3F2EE] px-3 py-1.5 text-sm flex gap-2 disabled:cursor-default"
+                  className="w-full text-left rounded-xl bg-[var(--soft)] px-3 py-1.5 text-sm flex gap-2 disabled:cursor-default"
                 >
-                  {i.task?.code && <span className="text-[11px] text-[#6F6E69] w-14 shrink-0 pt-0.5">{i.task.code}</span>}
+                  {i.task?.code && <span className="text-[11px] text-[var(--muted)] w-14 shrink-0 pt-0.5">{i.task.code}</span>}
                   <span className="flex-1 min-w-0">{i.text}</span>
-                  {i.who && <span className="text-xs text-[#6F6E69] shrink-0">{i.who}</span>}
+                  {i.who && <span className="text-xs text-[var(--muted)] shrink-0">{i.who}</span>}
                 </button>
               ))}
             </div>

@@ -317,7 +317,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 }
 
 function RoleBadge({ access }: { access: Access }) {
-  const tone = access === "owner" ? "bg-[var(--ink)] text-white" : access === "manager" ? "bg-[#dbe8f8] text-[#1d5aa3]" : access === "marketer" ? "bg-[#fde3d6] text-[#b4461c]" : "bg-[var(--soft)] text-[var(--ink-2)]";
+  const tone = access === "owner" ? "bg-[var(--ink)] text-white" : access === "manager" ? "bg-[var(--apricot-2)] text-[var(--ink)]" : access === "marketer" ? "bg-[#fde3d6] text-[#b4461c]" : "bg-[var(--soft)] text-[var(--ink-2)]";
   return <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${tone}`}>{ACCESS_META[access].label}</span>;
 }
 
@@ -335,7 +335,7 @@ function RolePicker({ value, onChange, canOwner, disabled }: { value: Access; on
             aria-checked={on}
             disabled={off && !on}
             onClick={() => !off && !on && onChange(a)}
-            className={`text-left rounded-xl border px-3.5 py-3 transition-colors ${on ? "border-[var(--ink)] bg-[var(--soft)]" : "border-[var(--line)] hover:border-[#d9d6ce]"} ${off && !on ? "opacity-40 cursor-not-allowed" : ""}`}
+            className={`text-left rounded-xl border px-3.5 py-3 transition-colors ${on ? "border-[var(--ink)] bg-[var(--soft)]" : "border-[var(--line)] hover:border-[var(--ink)]"} ${off && !on ? "opacity-40 cursor-not-allowed" : ""}`}
           >
             <span className="flex items-center gap-2">
               <span className={`h-3.5 w-3.5 rounded-full border-2 shrink-0 ${on ? "border-[var(--ink)] bg-[var(--ink)] shadow-[inset_0_0_0_2px_var(--soft)]" : "border-[#c8c6bf]"}`} />
@@ -389,7 +389,7 @@ function Chip({ on, disabled, onClick, children }: { on: boolean; disabled?: boo
       aria-pressed={on}
       disabled={disabled}
       onClick={onClick}
-      className={`pill px-3 py-1.5 text-sm border transition-colors ${on ? "bg-[var(--ink)] text-white border-[var(--ink)]" : "bg-[var(--card)] border-[var(--line)] text-[var(--ink-2)] hover:border-[#d9d6ce]"} disabled:opacity-60 disabled:cursor-default`}
+      className={`pill px-3 py-1.5 text-sm border transition-colors ${on ? "bg-[var(--ink)] text-white border-[var(--ink)]" : "bg-[var(--card)] border-[var(--line)] text-[var(--ink-2)] hover:border-[var(--ink)]"} disabled:opacity-60 disabled:cursor-default`}
     >
       {children}
     </button>

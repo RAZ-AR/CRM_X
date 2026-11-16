@@ -64,14 +64,14 @@ export default function RisksPage() {
           <input type="checkbox" checked={showClosed} onChange={(e) => setShowClosed(e.target.checked)} /> закрытые
         </label>
       </div>
-      {err && <div className="card p-3 text-sm text-red-500">{err}</div>}
+      {err && <div className="card p-3 text-sm text-[var(--red)]">{err}</div>}
 
       <div className="card p-4">
         <div className="font-medium mb-2">Карта рисков</div>
         <div className="grid grid-cols-[auto_repeat(3,1fr)] gap-1 text-xs max-w-md">
           <span />
           {[1, 2, 3].map((i) => (
-            <span key={i} className="text-center text-[#6F6E69]">влияние: {LEVELS[i as RiskLevel].toLowerCase()}</span>
+            <span key={i} className="text-center text-[var(--muted)]">влияние: {LEVELS[i as RiskLevel].toLowerCase()}</span>
           ))}
           {[3, 2, 1].map((p) => (
             <Row key={p} p={p as RiskLevel} open={open} />
@@ -101,17 +101,17 @@ export default function RisksPage() {
                   <span className="font-medium text-base">{r.title}</span>
                   <span className="pill text-[11px] px-2 py-0.5" style={{ background: RISK_STATUS[r.status].color }}>{RISK_STATUS[r.status].label}</span>
                 </div>
-                <div className="text-[#6F6E69]">
+                <div className="text-[var(--muted)]">
                   {zoneName(r.zone)} · вероятность {LEVELS[r.probability].toLowerCase()} · влияние {LEVELS[r.impact].toLowerCase()} · следит {name(r.ownerId)}
-                  {r.decideBy && <span className={late ? "text-red-500 font-medium" : ""}> · решить до {shortDate(r.decideBy)}</span>}
+                  {r.decideBy && <span className={late ? "text-[var(--red)] font-medium" : ""}> · решить до {shortDate(r.decideBy)}</span>}
                 </div>
-                {r.planB && <div><span className="text-[#6F6E69]">План Б:</span> {r.planB}</div>}
+                {r.planB && <div><span className="text-[var(--muted)]">План Б:</span> {r.planB}</div>}
                 {r.taskIds.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {r.taskIds.map((id) => {
                       const t = tasks.find((x) => x.id === id);
                       return t ? (
-                        <button key={id} type="button" className="pill bg-[#F3F2EE] px-2 py-0.5 text-xs" onClick={() => setPreviewId(id)}>
+                        <button key={id} type="button" className="pill bg-[var(--soft)] px-2 py-0.5 text-xs" onClick={() => setPreviewId(id)}>
                           {t.code || "задача"} · {t.title}
                         </button>
                       ) : null;
@@ -121,12 +121,12 @@ export default function RisksPage() {
               </div>
               <div className="flex flex-col gap-1 items-end text-xs">
                 {canEditRisk(current, r) && (
-                  <button type="button" className="text-[#6F6E69]" onClick={() => setEdit(r.id)}>изменить</button>
+                  <button type="button" className="text-[var(--muted)]" onClick={() => setEdit(r.id)}>изменить</button>
                 )}
                 {canDeleteRisk(current, r) && (
                   <button
                     type="button"
-                    className="text-red-500"
+                    className="text-[var(--red)]"
                     onClick={async () => {
                       if (!confirm(`Удалить риск «${r.title}»?`)) return;
                       const res = await deleteRecord("risks", r.id);
@@ -140,7 +140,7 @@ export default function RisksPage() {
             </div>
           );
         })}
-        {list.length === 0 && <div className="card p-6 text-sm text-[#6F6E69]">Рисков пока нет. Добавьте то, что может сорвать сроки или бюджет.</div>}
+        {list.length === 0 && <div className="card p-6 text-sm text-[var(--muted)]">Рисков пока нет. Добавьте то, что может сорвать сроки или бюджет.</div>}
       </div>
 
       <form className="card p-4 grid sm:grid-cols-3 gap-2" onSubmit={(e) => onSubmit(e)}>
@@ -149,7 +149,7 @@ export default function RisksPage() {
         <button className="pill bg-black text-white px-4 py-2">Добавить</button>
       </form>
       {isCpo(current) && (
-        <p className="text-xs text-[#6F6E69] px-1">Риски видит вся команда. Менять может автор, ответственный и Owner; удалять — автор и Owner.</p>
+        <p className="text-xs text-[var(--muted)] px-1">Риски видит вся команда. Менять может автор, ответственный и Owner; удалять — автор и Owner.</p>
       )}
     </div>
   );
@@ -158,11 +158,11 @@ export default function RisksPage() {
 function Row({ p, open }: { p: RiskLevel; open: Risk[] }) {
   return (
     <>
-      <span className="text-[#6F6E69] pr-1 self-center">вероятн.: {LEVELS[p].toLowerCase()}</span>
+      <span className="text-[var(--muted)] pr-1 self-center">вероятн.: {LEVELS[p].toLowerCase()}</span>
       {[1, 2, 3].map((i) => {
         const n = open.filter((r) => r.probability === p && r.impact === i).length;
         return (
-          <span key={i} className="h-9 rounded-lg grid place-items-center font-medium" style={{ background: n ? scoreColor(p * i) : "#F3F2EE" }}>
+          <span key={i} className="h-9 rounded-lg grid place-items-center font-medium" style={{ background: n ? scoreColor(p * i) : "var(--soft)" }}>
             {n || ""}
           </span>
         );
@@ -225,7 +225,7 @@ function Fields({
           <option key={t.id} value={t.id}>{t.code ? `${t.code} · ` : ""}{t.title}</option>
         ))}
       </select>
-      <p className="sm:col-span-3 text-[11px] text-[#6F6E69] -mt-1">Связанные задачи: удерживайте Ctrl / ⌘, чтобы выбрать несколько.</p>
+      <p className="sm:col-span-3 text-[11px] text-[var(--muted)] -mt-1">Связанные задачи: удерживайте Ctrl / ⌘, чтобы выбрать несколько.</p>
     </>
   );
 }

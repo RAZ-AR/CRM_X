@@ -33,14 +33,14 @@ export default function ProfilePage() {
       <h1 className="page-title m-0">Мой профиль</h1>
       <div className="card p-5">
         <div className="font-medium">{current.name}</div>
-        <div className="text-sm text-[#6F6E69]">логин {current.email} · {current.title}</div>
+        <div className="text-sm text-[var(--muted)]">логин {current.email} · {current.title}</div>
       </div>
       <form onSubmit={onSubmit} className="card p-5 flex flex-col gap-2">
         <div className="font-medium">Сменить пароль</div>
         <input name="current" type="password" required placeholder="Текущий пароль" autoComplete="current-password" />
         <input name="next" type="password" required minLength={4} maxLength={64} placeholder="Новый пароль · от 4 символов" autoComplete="new-password" />
         <input name="repeat" type="password" required minLength={4} maxLength={64} placeholder="Повторите новый пароль" autoComplete="new-password" />
-        {msg && <p className={msg.ok ? "text-green-600 text-sm" : "text-red-500 text-sm"}>{msg.text}</p>}
+        {msg && <p className={msg.ok ? "text-[var(--ink)] text-sm" : "text-[var(--red)] text-sm"}>{msg.text}</p>}
         <button disabled={busy} className="pill bg-black text-white py-2 font-medium disabled:opacity-50">
           {busy ? "Сохраняю…" : "Сохранить"}
         </button>
@@ -70,7 +70,7 @@ function TelegramCard({ linked, owner }: { linked: boolean; owner: boolean }) {
   return (
     <div className="card p-5 flex flex-col gap-2">
       <div className="font-medium">Telegram</div>
-      <p className="text-sm text-[#6F6E69]">
+      <p className="text-sm text-[var(--muted)]">
         Бот пишет, когда вам назначают задачу, когда ваша задача ушла на проверку, готова или заблокирована,
         и каждое утро в 9:00 присылает список дел.
       </p>
@@ -93,7 +93,7 @@ function TelegramCard({ linked, owner }: { linked: boolean; owner: boolean }) {
         <button
           type="button"
           disabled={busy}
-          className="pill bg-[#F3F2EE] py-2 text-sm"
+          className="pill bg-[var(--soft)] py-2 text-sm"
           onClick={async () => {
             const r = await call("/api/telegram/unlink", "POST");
             setNote(r.ok ? { ok: true, text: "Отключено. Обновите страницу." } : { ok: false, text: r.error || "Не получилось" });
@@ -106,7 +106,7 @@ function TelegramCard({ linked, owner }: { linked: boolean; owner: boolean }) {
         <button
           type="button"
           disabled={busy}
-          className="pill bg-[#F3F2EE] py-2 text-sm"
+          className="pill bg-[var(--soft)] py-2 text-sm"
           onClick={async () => {
             const r = await call("/api/telegram/digest", "POST");
             setNote(
@@ -119,7 +119,7 @@ function TelegramCard({ linked, owner }: { linked: boolean; owner: boolean }) {
           Разослать утренний список сейчас
         </button>
       )}
-      {note && <p className={note.ok ? "text-green-600 text-sm" : "text-red-500 text-sm"}>{note.text}</p>}
+      {note && <p className={note.ok ? "text-[var(--ink)] text-sm" : "text-[var(--red)] text-sm"}>{note.text}</p>}
     </div>
   );
 }

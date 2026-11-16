@@ -10,6 +10,7 @@ private struct HoverRowStyle: ButtonStyle {
 struct PopoverView: View {
     @ObservedObject var store: Store
     @ObservedObject var prefs: Prefs
+    @ObservedObject var updater: Updater
     let openCRM: (String) -> Void
     let openQuicky: () -> Void
     let quit: () -> Void
@@ -17,12 +18,14 @@ struct PopoverView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
+            updateBanner
             Divider()
             content
             Divider()
             footer
         }
         .frame(width: 380)
+        .tint(Color(red: 1, green: 0.357, blue: 0.122))   // оранжевый акцент Quicky
     }
 
     private var header: some View {
@@ -46,6 +49,36 @@ struct PopoverView: View {
                 .buttonStyle(.borderedProminent)
         }
         .padding(12)
+    }
+
+    @ViewBuilder private var updateBanner: some View {
+        if let rel = updater.available {
+            HStack(spacing: 8) {
+                Image(systemName: "arrow.down.circle.fill").foregroundStyle(Color(red: 1, green: 0.357, blue: 0.122))
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Доступен Quicky \(rel.version)").font(.callout.weight(.semibold))
+                    Text(updateStatus).font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                switch updater.state {
+                case .downloading, .installing: ProgressView().controlSize(.small)
+                default: Button("Обновить") { updater.install() }.buttonStyle(.borderedProminent)
+                }
+            }
+            .padding(.horizontal, 12).padding(.vertical, 8)
+            .background(Color(red: 1, green: 0.357, blue: 0.122).opacity(0.12))
+        } else if case .failed(let e) = updater.state {
+            Text("Обновление: \(e)").font(.caption).foregroundStyle(.red).padding(.horizontal, 12).padding(.bottom, 8)
+        }
+    }
+
+    private var updateStatus: String {
+        switch updater.state {
+        case .downloading: return "Скачиваю…"
+        case .installing: return "Устанавливаю, Quicky перезапустится"
+        case .failed(let e): return e
+        default: return "У вас \(Updater.currentVersion)"
+        }
     }
 
     @ViewBuilder private var content: some View {
@@ -92,6 +125,15 @@ struct PopoverView: View {
                     .help("Агенты отвечают через Gemini (онлайн) или Ollama (локально) — выбор на экране «Агенты»")
             }
             .toggleStyle(.checkbox).font(.caption)
+            // Версия и проверка обновлений — отдельной строкой, чтобы кнопку не вытесняли соседи.
+            HStack {
+                Text("Quicky \(Updater.currentVersion)").font(.caption.weight(.semibold))
+                Spacer()
+                Button(updater.state == .upToDate ? "Последняя версия ✓" : (updater.state == .checking ? "Проверяю…" : "Проверить обновления")) {
+                    Task { await updater.check(manual: true) }
+                }
+                .buttonStyle(.bordered).controlSize(.small).disabled(updater.state == .checking)
+            }
             HStack {
                 if let t = store.lastSync {
                     Text("Обновлено \(t.formatted(date: .omitted, time: .shortened))")

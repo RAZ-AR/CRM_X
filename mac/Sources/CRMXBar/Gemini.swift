@@ -74,16 +74,45 @@ enum Gemini {
         }.first
     }
 
+    /// Без «размышлений» модель отвечает в разы быстрее. У поколений Gemini это разные параметры —
+    /// пробуем по очереди, рабочий вариант запоминаем.
+    private static let thinkingModes: [(String, [String: Any]?)] = [
+        ("level-minimal", ["thinkingLevel": "minimal"]),
+        ("level-low", ["thinkingLevel": "low"]),
+        ("budget-0", ["thinkingBudget": 0]),
+        ("none", nil),
+    ]
+
     private static func generate(model: String, key: String, system: String, messages: [AIClient.Message]) async throws -> String {
+        let saved = UserDefaults.standard.string(forKey: "geminiThinking.\(model)")
+        let modes = thinkingModes.filter { saved == nil || $0.0 == saved }
+        var lastError: Error = Failure.empty
+        for (name, thinking) in modes {
+            do {
+                let text = try await generateOnce(model: model, key: key, system: system, messages: messages, thinking: thinking)
+                UserDefaults.standard.set(name, forKey: "geminiThinking.\(model)")
+                return text
+            } catch Failure.http(400, let t) where t.localizedCaseInsensitiveContains("thinking") {
+                lastError = Failure.http(400, t)   // этот вариант модель не знает — следующий
+                continue
+            }
+        }
+        UserDefaults.standard.removeObject(forKey: "geminiThinking.\(model)")
+        throw lastError
+    }
+
+    private static func generateOnce(model: String, key: String, system: String, messages: [AIClient.Message], thinking: [String: Any]?) async throws -> String {
         var req = URLRequest(url: base.appendingPathComponent("models/\(model):generateContent"))
         req.httpMethod = "POST"
         req.timeoutInterval = 60
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.setValue(key, forHTTPHeaderField: "x-goog-api-key")
+        var config: [String: Any] = ["temperature": 0.3, "maxOutputTokens": 1500]
+        if let thinking { config["thinkingConfig"] = thinking }
         let body: [String: Any] = [
             "systemInstruction": ["parts": [["text": system]]],
             "contents": messages.map { ["role": $0.role == "assistant" ? "model" : "user", "parts": [["text": $0.content]]] },
-            "generationConfig": ["temperature": 0.3, "maxOutputTokens": 2048],
+            "generationConfig": config,
         ]
         req.httpBody = try JSONSerialization.data(withJSONObject: body)
         let (data, resp) = try await URLSession.shared.data(for: req)
@@ -108,24 +137,63 @@ enum Gemini {
 }
 
 /// Ключ Gemini в Связке ключей (не в файлах и не в настройках).
+/// Ключ Gemini. Хранится в файле ~/Library/Application Support/Quicky/gemini.key с правами 0600
+/// (читать может только ваша учётная запись). Раньше ключ лежал в Связке ключей, но приложение подписано
+/// локальным сертификатом, и macOS после каждого обновления заново спрашивала пароль. Имя Keychain оставлено,
+/// чтобы не трогать вызовы.
 enum Keychain {
     private static let service = "app.crmx.bar.gemini"
+    private static let migratedKey = "gemini.migratedFromKeychain"
+    private static var cache: String??
+
+    private static var file: URL {
+        let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Quicky", isDirectory: true)
+        return dir.appendingPathComponent("gemini.key")
+    }
 
     static var geminiKey: String? {
+        if let cache { return cache }
+        var key = (try? String(contentsOf: file, encoding: .utf8))?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if key?.isEmpty != false {
+            key = nil
+            // Однократный перенос из Связки ключей (macOS спросит пароль последний раз).
+            if !UserDefaults.standard.bool(forKey: migratedKey) {
+                UserDefaults.standard.set(true, forKey: migratedKey)
+                if let old = legacyKey(), !old.isEmpty { write(old); key = old }
+            }
+        }
+        cache = .some(key)
+        return key
+    }
+
+    static func setGeminiKey(_ key: String?) {
+        UserDefaults.standard.set(true, forKey: migratedKey)
+        let q: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service]
+        SecItemDelete(q as CFDictionary)   // старая запись больше не нужна
+        guard let key, !key.isEmpty else {
+            try? FileManager.default.removeItem(at: file)
+            cache = .some(nil)
+            return
+        }
+        write(key)
+        cache = .some(key)
+    }
+
+    private static func write(_ key: String) {
+        let fm = FileManager.default
+        let dir = file.deletingLastPathComponent()
+        try? fm.createDirectory(at: dir, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
+        try? fm.setAttributes([.posixPermissions: 0o700], ofItemAtPath: dir.path)
+        fm.createFile(atPath: file.path, contents: Data(key.utf8), attributes: [.posixPermissions: 0o600])
+        try? fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: file.path)
+    }
+
+    private static func legacyKey() -> String? {
         let q: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service,
                                 kSecReturnData as String: true, kSecMatchLimit as String: kSecMatchLimitOne]
         var out: AnyObject?
         guard SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess, let d = out as? Data else { return nil }
         return String(data: d, encoding: .utf8)
-    }
-
-    static func setGeminiKey(_ key: String?) {
-        let q: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service]
-        SecItemDelete(q as CFDictionary)
-        guard let key, !key.isEmpty else { return }
-        var add = q
-        add[kSecValueData as String] = Data(key.utf8)
-        add[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
-        SecItemAdd(add as CFDictionary, nil)
     }
 }

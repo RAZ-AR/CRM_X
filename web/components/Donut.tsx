@@ -69,7 +69,7 @@ export function Donut({
         cy={size / 2}
         r={r}
         fill="none"
-        stroke="#EEF0F4"
+        stroke="#E6E6E1"
         strokeWidth="22"
       />
       <circle
@@ -77,7 +77,7 @@ export function Donut({
         cy={size / 2}
         r={r}
         fill="none"
-        stroke="#24382c"
+        stroke="#111111"
         strokeWidth="22"
         strokeDasharray={c}
         strokeDashoffset={stroke}
@@ -93,7 +93,7 @@ export function Donut({
       >
         {percent}%
       </text>
-      <text x="50%" y="62%" textAnchor="middle" fontSize="12" fill="#9CA3AF">
+      <text x="50%" y="62%" textAnchor="middle" fontSize="12" fill="#5A5A55">
         {label}
       </text>
     </svg>

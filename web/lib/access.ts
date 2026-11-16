@@ -201,11 +201,11 @@ export const statusMeta: Record<
   Task["status"],
   { label: string; emoji: string; color: string }
 > = {
-  todo: { label: "Не начато · бэклог", emoji: "", color: "#E5E7EB" },
-  in_progress: { label: "В работе", emoji: "🔵", color: "#BFDBFE" },
-  blocked: { label: "Заблокировано", emoji: "⛔", color: "#FECACA" },
-  review: { label: "На проверке", emoji: "🟣", color: "#DDD6FE" },
-  done: { label: "Готово", emoji: "🟢", color: "#BBF7D0" },
+  todo: { label: "Не начато · бэклог", emoji: "", color: "#E6E6E1" },
+  in_progress: { label: "В работе", emoji: "🔵", color: "#FFD08F" },
+  blocked: { label: "Заблокировано", emoji: "⛔", color: "#FFB08A" },
+  review: { label: "На проверке", emoji: "🟣", color: "#D4D4CF" },
+  done: { label: "Готово", emoji: "🟢", color: "#BEBEB8" },
 };
 
 /** Путь исполнения — без блока. */

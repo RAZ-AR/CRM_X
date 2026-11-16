@@ -21,6 +21,9 @@ final class Store: ObservableObject {
     @Published private(set) var byStatus: [(status: String, items: [Item])] = []
     /// Все мои открытые задачи (для окна Quicky).
     @Published private(set) var all: [Item] = []
+    /// Для дашборда: проекты CRM X и компактный список всех видимых задач команды.
+    @Published private(set) var zones: [CRMZone] = []
+    @Published private(set) var teamTasks: [[String]] = []   // [zone, status, assignee, due]
     @Published private(set) var lastSync: Date?
     @Published private(set) var refreshing = false
 
@@ -53,10 +56,21 @@ final class Store: ObservableObject {
         }
     }
 
+    /// Предстоящие оплаты из Google Sheets (если таблица подключена).
+    @Published private(set) var payments: [Payments.Item] = []
+    @Published private(set) var paymentsError: String?
+
+    func refreshPayments() async {
+        guard Payments.sheetURL != nil else { payments = []; paymentsError = nil; return }
+        do { payments = try await Payments.fetch(); paymentsError = nil }
+        catch { paymentsError = error.localizedDescription }
+    }
+
     func refresh() async {
         if refreshing { return }
         refreshing = true
         defer { refreshing = false }
+        Task { await self.refreshPayments() }   // параллельно с CRM
         do {
             let res = try await fetchState()
             guard res.ok, let me = res.me, let state = res.state else {
@@ -106,6 +120,8 @@ final class Store: ObservableObject {
     private func apply(me: String, state: CRMState) {
         let names = Dictionary(state.users.map { ($0.id, $0.name) }, uniquingKeysWith: { a, _ in a })
         myName = names[me] ?? ""
+        zones = state.zones ?? []
+        teamTasks = state.tasks.map { [$0.zone ?? "", $0.status, names[$0.assigneeId ?? ""] ?? "", $0.due ?? ""] }
         let team = Settings.includeTeam ? Set(state.users.filter { $0.managerId == me }.map(\.id)) : []
 
         let mine = state.tasks.filter { t in

@@ -1,18 +1,18 @@
 import type { TaskStatus } from "./types";
 
 export const COL: Record<TaskStatus, { title: string; color: string }> = {
-  todo: { title: "Не начато · бэклог", color: "#E5E7EB" },
-  in_progress: { title: "В работе", color: "#BFDBFE" },
-  blocked: { title: "Заблокировано", color: "#FECACA" },
-  review: { title: "На проверке", color: "#DDD6FE" },
-  done: { title: "Готово", color: "#BBF7D0" },
+  todo: { title: "Не начато · бэклог", color: "#E6E6E1" },
+  in_progress: { title: "В работе", color: "#FFD08F" },
+  blocked: { title: "Заблокировано", color: "#FFB08A" },
+  review: { title: "На проверке", color: "#D4D4CF" },
+  done: { title: "Готово", color: "#BEBEB8" },
 };
 
 export const PRI: Record<string, { title: string; color: string }> = {
-  low: { title: "Низкий", color: "#E5E7EB" },
-  medium: { title: "Средний", color: "#BFDBFE" },
-  high: { title: "Высокий", color: "#FDBA74" },
-  critical: { title: "Critical", color: "#FECACA" },
+  low: { title: "Низкий", color: "#E6E6E1" },
+  medium: { title: "Средний", color: "#FFD08F" },
+  high: { title: "Высокий", color: "#FFD08F" },
+  critical: { title: "Critical", color: "#FFB08A" },
 };
 
 export function ago(iso: string) {

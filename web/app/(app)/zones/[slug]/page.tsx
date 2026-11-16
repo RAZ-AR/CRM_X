@@ -53,7 +53,7 @@ export default function ZonePage() {
       {(isCpo(current) || hasPerm(current, "zone_team")) && team.length > 0 && (
         <div className="card p-5 flex gap-2 flex-wrap">
           {team.map((u) => (
-            <span key={u.id} className="pill bg-[#F3F2EE] px-3 py-1 text-sm">{u.avatar} {u.name}</span>
+            <span key={u.id} className="pill bg-[var(--soft)] px-3 py-1 text-sm">{u.avatar} {u.name}</span>
           ))}
         </div>
       )}

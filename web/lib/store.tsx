@@ -139,9 +139,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         if (data?.ok && data.state) {
           apply(normalizeState(data.state), true, data.me || localStorage.getItem(USER_KEY));
-          setReady(true);
+          if (!cancelled) setReady(true);
           return;
         }
+        if (cancelled) return;
         if (data?.auth || res.status === 401) {
           localStorage.removeItem(USER_KEY);
           setCurrent(null);

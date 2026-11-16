@@ -49,7 +49,7 @@ export default function WikiPageView() {
           <button
             key={b.id}
             onClick={() => setOpen(b.id)}
-            className={`w-full text-left rounded-2xl px-3 py-2 text-sm flex items-center gap-2 ${shown?.id === b.id ? "bg-black text-white" : "bg-[#F3F2EE]"}`}
+            className={`w-full text-left rounded-2xl px-3 py-2 text-sm flex items-center gap-2 ${shown?.id === b.id ? "bg-black text-white" : "bg-[var(--soft)]"}`}
           >
             {b.icon}
             {b.title}
@@ -60,7 +60,7 @@ export default function WikiPageView() {
           <button
             key={p.id}
             onClick={() => setOpen(p.id)}
-            className={`w-full text-left rounded-2xl px-3 py-2 text-sm ${page?.id === p.id ? "bg-black text-white" : "bg-[#F3F2EE]"}`}
+            className={`w-full text-left rounded-2xl px-3 py-2 text-sm ${page?.id === p.id ? "bg-black text-white" : "bg-[var(--soft)]"}`}
           >
             {p.title}
           </button>
