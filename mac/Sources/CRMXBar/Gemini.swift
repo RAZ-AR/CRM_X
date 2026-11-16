@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 /// Google Gemini API (бесплатный уровень AI Studio). Ключ — в Связке ключей macOS.
-/// Модель выбирается автоматически: самая свежая стабильная «flash» из списка моделей ключа.
+/// Модель выбирается автоматически: самая быстрая из свежих «flash» (перепроверка раз в сутки и после сбоя).
 enum Gemini {
     private static let base = URL(string: "https://generativelanguage.googleapis.com/v1beta/")!
 
@@ -21,14 +21,15 @@ enum Gemini {
 
     static func ask(system: String, messages: [AIClient.Message]) async throws -> (String, String) {
         guard let key = Keychain.geminiKey, !key.isEmpty else { throw Failure.noKey }
-        var model = try await currentModel(key: key)
+        let model = try await currentModel(key: key)
         do {
-            return (try await generate(model: model, key: key, system: system, messages: messages), model)
-        } catch Failure.http(404, _) {
-            // Модель сняли — выбираем заново.
+            return (try await generate(model: model, key: key, system: system, messages: messages, timeout: 25), model)
+        } catch where retryable(error) {
+            // Модель перегружена, сняли или кончился её лимит — на 6 часов в сторону, берём самую быструю из остальных.
+            markSlow(model)
             Settings.geminiModel = nil
-            model = try await currentModel(key: key)
-            return (try await generate(model: model, key: key, system: system, messages: messages), model)
+            let next = try await currentModel(key: key)
+            return (try await generate(model: next, key: key, system: system, messages: messages, timeout: 40), next)
         }
     }
 
@@ -38,8 +39,26 @@ enum Gemini {
         return try await currentModel(key: key)
     }
 
+    private static func retryable(_ e: Error) -> Bool {
+        if let u = e as? URLError { return [.timedOut, .networkConnectionLost, .cannotConnectToHost].contains(u.code) }
+        switch e as? Failure {
+        case .quota, .empty: return true
+        case .http(let c, _): return c == 404 || c >= 500
+        default: return false
+        }
+    }
+
+    private static let picked = "geminiModelPickedAt"
+    private static func markSlow(_ m: String) { UserDefaults.standard.set(Date(), forKey: "geminiSlow.\(m)") }
+    private static func isSlow(_ m: String) -> Bool {
+        (UserDefaults.standard.object(forKey: "geminiSlow.\(m)") as? Date).map { Date().timeIntervalSince($0) < 6 * 3600 } ?? false
+    }
+
+    /// Модель выбираем не «самую новую», а самую быструю: новые модели на бесплатном ключе бывают перегружены
+    /// и отвечают по минуте. Раз в сутки (или после сбоя) пробуем несколько Flash сразу и берём первую ответившую.
     private static func currentModel(key: String) async throws -> String {
-        if let m = Settings.geminiModel { return m }
+        if let m = Settings.geminiModel,
+           let at = UserDefaults.standard.object(forKey: picked) as? Date, Date().timeIntervalSince(at) < 24 * 3600 { return m }
         var req = URLRequest(url: base.appendingPathComponent("models").appending(queryItems: [.init(name: "pageSize", value: "200")]))
         req.setValue(key, forHTTPHeaderField: "x-goog-api-key")
         req.timeoutInterval = 20
@@ -51,14 +70,34 @@ enum Gemini {
                   (m["supportedGenerationMethods"] as? [String] ?? []).contains("generateContent") else { return nil }
             return name.replacingOccurrences(of: "models/", with: "")
         }
-        guard let pick = choose(names) else { throw Failure.http(404, "нет доступной модели Flash") }
+        let all = candidates(names)
+        guard !all.isEmpty else { throw Failure.http(404, "нет доступной модели Flash") }
+        let fresh = all.filter { !isSlow($0) }
+        let pool = Array((fresh.isEmpty ? all : fresh).prefix(5))
+        let pick = await fastest(pool, key: key) ?? pool[0]
         Settings.geminiModel = pick
+        UserDefaults.standard.set(Date(), forKey: picked)
         return pick
     }
 
-    /// Самая свежая «gemini-X-flash»: без lite/image/tts/live/exp; стабильная лучше preview.
-    static func choose(_ names: [String]) -> String? {
-        let bad = ["lite", "image", "tts", "live", "audio", "exp", "embedding", "thinking", "8b", "learnlm"]
+    /// Короткий запрос всем кандидатам сразу; побеждает первый ответ за 12 секунд.
+    private static func fastest(_ models: [String], key: String) async -> String? {
+        await withTaskGroup(of: String?.self) { group in
+            for m in models {
+                group.addTask {
+                    let ok = try? await generate(model: m, key: key, system: "Отвечай одним словом.",
+                                                 messages: [.init(role: "user", content: "Скажи: готов")], timeout: 12)
+                    return ok == nil ? nil : m
+                }
+            }
+            for await r in group { if let r { group.cancelAll(); return r } }
+            return nil
+        }
+    }
+
+    /// Модели «gemini-X-flash» без lite/image/tts/live/exp: новые выше, стабильные выше preview.
+    static func candidates(_ names: [String]) -> [String] {
+        let bad = ["lite", "image", "tts", "live", "audio", "exp", "embedding", "thinking", "8b", "learnlm", "omni"]
         let flash = names.filter { n in n.hasPrefix("gemini-") && n.contains("flash") && !bad.contains { n.contains($0) } }
         func version(_ n: String) -> Double {
             let m = n.range(of: #"gemini-(\d+(\.\d+)?)"#, options: .regularExpression).map { String(n[$0].dropFirst(7)) }
@@ -71,29 +110,30 @@ enum Gemini {
             if pa != pb { return !pa }
             if a.hasSuffix("-latest") != b.hasSuffix("-latest") { return a.hasSuffix("-latest") }
             return a.count < b.count
-        }.first
+        }
     }
+    static func choose(_ names: [String]) -> String? { candidates(names).first }
 
     /// Без «размышлений» модель отвечает в разы быстрее. У поколений Gemini это разные параметры —
-    /// пробуем по очереди, рабочий вариант запоминаем.
+    /// пробуем по очереди (сначала полное отключение), рабочий вариант запоминаем.
     private static let thinkingModes: [(String, [String: Any]?)] = [
+        ("budget-0", ["thinkingBudget": 0]),
         ("level-minimal", ["thinkingLevel": "minimal"]),
         ("level-low", ["thinkingLevel": "low"]),
-        ("budget-0", ["thinkingBudget": 0]),
         ("none", nil),
     ]
 
-    private static func generate(model: String, key: String, system: String, messages: [AIClient.Message]) async throws -> String {
+    private static func generate(model: String, key: String, system: String, messages: [AIClient.Message], timeout: TimeInterval) async throws -> String {
         let saved = UserDefaults.standard.string(forKey: "geminiThinking.\(model)")
         let modes = thinkingModes.filter { saved == nil || $0.0 == saved }
         var lastError: Error = Failure.empty
         for (name, thinking) in modes {
             do {
-                let text = try await generateOnce(model: model, key: key, system: system, messages: messages, thinking: thinking)
+                let text = try await generateOnce(model: model, key: key, system: system, messages: messages, thinking: thinking, timeout: timeout)
                 UserDefaults.standard.set(name, forKey: "geminiThinking.\(model)")
                 return text
-            } catch Failure.http(400, let t) where t.localizedCaseInsensitiveContains("thinking") {
-                lastError = Failure.http(400, t)   // этот вариант модель не знает — следующий
+            } catch Failure.http(400, let t) {
+                lastError = Failure.http(400, t)   // этот вариант настройки модель не принимает — следующий
                 continue
             }
         }
@@ -101,10 +141,10 @@ enum Gemini {
         throw lastError
     }
 
-    private static func generateOnce(model: String, key: String, system: String, messages: [AIClient.Message], thinking: [String: Any]?) async throws -> String {
+    private static func generateOnce(model: String, key: String, system: String, messages: [AIClient.Message], thinking: [String: Any]?, timeout: TimeInterval) async throws -> String {
         var req = URLRequest(url: base.appendingPathComponent("models/\(model):generateContent"))
         req.httpMethod = "POST"
-        req.timeoutInterval = 60
+        req.timeoutInterval = timeout
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.setValue(key, forHTTPHeaderField: "x-goog-api-key")
         var config: [String: Any] = ["temperature": 0.3, "maxOutputTokens": 1500]

@@ -52,7 +52,7 @@ final class QuickyWindow: NSObject, NSWindowDelegate, WKScriptMessageHandler, WK
         web.setValue(false, forKey: "drawsBackground")
         web.loadFileURL(page, allowingReadAccessTo: dir)
 
-        let w = NSWindow(
+        let w = QuickyNSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 1320, height: 860),
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered, defer: false)
@@ -177,6 +177,14 @@ final class QuickyWindow: NSObject, NSWindowDelegate, WKScriptMessageHandler, WK
     nonisolated func userContentController(_ c: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let body = message.body as? [String: Any], let action = body["action"] as? String else { return }
         let id = body["id"] as? String
+        if action == "dragZones" {
+            func rects(_ k: String) -> [NSRect] {
+                (body[k] as? [[Double]] ?? []).compactMap { $0.count == 4 ? NSRect(x: $0[0], y: $0[1], width: $0[2], height: $0[3]) : nil }
+            }
+            let zones = rects("zones"), holes = rects("holes")
+            Task { @MainActor in (self.window as? QuickyNSWindow)?.setDragZones(zones, holes: holes) }
+            return
+        }
         if action == "ask" {
             // Вопрос агенту → Ollama → window.quickyReply({id, text | error}).
             let system = body["system"] as? String ?? ""
@@ -287,5 +295,25 @@ private final class WeakHandler: NSObject, WKScriptMessageHandler {
     init(_ t: NSObject & WKScriptMessageHandler) { target = t }
     func userContentController(_ c: WKUserContentController, didReceive m: WKScriptMessage) {
         target?.userContentController(c, didReceive: m)
+    }
+}
+
+/// Окно Quicky без системного заголовка: пустые места шапки страницы работают как заголовок —
+/// нажатие там двигает окно, двойной щелчок разворачивает. Где шапка и её кнопки, сообщает страница
+/// (координаты страницы: от левого верхнего угла содержимого окна, y вниз).
+final class QuickyNSWindow: NSWindow {
+    private var zones: [NSRect] = [], holes: [NSRect] = []
+    func setDragZones(_ z: [NSRect], holes h: [NSRect]) { zones = z; holes = h }
+
+    override func sendEvent(_ event: NSEvent) {
+        if event.type == .leftMouseDown, let content = contentView {
+            let p = event.locationInWindow
+            let pt = NSPoint(x: p.x, y: content.bounds.height - p.y)
+            if zones.contains(where: { $0.contains(pt) }) && !holes.contains(where: { $0.insetBy(dx: -2, dy: -2).contains(pt) }) {
+                if event.clickCount == 2 { performZoom(nil) } else { performDrag(with: event) }
+                return
+            }
+        }
+        super.sendEvent(event)
     }
 }
