@@ -102,6 +102,8 @@ svg.i { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor;
 .ask kbd { margin-left: auto; font: inherit; font-size: var(--t-xs); font-weight: 600; background: var(--apricot); border-radius: var(--r-pill); padding: 2px 10px; }
 .user { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: #fff; font-weight: 700; font-family: var(--display); font-size: var(--t-sm); text-decoration: none; }
 .user:hover, .user[aria-current="page"] { background: var(--orange); color: var(--ink); }
+header.bar, .crm-bar { -webkit-user-select: none; user-select: none; }
+html.in-app header.bar { padding-left: 84px; }
 
 .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); }
 .layout > section { padding: var(--s5) var(--s4); min-width: 0; }
@@ -1484,7 +1486,24 @@ document.addEventListener("click", (e) => {
   const t = e.target.closest("[data-task]"); if (t) return post({ action: "openTask", id: t.dataset.task });
   const a = e.target.closest("[data-act]"); if (a) return post({ action: a.dataset.act });
 });
-if (bridge) { window.quickyData({ phase: "loading" }); post({ action: "ready" }); }
+// Окно без системного заголовка: приложение тащит его за пустые места шапки (двойной щелчок — развернуть).
+// Страница сообщает, где шапка и где на ней кнопки; решение принимается в момент нажатия, без задержки.
+let dragSent = "";
+function sendDragZones() {
+  if (!bridge) return;
+  const box = (el) => { const r = el.getBoundingClientRect(); return [r.left, r.top, r.width, r.height].map(Math.round); };
+  const zones = [...document.querySelectorAll("header.bar, .crm-bar")].filter((el) => el.offsetParent).map(box);
+  const holes = [...document.querySelectorAll("header.bar a, header.bar button, header.bar kbd, .crm-bar button, .crm-bar a")].filter((el) => el.offsetParent).map(box);
+  const key = JSON.stringify([zones, holes]);
+  if (key === dragSent) return;
+  dragSent = key;
+  post({ action: "dragZones", zones, holes });
+}
+let dragRaf = 0;
+const queueDragZones = () => { cancelAnimationFrame(dragRaf); dragRaf = requestAnimationFrame(sendDragZones); };
+["resize", "scroll", "hashchange"].forEach((ev) => addEventListener(ev, queueDragZones, { passive: true }));
+setInterval(sendDragZones, 2000);
+if (bridge) { document.documentElement.classList.add("in-app"); window.quickyData({ phase: "loading" }); post({ action: "ready" }); queueDragZones(); }
 </script>
 </body>
 </html>
