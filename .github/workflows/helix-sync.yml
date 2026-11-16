@@ -1,9 +1,10 @@
-# Синхронизация Helix → Quicky каждые 2 часа (Vercel Hobby разрешает cron только раз в сутки).
+# Синхронизация Helix → CRM X и Quicky раз в 6 часов (Vercel Hobby разрешает cron только раз в сутки).
+# Сразу — кнопка «Синхронизировать» в CRM X или Quicky (/api/helix/sync).
 # Секреты репозитория: QUICKY_URL (https://crm-x-nine.vercel.app), CRON_SECRET (тот же, что в Vercel).
 name: Helix sync
 on:
   schedule:
-    - cron: "15 */2 * * *"
+    - cron: "15 */6 * * *"
   workflow_dispatch:
     inputs:
       dry:

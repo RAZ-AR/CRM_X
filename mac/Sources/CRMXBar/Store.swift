@@ -26,6 +26,10 @@ final class Store: ObservableObject {
     @Published private(set) var teamTasks: [[String]] = []   // [zone, status, assignee, due]
     @Published private(set) var lastSync: Date?
     @Published private(set) var refreshing = false
+    /// Helix: когда сервер последний раз подтягивал задачи, и идёт ли синхронизация по кнопке.
+    @Published private(set) var helixAt: String?
+    @Published private(set) var helixBusy = false
+    @Published private(set) var helixError: String?
 
     /// Лента изменений для экрана «Изменения» (последние 60, хранится между запусками).
     struct Note: Codable { let at: Date; let title: String; let body: String; let taskId: String }
@@ -96,16 +100,43 @@ final class Store: ObservableObject {
         phase = .needsLogin
     }
 
+    /// Кнопка «Синхронизировать»: сервер сразу тянет Helix, потом обновляем свои данные.
+    func syncHelix() async {
+        if helixBusy { return }
+        helixBusy = true; helixError = nil
+        defer { helixBusy = false }
+        do {
+            var req = URLRequest(url: Settings.url("/api/helix/sync"))
+            req.httpMethod = "POST"
+            req.timeoutInterval = 90
+            for (k, v) in HTTPCookie.requestHeaderFields(with: try await sessionCookies()) { req.setValue(v, forHTTPHeaderField: k) }
+            let (data, resp) = try await URLSession(configuration: .ephemeral).data(for: req)
+            if (resp as? HTTPURLResponse)?.statusCode == 401 { throw Unauthorized.yes }
+            struct R: Decodable { let ok: Bool; let error: String? }
+            let r = try JSONDecoder().decode(R.self, from: data)
+            if !r.ok { helixError = r.error ?? "Helix не ответил" }
+        } catch Unauthorized.yes {
+            phase = .needsLogin
+        } catch {
+            helixError = error.localizedDescription
+        }
+        await refresh()
+    }
+
     // MARK: - Network
 
     private enum Unauthorized: Error { case yes }
 
-    private func fetchState() async throws -> StateResponse {
+    private func sessionCookies() async throws -> [HTTPCookie] {
         let host = Settings.baseURL.host ?? ""
         let cookies = await WKWebsiteDataStore.default().httpCookieStore.allCookies()
             .filter { host.hasSuffix($0.domain.trimmingCharacters(in: CharacterSet(charactersIn: "."))) }
         guard cookies.contains(where: { $0.name == "crmx_session" }) else { throw Unauthorized.yes }
+        return cookies
+    }
 
+    private func fetchState() async throws -> StateResponse {
+        let cookies = try await sessionCookies()
         var req = URLRequest(url: Settings.url("/api/state"))
         req.timeoutInterval = 30
         req.cachePolicy = .reloadIgnoringLocalCacheData
@@ -121,6 +152,7 @@ final class Store: ObservableObject {
         let names = Dictionary(state.users.map { ($0.id, $0.name) }, uniquingKeysWith: { a, _ in a })
         myName = names[me] ?? ""
         zones = state.zones ?? []
+        helixAt = state.helixSync?.at
         teamTasks = state.tasks.map { [$0.zone ?? "", $0.status, names[$0.assigneeId ?? ""] ?? "", $0.due ?? ""] }
         let team = Settings.includeTeam ? Set(state.users.filter { $0.managerId == me }.map(\.id)) : []
 

@@ -25,7 +25,12 @@ export type HelixTask = {
   subtasks?: HelixTask[];
 };
 
-export type HelixSyncMeta = { at: string; count: number; firstAt: string; unmapped?: string[]; source?: "server" | "mac" };
+export type HelixSyncMeta = {
+  at: string; count: number; firstAt: string; unmapped?: string[]; source?: "server" | "mac";
+  /** Кто запустил: расписание или кнопка «Синхронизировать» (тогда имя человека). */
+  by?: string;
+  added?: number; statusChanged?: number; dueChanged?: number;
+};
 
 export class HelixError extends Error {}
 

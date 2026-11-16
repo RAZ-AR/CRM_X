@@ -101,6 +101,7 @@ final class QuickyWindow: NSObject, NSWindowDelegate, WKScriptMessageHandler, WK
         case .ok: payload["phase"] = "ok"
         }
         if let t = store.lastSync { payload["lastSync"] = iso.string(from: t) }
+        payload["helix"] = ["at": store.helixAt ?? NSNull(), "busy": store.helixBusy, "error": store.helixError ?? NSNull()] as [String: Any]
         payload["tasks"] = store.all.map { item -> [String: Any] in
             let t = item.task
             return [
@@ -263,6 +264,7 @@ final class QuickyWindow: NSObject, NSWindowDelegate, WKScriptMessageHandler, WK
         case "crmCmd": if let id { crm.command(id) }
         case "login": showCRM("/login")
         case "refresh": Task { await store.refresh() }
+        case "syncHelix": Task { await store.syncHelix() }
         case "installUpdate": Updater.shared.install()
         default: break
         }
