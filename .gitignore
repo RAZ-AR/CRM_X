@@ -6,3 +6,4 @@ web/.env.local
 *.log
 .vercel
 .env*
+.sync/

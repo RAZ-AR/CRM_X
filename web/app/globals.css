@@ -1,30 +1,39 @@
 @import "tailwindcss";
 
-/* Дизайн-система CRM X: тёплый нейтральный фон, белые карточки с тонкой рамкой, один акцент для данных. */
+/* Дизайн-система CRM X = Quicky (стиль Superdry): чёрный холст, светло-серые панели,
+   белые поверхности, чёрный текст и тонкие чёрные линии, один оранжевый акцент. */
 :root {
-  --bg: #f5f4f0;
-  --card: #ffffff;
-  --line: #eceae4;
-  --soft: #f3f2ee;
-  --track: #efede8;
-  --ink: #161614;
-  --ink-2: #55544f;
-  --muted: #6f6e69;
-  --blue: #2a78d6;
-  --blue-soft: #9dc0ec;
-  --orange: #eb6834;
-  --aqua: #1baf7a;
-  --red: #c9302f;
+  --canvas: #0b0b0b;
+  --bg: #ecece9;          /* панель: фон страницы внутри рамки */
+  --card: #ffffff;        /* поверхность: карточки */
+  --line: #d4d4cf;        /* мягкие разделители */
+  --hair: #141414;        /* тонкие чёрные линии (кнопки-обводки, активные элементы) */
+  --soft: #f6f6f3;
+  --track: #e6e6e1;
+  --ink: #111111;
+  --ink-2: #33332f;
+  --muted: #5a5a55;
+  --orange: #ff5b1f;
+  --apricot: #ffd08f;
+  --apricot-2: #ffe3b8;
+  --grey: #8e8e89;
+  --red: #c4370b;
+  /* роли данных: чёрный — основное, оранжевый — акцент, серый — прочее */
+  --blue: #111111;
+  --blue-soft: #ffd08f;
+  --aqua: #33332f;
   /* старые имена, чтобы ничего не сломалось */
-  --mint: #1baf7a;
-  --coral: #eb6834;
-  --lavender: #2a78d6;
+  --mint: #33332f;
+  --coral: #ff5b1f;
+  --lavender: #111111;
+  --gap: 10px;
+  --r-panel: 22px;
 }
 
 html,
 body {
   min-height: 100%;
-  background: var(--bg);
+  background: var(--canvas);
   color: var(--ink);
   overflow-x: hidden;
 }
@@ -34,19 +43,38 @@ body {
   font-feature-settings: "tnum" 0;
 }
 
+::selection {
+  background: var(--apricot);
+  color: var(--ink);
+}
+
 .num {
   font-variant-numeric: tabular-nums;
 }
 
+/* Крупные цифры и заголовки — широкий гротеск Unbounded. */
+.display,
+.page-title,
+h1,
+h2 {
+  font-family: var(--font-unbounded), var(--font-onest), ui-sans-serif, sans-serif;
+}
+
 .card {
   background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 20px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  transition: border-color 0.15s ease;
+}
+
+a.card:hover,
+.card.hoverable:hover {
+  border-color: var(--hair);
 }
 
 @media (max-width: 767px) {
   .card {
-    border-radius: 18px;
+    border-radius: 14px;
   }
 }
 
@@ -60,30 +88,53 @@ body {
   color: var(--muted);
 }
 
+/* Подпись-ярлык как в Quicky: капслок, разрядка. */
+.label {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+}
+
 .page-title {
-  font-size: 28px;
-  line-height: 32px;
+  font-size: clamp(26px, 2.6vw, 36px);
+  line-height: 1.1;
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
 }
 
 @media (max-width: 767px) {
   .page-title {
-    font-size: 22px;
-    line-height: 28px;
+    font-size: 24px;
   }
 }
 
 input,
 select,
 textarea {
-  border: 1px solid var(--line);
+  border: 1.5px solid var(--line);
   border-radius: 999px;
   padding: 0.65rem 1rem;
   background: var(--card);
   color: inherit;
   font: inherit;
   max-width: 100%;
+  transition: border-color 0.15s ease;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--grey);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--hair);
+  outline: none;
 }
 
 input:focus-visible,
@@ -91,7 +142,7 @@ select:focus-visible,
 textarea:focus-visible,
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--blue);
+  outline: 2px solid var(--orange);
   outline-offset: 2px;
 }
 
@@ -99,7 +150,30 @@ textarea {
   border-radius: 1rem;
 }
 
+/* Чёрные кнопки — «таблетки» с плотным шрифтом, как CTA в Quicky. */
+button.bg-black,
+a.bg-black,
+button.bg-\[var\(--ink\)\],
+a.bg-\[var\(--ink\)\] {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+button.bg-black:hover,
+a.bg-black:hover {
+  background: #2a2a27;
+}
+
 @keyframes slideUp {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

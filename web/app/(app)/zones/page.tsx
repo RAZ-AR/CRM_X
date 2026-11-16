@@ -38,7 +38,7 @@ export default function ZonesPage() {
           const late = list.filter((t) => t.status !== "done" && t.due < today).length;
           const streams = streamProgress(list).filter((s) => s.total > 0);
           return (
-            <Link key={z.slug} href={`/zones/${z.slug}`} className="card p-4 md:p-6 flex flex-col gap-3 min-w-0 hover:border-[#d9d6ce]">
+            <Link key={z.slug} href={`/zones/${z.slug}`} className="card p-4 md:p-6 flex flex-col gap-3 min-w-0 hover:border-[var(--ink)]">
               <span className="flex items-center gap-2 min-w-0">
                 <span className="h-2.5 w-2.5 rounded-[3px] shrink-0" style={{ background: z.color }} />
                 <span className="font-semibold truncate">{z.emoji} {z.name}</span>

@@ -32,7 +32,7 @@ export default function TasksPage() {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-end gap-2 pb-1">
-        <Link href="/home" className="pill bg-[#F3F2EE] p-2" aria-label="На главную">
+        <Link href="/home" className="pill bg-[var(--soft)] p-2" aria-label="На главную">
           <ChevronLeft size={16} />
         </Link>
         <h1 className="page-title m-0 mr-auto">{view === "all" ? "Все задачи" : HOME_VIEWS[view]}</h1>
@@ -70,7 +70,7 @@ export default function TasksPage() {
       </div>
 
       <div className="card px-4 md:px-5 py-2">
-        {list.length === 0 && <p className="text-sm text-[#6F6E69] p-3">Здесь пусто</p>}
+        {list.length === 0 && <p className="text-sm text-[var(--muted)] p-3">Здесь пусто</p>}
         {list.map((t) => {
           const a = users.find((u) => u.id === t.assigneeId);
           const z = zones.find((x) => x.slug === t.zone);

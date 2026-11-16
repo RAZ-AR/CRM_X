@@ -1,0 +1,27 @@
+# Синхронизация Helix → Quicky каждые 2 часа (Vercel Hobby разрешает cron только раз в сутки).
+# Секреты репозитория: QUICKY_URL (https://crm-x-nine.vercel.app), CRON_SECRET (тот же, что в Vercel).
+name: Helix sync
+on:
+  schedule:
+    - cron: "15 */2 * * *"
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "Только посчитать, ничего не записывать"
+        type: boolean
+        default: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Call /api/cron/helix
+        env:
+          QUICKY_URL: ${{ secrets.QUICKY_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          DRY: ${{ inputs.dry && '1' || '0' }}
+        run: |
+          code=$(curl -sS -o out.json -w "%{http_code}" --max-time 90 \
+            -H "Authorization: Bearer $CRON_SECRET" "$QUICKY_URL/api/cron/helix?dry=$DRY")
+          cat out.json; echo
+          test "$code" = "200"

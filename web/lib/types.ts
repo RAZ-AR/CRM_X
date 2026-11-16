@@ -169,12 +169,12 @@ export const CONTACT_KINDS: { id: Contact["kind"]; label: string }[] = [
 ];
 
 export const CONTRACTOR_STATUS: Record<ContractorStatus, { label: string; color: string }> = {
-  lead: { label: "Кандидат", color: "#E5E7EB" },
-  negotiation: { label: "Переговоры", color: "#FDE68A" },
-  contract: { label: "Договор", color: "#BFDBFE" },
-  working: { label: "В работе", color: "#BBF7D0" },
-  done: { label: "Завершено", color: "#D1D5DB" },
-  rejected: { label: "Отказ", color: "#FECACA" },
+  lead: { label: "Кандидат", color: "#E6E6E1" },
+  negotiation: { label: "Переговоры", color: "#FFE3B8" },
+  contract: { label: "Договор", color: "#FFD08F" },
+  working: { label: "В работе", color: "#BEBEB8" },
+  done: { label: "Завершено", color: "#D4D4CF" },
+  rejected: { label: "Отказ", color: "#FFB08A" },
 };
 
 export type NoticeKind = "task_new" | "deadline" | "status" | "comment" | "broadcast";
@@ -223,6 +223,8 @@ export type AppState = {
   risks?: Risk[];
   /** Личные дела с напоминаниями: каждый видит только свои. */
   todos?: Todo[];
+  /** Последняя синхронизация с Helix (пишет только /api/cron/helix). */
+  helixSync?: { at: string; count: number; firstAt: string; unmapped?: string[]; source?: "server" | "mac" };
 };
 
 export type TodoRepeat = "none" | "daily" | "weekdays" | "weekly";
@@ -285,9 +287,9 @@ export type BudgetLine = {
 export type ExpenseStatus = "planned" | "invoiced" | "paid";
 
 export const EXPENSE_STATUS: Record<ExpenseStatus, { label: string; color: string }> = {
-  planned: { label: "Запланирован", color: "#E5E7EB" },
-  invoiced: { label: "Счёт получен", color: "#FDE68A" },
-  paid: { label: "Оплачен", color: "#BBF7D0" },
+  planned: { label: "Запланирован", color: "#E6E6E1" },
+  invoiced: { label: "Счёт получен", color: "#FFE3B8" },
+  paid: { label: "Оплачен", color: "#BEBEB8" },
 };
 
 export type Expense = {
@@ -309,9 +311,9 @@ export type Expense = {
 export type RiskStatus = "open" | "watch" | "closed";
 
 export const RISK_STATUS: Record<RiskStatus, { label: string; color: string }> = {
-  open: { label: "Открыт", color: "#FECACA" },
-  watch: { label: "Наблюдаем", color: "#FDE68A" },
-  closed: { label: "Закрыт", color: "#D1D5DB" },
+  open: { label: "Открыт", color: "#FFB08A" },
+  watch: { label: "Наблюдаем", color: "#FFE3B8" },
+  closed: { label: "Закрыт", color: "#D4D4CF" },
 };
 
 /** 1 — низкая, 2 — средняя, 3 — высокая. */

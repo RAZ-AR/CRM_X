@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 
 /** Цвета данных: один акцент + два для различения проектов; прочее — серый. Статусный красный — только для проблем. */
-export const SERIES = ["#2a78d6", "#eb6834", "#1baf7a"] as const;
+export const SERIES = ["#111111", "#FF5B1F", "#8E8E89"] as const;
 export const OTHER = "#c8c6bf";
-export const TRACK = "#efede8";
-export const RED = "#c9302f";
+export const TRACK = "#E6E6E1";
+export const RED = "#C4370B";
 
 /** Ширина контейнера для SVG-графиков (чтобы подписи не растягивались). */
 export function useWidth<T extends HTMLElement>(initial = 600) {
@@ -78,7 +78,7 @@ export function Spark({
         {values.map((v, i) => {
           const h = Math.max(2, ((height - 2) * v) / mx);
           return (
-            <rect key={i} x={i * slot + 2} y={height - h} width={Math.max(2, slot - 4)} height={h} rx={2} fill={i === n - 1 ? color : "#bcd3f1"}>
+            <rect key={i} x={i * slot + 2} y={height - h} width={Math.max(2, slot - 4)} height={h} rx={2} fill={i === n - 1 ? color : "#D4D4CF"}>
               <title>{`${labels?.[i] ?? ""} ${v}`.trim()}</title>
             </rect>
           );

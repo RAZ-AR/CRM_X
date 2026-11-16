@@ -1,0 +1,12 @@
+# Vercel собирает только web/ — всё остальное не загружаем.
+/mac
+/design
+/sync
+/quicky-app
+**/node_modules
+**/.next
+**/.build
+**/dist
+*.dmg
+/design-refs
+/supabase

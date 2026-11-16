@@ -9,9 +9,9 @@ export function riskScore(r: Pick<Risk, "probability" | "impact">) {
 }
 
 export function scoreColor(score: number) {
-  if (score >= 6) return "#FECACA";
-  if (score >= 3) return "#FDE68A";
-  return "#E5E7EB";
+  if (score >= 6) return "#FFB08A";
+  if (score >= 3) return "#FFE3B8";
+  return "#E6E6E1";
 }
 
 /** Важные сверху: выше балл, раньше дата решения. Закрытые — в конце. */
