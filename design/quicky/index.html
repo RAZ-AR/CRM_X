@@ -895,7 +895,7 @@ function renderLive() {
     $("#h-num").textContent = "—";
     $("#h-unit").textContent = d.phase === "loading" ? "загружаю задачи" : "нет данных";
     $("#h-sub").textContent = d.phase === "needsLogin" ? "Войди в CRM X, и здесь появятся твои задачи." : d.phase === "error" ? (d.error || "CRM X не отвечает.") : "Секунду…";
-    $("#ins-p").textContent = d.phase === "needsLogin" ? "Я не вижу твою сессию CRM X. Войди один раз, дальше буду обновлять сам." : d.phase === "error" ? "CRM X сейчас недоступна. Если база в Aiven уснула, включи её в консоли Aiven." : "Синхронизирую CRM X…";
+    $("#ins-p").textContent = d.phase === "needsLogin" ? "Я не вижу твою сессию CRM X. Войди один раз, дальше буду обновлять сам." : d.phase === "error" ? "CRM X сейчас недоступна. Проверь интернет — я сам попробую ещё раз." : "Синхронизирую CRM X…";
     trend.hidden = true;
     $("#acts").innerHTML = d.phase === "loading" ? "" : d.phase === "needsLogin"
       ? `<button class="btn primary" type="button" data-act="login"><span class="box"><svg class="i"><use href="#i-arrow"/></svg></span>Войти в CRM X<svg class="i arr"><use href="#i-arrow"/></svg></button>`
@@ -1066,7 +1066,7 @@ function emptyHTML(title, text) { return `<div class="empty"><b>${title}</b>${te
 function notLive(v) {
   if (!v.live || v.phase === undefined) return "";
   return v.phase === "needsLogin" ? emptyHTML("Нужен вход в CRM X", "Войди один раз — дальше Quicky обновляет задачи сам.")
-    : v.phase === "error" ? emptyHTML("CRM X недоступна", "Если база в Aiven уснула, включи её в консоли Aiven.")
+    : v.phase === "error" ? emptyHTML("CRM X недоступна", "Проверь интернет — я сам попробую ещё раз.")
     : emptyHTML("Загружаю задачи…", "Секунду.");
 }
 

@@ -15,7 +15,7 @@
 //   HELIX_PASSWORD=...           пароль в Helix (вписывает сам пользователь)
 //   HELIX_ME=Armen Razmikovich   как меня зовут в Helix
 //   CRMX_ME_ID=u-armen           мой id в CRM X
-//   DATABASE_URL=postgresql://…  база CRM X (Aiven)
+//   DATABASE_URL=postgresql://…  база CRM X (Neon)
 //
 // Запуск: node helix-sync.mjs [--dry-run] [--helix-file tasks.json] [--state-file state.json]
 //   --dry-run      ничего не пишет, печатает, что изменится
@@ -178,11 +178,8 @@ async function withDb(fn) {
   }
   if (!process.env.DATABASE_URL) die("нет DATABASE_URL в ~/.config/quicky/helix.env");
   const { default: pg } = await import("pg");
-  // sslmode из URL у pg ≥8.13 включает строгую проверку сертификата, а у Aiven свой CA —
-  // убираем параметр и шифруем без проверки цепочки (как Prisma в самой CRM X).
-  const url = new URL(process.env.DATABASE_URL);
-  url.searchParams.delete("sslmode");
-  const client = new pg.Client({ connectionString: url.toString(), ssl: { rejectUnauthorized: false } });
+  // У Neon публичный сертификат, поэтому sslmode=require из URL работает со строгой проверкой.
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
   try {
     const { rows } = await client.query(`SELECT data, rev FROM "StateStore" WHERE id = 'main'`);
