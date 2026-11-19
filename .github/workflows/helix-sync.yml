@@ -14,15 +14,23 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 5
     steps:
       - name: Call /api/cron/helix
         env:
           QUICKY_URL: ${{ secrets.QUICKY_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           DRY: ${{ inputs.dry && '1' || '0' }}
+        # Helix иногда подвисает — одна повторная попытка через 30 с. На 401 (неверный секрет) не повторяем.
         run: |
-          code=$(curl -sS -o out.json -w "%{http_code}" --max-time 90 \
-            -H "Authorization: Bearer $CRON_SECRET" "$QUICKY_URL/api/cron/helix?dry=$DRY")
-          cat out.json; echo
+          call() {
+            code=$(curl -sS -o out.json -w "%{http_code}" --max-time 90 \
+              -H "Authorization: Bearer $CRON_SECRET" "$QUICKY_URL/api/cron/helix?dry=$DRY") || code=000
+            cat out.json 2>/dev/null || true; echo; echo "HTTP $code"
+          }
+          call
+          if [ "$code" != "200" ] && [ "$code" != "401" ]; then
+            echo "::warning::Первая попытка: HTTP $code, повтор через 30 с"
+            sleep 30; call
+          fi
           test "$code" = "200"
