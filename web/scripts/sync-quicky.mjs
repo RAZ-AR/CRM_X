@@ -10,8 +10,10 @@ const src = join(web, "..", "design", "quicky");
 const dst = join(web, "public", "quicky");
 const files = ["index.html", "manifest.webmanifest", "icon.svg", "icon-512.png", "logo.svg", "blize.ttf"];
 
-if (!existsSync(src)) {
-  console.log("sync-quicky: design/quicky не найден — оставляю public/quicky как есть");
+// На Vercel папка вне web/ может быть неполной — тогда берём закоммиченную копию.
+const have = files.filter((f) => existsSync(join(src, f)));
+if (have.length < files.length) {
+  console.log("sync-quicky: design/quicky недоступен целиком — оставляю public/quicky как есть");
 } else {
   mkdirSync(dst, { recursive: true });
   for (const f of files) copyFileSync(join(src, f), join(dst, f));
