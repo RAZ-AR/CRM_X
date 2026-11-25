@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Quicky app icon">
+  <!-- macOS-сетка: squircle 824×824, поля 100. Чёрный фон, Q шрифтом Blize (в кривых), оранжевая точка. -->
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="#0B0B0B"/>
+  <rect x="101" y="101" width="822" height="822" rx="185" fill="none" stroke="#2A2A27" stroke-width="2"/>
+  <path fill="#ECECE9" transform="translate(311.1 612.0) scale(0.44)" d="M515 0Q504 0 494.0 8.5Q484 17 482 28Q480 39 487.5 47.0Q495 55 506 55H794L754 309H559L374 88L388 0H-27L83 -700H913L803 0ZM504 -573Q506 -585 499.0 -593.0Q492 -601 480 -601Q469 -601 459.5 -592.5Q450 -584 448 -573L378 -127Q376 -116 382.5 -107.5Q389 -99 400 -99Q412 -99 422.0 -107.0Q432 -115 434 -127Z"/>
+  <circle cx="790" cy="236" r="44" fill="#FF5B1F"/>
+</svg>

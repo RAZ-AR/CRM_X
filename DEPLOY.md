@@ -1,23 +1,25 @@
-# Онлайн: GitHub + Vercel + Aiven Postgres
+# Онлайн: GitHub + Vercel + Neon Postgres
 
-Приложение уже можно выложить на Vercel. Общая база (все видят одни задачи) появится после Aiven.
+Приложение уже можно выложить на Vercel. Общая база (все видят одни задачи) появится после Neon.
 
 ## 1. GitHub
 Репозиторий создаётся командой (или вручную: github.com/new).
 
-## 2. Aiven — бесплатный Postgres
-1. Открой https://console.aiven.io/signup
-2. Google / GitHub, план **Free / Hobby** если есть, иначе самый дешёвый PostgreSQL.
-3. Create service → **PostgreSQL** → облако ближе к тебе.
-4. Service → **Connection information** → скопируй **Service URI**
-   `postgresql://avnadmin:...@....aivencloud.com:PORT/defaultdb?sslmode=require`
+## 2. Neon — бесплатный Postgres
+1. Открой https://console.neon.tech (или Vercel → Storage → Neon).
+2. New Project → Postgres 18, регион **AWS US East (N. Virginia)**: функции Vercel работают в `iad1`, база рядом — запросы быстрее.
+3. **Connect** → скопируй два адреса:
+   - прямой (в хосте нет `-pooler`) — для локальной работы и `prisma db push`;
+   - через пулер (`-pooler` в хосте) — для Vercel.
+
+База сама засыпает после ~5 минут простоя и сама просыпается при первом запросе (первый ответ ~0.5–1 с). Включать её руками не нужно.
 
 ## 3. Таблицы и сид
 Локально в папке `web`:
 
 ```bash
 cd web
-echo 'DATABASE_URL="вставь-uri-aiven"' > .env
+echo 'DATABASE_URL="прямой-адрес-neon"' > .env
 npx prisma db push
 ```
 
@@ -25,12 +27,14 @@ npx prisma db push
 1. vercel.com → Import GitHub repo
 2. **Root Directory:** `web`
 3. Environment Variables:
-   - `DATABASE_URL` = тот же URI Aiven (опционально)
+   - `DATABASE_URL` = адрес Neon **через пулер** с `&pgbouncer=true` в конце (Prisma иначе ломается на пулере)
    - `SESSION_SECRET` = длинная случайная строка (`openssl rand -hex 32`). Без неё ключ сессий берётся из `BLOB_READ_WRITE_TOKEN`. Смена значения разлогинит всех.
 4. Deploy
 
-Если на Vercel красная плашка «только этот браузер»: Aiven режет чужие IP.
-Aiven Console → PostgreSQL → **Allowed IP addresses** → Add `0.0.0.0/0` (или Public Access). Сохрани. Подожди 1–2 мин, обнови CRM, выйди и зайди.
+Если на Vercel красная плашка «только этот браузер»: проверь `DATABASE_URL` в Vercel и что проект Neon не на паузе (Neon Console → проект crm-x). После смены переменной — Redeploy.
+
+## Helix-синхронизация на Mac
+`~/.config/quicky/helix.env` → `DATABASE_URL` = прямой адрес Neon с `sslmode=verify-full`.
 
 Логины: **Armen** (Owner), **Vladimir**, **Karina**. Пароли выдаёт Owner, сменить свой: «Мой профиль».
 

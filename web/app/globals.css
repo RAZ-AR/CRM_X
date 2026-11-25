@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Надпись бренда (crm x, Quicky) — шрифт Blize. Файл лежит в public/quicky (копия design/quicky/blize.ttf). */
+@font-face { font-family: "Blize"; src: url("/quicky/blize.ttf") format("truetype"); font-display: swap; }
+.wordmark { font-family: "Blize", var(--font-display, sans-serif); font-weight: 400; letter-spacing: 0; line-height: 1; }
+
 /* Дизайн-система CRM X = Quicky (стиль Superdry): чёрный холст, светло-серые панели,
    белые поверхности, чёрный текст и тонкие чёрные линии, один оранжевый акцент. */
 :root {

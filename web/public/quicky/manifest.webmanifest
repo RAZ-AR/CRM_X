@@ -1,0 +1,15 @@
+{
+  "name": "Quicky",
+  "short_name": "Quicky",
+  "description": "Личный штаб: задачи CRM X и агент @bari.",
+  "lang": "ru",
+  "start_url": "/quicky/index.html",
+  "scope": "/quicky/",
+  "display": "standalone",
+  "background_color": "#0B0B0B",
+  "theme_color": "#0B0B0B",
+  "icons": [
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

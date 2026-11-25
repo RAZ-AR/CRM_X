@@ -145,7 +145,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Link href="/home" className="flex items-center gap-2 min-w-0" aria-label="CRM X — главная">
               <QMark />
               {!collapsed && (
-                <span className="display font-bold text-[18px] tracking-[-0.04em] whitespace-nowrap">
+                <span className="wordmark text-[18px] whitespace-nowrap">
                   crm x<span className="inline-block h-[7px] w-[7px] rounded-full bg-[var(--orange)] ml-0.5 align-top mt-1" />
                 </span>
               )}
@@ -222,7 +222,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <button className="md:hidden h-10 w-10 rounded-full bg-[var(--card)] grid place-items-center shrink-0" aria-label="Меню" onClick={() => setMenu(true)}>
               <Menu size={18} />
             </button>
-            <Link href="/home" className="md:hidden display font-bold text-[15px] tracking-[-0.04em] shrink-0" aria-label="CRM X — главная">crm x</Link>
+            <Link href="/home" className="md:hidden wordmark text-[15px] shrink-0" aria-label="CRM X — главная">crm x</Link>
             <button
               type="button"
               onClick={() => setCmdk(true)}
@@ -326,12 +326,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Знак Quicky: горизонтальный овал с диагональю. */
+/** Знак Quicky: заглавная Q шрифтом Blize (в кривых). */
 function QMark() {
   return (
-    <svg viewBox="0 0 110 58" className="h-[22px] w-[42px] shrink-0" aria-hidden="true">
-      <ellipse cx="50" cy="28" rx="44" ry="21" fill="none" stroke="var(--ink)" strokeWidth="7" />
-      <path d="M21 15.5 L104 53" fill="none" stroke="var(--ink)" strokeWidth="7" strokeLinecap="round" />
+    <svg viewBox="-27 -700 940 1009" className="h-[24px] w-[23px] shrink-0" aria-hidden="true">
+      <path fill="var(--ink)" d="M515 0Q504 0 494.0 8.5Q484 17 482 28Q480 39 487.5 47.0Q495 55 506 55H794L754 309H559L374 88L388 0H-27L83 -700H913L803 0ZM504 -573Q506 -585 499.0 -593.0Q492 -601 480 -601Q469 -601 459.5 -592.5Q450 -584 448 -573L378 -127Q376 -116 382.5 -107.5Q389 -99 400 -99Q412 -99 422.0 -107.0Q432 -115 434 -127Z" />
     </svg>
   );
 }

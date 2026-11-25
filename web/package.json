@@ -3,13 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/sync-quicky.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/sync-quicky.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "npx tsx scripts/seed-aiven.ts"
+    "db:seed": "npx tsx scripts/seed-db.ts",
+    "sync:quicky": "node scripts/sync-quicky.mjs"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",

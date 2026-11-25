@@ -49,7 +49,7 @@
 ## Стек
 
 - Next.js (App Router) в папке `web/`
-- Общий стейт в Vercel Blob (+ опционально Aiven Postgres)
+- Общий стейт в Postgres (Neon), без `DATABASE_URL` — локальный JSON-файл
 - Деплой: Vercel, root directory = `web`
 
 ## Локально
