@@ -16,11 +16,10 @@ export default function LoginPage() {
       <div className="w-full max-w-[440px] bg-[var(--bg)] rounded-[var(--r-panel)] p-3">
         <div className="rounded-[16px] bg-[var(--apricot)] px-6 pt-6 pb-16">
           <div className="flex items-center gap-2">
-            <svg viewBox="0 0 110 58" className="h-[24px] w-[46px]" aria-hidden="true">
-              <ellipse cx="50" cy="28" rx="44" ry="21" fill="none" stroke="#111" strokeWidth="7" />
-              <path d="M21 15.5 L104 53" fill="none" stroke="#111" strokeWidth="7" strokeLinecap="round" />
+            <svg viewBox="-27 -700 940 1009" className="h-[26px] w-[25px]" aria-hidden="true">
+              <path fill="#111" d="M515 0Q504 0 494.0 8.5Q484 17 482 28Q480 39 487.5 47.0Q495 55 506 55H794L754 309H559L374 88L388 0H-27L83 -700H913L803 0ZM504 -573Q506 -585 499.0 -593.0Q492 -601 480 -601Q469 -601 459.5 -592.5Q450 -584 448 -573L378 -127Q376 -116 382.5 -107.5Q389 -99 400 -99Q412 -99 422.0 -107.0Q432 -115 434 -127Z" />
             </svg>
-            <span className="display font-bold text-[20px] tracking-[-0.04em]">crm x</span>
+            <span className="wordmark text-[20px]">crm x</span>
             <span className="h-2 w-2 rounded-full bg-[var(--orange)] self-start mt-1" />
           </div>
           <h1 className="page-title mt-8 mb-1">Вход в CRM X</h1>
@@ -32,7 +31,12 @@ export default function LoginPage() {
             e.preventDefault();
             setErr("");
             const r = await login(email, password);
-            if (r === true) router.push("/home");
+            if (r === true) {
+              // ?next=/quicky/… — вернуться туда, откуда пришли (только свои пути).
+              const next = new URLSearchParams(window.location.search).get("next") || "";
+              if (next.startsWith("/quicky/")) window.location.href = next;
+              else router.push("/home");
+            }
             else setErr(r);
           }}
         >
