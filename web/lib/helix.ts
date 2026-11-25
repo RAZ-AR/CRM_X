@@ -34,18 +34,31 @@ export type HelixSyncMeta = {
 
 export class HelixError extends Error {}
 
+/** Helix иногда принимает соединение и молчит; без таймаута функция висит до лимита Vercel (60 с). */
+const HELIX_TIMEOUT_MS = 20_000;
+
+async function helixFetch(url: string, init: RequestInit, what: string): Promise<Response> {
+  try {
+    return await fetch(url, { ...init, cache: "no-store", signal: AbortSignal.timeout(HELIX_TIMEOUT_MS) });
+  } catch (e) {
+    if (e instanceof Error && (e.name === "TimeoutError" || e.name === "AbortError")) {
+      throw new HelixError(`Helix не ответил за ${HELIX_TIMEOUT_MS / 1000} с (${what})`);
+    }
+    throw new HelixError(`Helix недоступен (${what}): ${e instanceof Error ? e.message : String(e)}`);
+  }
+}
+
 export async function fetchHelixTasks(env = process.env): Promise<HelixTask[]> {
   const base = (env.HELIX_URL || "https://helixarm.am/team").replace(/\/$/, "");
   const username = env.HELIX_USERNAME, password = env.HELIX_PASSWORD;
   if (!username || !password) throw new HelixError("не заданы HELIX_USERNAME / HELIX_PASSWORD");
 
-  const res = await fetch(`${base}/?route=login`, {
+  const res = await helixFetch(`${base}/?route=login`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ username, password }),
     redirect: "manual",
-    cache: "no-store",
-  });
+  }, "вход");
   // PHP пересоздаёт сессию при входе и шлёт PHPSESSID дважды — берём последнее значение.
   const jar = new Map<string, string>();
   for (const c of res.headers.getSetCookie()) {
@@ -56,8 +69,9 @@ export async function fetchHelixTasks(env = process.env): Promise<HelixTask[]> {
     throw new HelixError(`вход в Helix не удался (HTTP ${res.status})`);
   }
   const cookie = [...jar].map(([k, v]) => `${k}=${v}`).join("; ");
-  const r = await fetch(`${base}/?route=tasks&action=get_all`, { headers: { Cookie: cookie }, cache: "no-store" });
-  const text = await r.text();
+  const r = await helixFetch(`${base}/?route=tasks&action=get_all`, { headers: { Cookie: cookie } }, "список задач");
+  let text: string;
+  try { text = await r.text(); } catch { throw new HelixError(`Helix не дослал список задач за ${HELIX_TIMEOUT_MS / 1000} с`); }
   let data: unknown;
   try { data = JSON.parse(text); } catch { throw new HelixError(`Helix вернул не JSON (HTTP ${r.status})`); }
   if (!Array.isArray(data)) throw new HelixError("Helix вернул неожиданный формат");
